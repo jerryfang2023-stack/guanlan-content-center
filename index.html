@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>观澜内容工厂 Lite v0.1</title>
-  <link rel="stylesheet" href="style.css?v=20260715-layout-revision-15">
+  <link rel="stylesheet" href="style.css?v=20260715-layout-workbench-17">
 </head>
 <body>
   <div class="app-shell">
@@ -492,72 +492,107 @@
       <section class="page" id="layoutPage" data-page-panel="layout">
         <div class="layout-workspace">
           <section class="layout-panel">
-            <div class="gzh-design-module is-expanded" aria-label="gzh-design 公众号排版引擎">
-              <div class="gzh-intake-row">
-                <label class="gzh-theme-select">
-                  <span>文章标题</span>
-                  <select id="layoutDraftSelect" aria-label="选择文章标题"></select>
-                </label>
-                <div class="layout-source-actions" aria-label="导入文章">
-                  <button class="ghost-button" id="layoutPasteToggleButton" type="button" aria-expanded="false" aria-controls="layoutPasteImport">粘贴文章</button>
-                  <button class="ghost-button" id="layoutImportButton" type="button">从文件导入</button>
-                  <input id="layoutArticleFile" class="layout-file-input" type="file" accept=".md,.markdown,.txt,.html,.htm,text/markdown,text/plain,text/html">
-                </div>
-              </div>
-              <details class="layout-paste-import" id="layoutPasteImport">
-                <summary>粘贴文章</summary>
-                <label for="layoutPasteTitle"><span>文章标题</span><input id="layoutPasteTitle" type="text" maxlength="120" required placeholder="输入文章标题"></label>
-                <label for="layoutPasteEditor"><span>文章正文</span><textarea id="layoutPasteEditor" placeholder="在此粘贴正文（⌘V / Ctrl+V）"></textarea></label>
-                <button class="secondary-button" id="layoutPasteButton" type="button">导入文章</button>
-              </details>
-              <div class="gzh-format-row">
-                <label class="gzh-theme-select">
-                  <span>排版主题</span>
-                  <select id="gzhThemeSelect">
-                    <option>观澜判断感 / 观澜蓝内参风</option>
-                    <option>石墨极简风</option>
-                    <option>橄榄手记</option>
-                    <option>红白色系</option>
-                    <option>摸鱼绿</option>
-                    <option>留白禅意风</option>
-                    <option>摸鱼票据风</option>
-                  </select>
-                </label>
-                <fieldset class="gzh-layout-options">
-                  <legend class="visually-hidden">排版要求，可多选</legend>
-                  <div class="gzh-options-toolbar">
-                    <span class="gzh-options-title">排版要求 <small>可多选</small></span>
-                  </div>
-                  <div class="gzh-layout-option-list">
-                    <label><input type="checkbox" data-gzh-feature="sectionNumbers" checked><span>章节编号</span></label>
-                    <label><input type="checkbox" data-gzh-feature="outline" checked><span>文章导读</span></label>
-                    <label><input type="checkbox" data-gzh-feature="quoteCard" checked><span>引言强调</span></label>
-                    <label><input type="checkbox" data-gzh-feature="keywordEmphasis" checked><span>关键词强调</span></label>
-                    <label><input type="checkbox" data-gzh-feature="richLists" checked><span>列表卡片</span></label>
-                  </div>
-                </fieldset>
-              </div>
-            </div>
-
-            <div class="layout-editor-stack">
-              <label>
-                <span>正文内容</span>
-                <textarea id="layoutMarkdownEditor" class="large-editor" aria-label="公众号排版 Markdown 正文"></textarea>
+            <header class="layout-workbench-header">
+              <label class="layout-document-picker">
+                <span>文章标题</span>
+                <select id="layoutDraftSelect" aria-label="选择文章标题"></select>
               </label>
-              <details class="layout-html-details">
-                <summary>查看或编辑公众号 HTML</summary>
-                <label>
-                  <span>公众号 HTML 片段</span>
-                  <textarea id="layoutHtmlEditor" class="large-editor" aria-label="公众号 HTML 片段">等待生成 HTML。产物应为纯 section 片段，不包含 html/head/body。</textarea>
-                </label>
-              </details>
-            </div>
-            <div class="layout-final-actions" aria-label="排版操作">
-              <div class="action-row tight">
-                <button class="secondary-button" type="button" data-gzh-action="html">生成排版</button>
-                <button class="secondary-button" type="button" data-gzh-action="preview">预览效果</button>
-                <button class="primary-button" id="savePendingPublishButton" type="button" data-save-pending-publication title="保存到待发布栏目">保存稿件</button>
+              <div class="layout-source-actions" aria-label="导入文章">
+                <button class="ghost-button" id="layoutPasteToggleButton" type="button" aria-expanded="false" aria-controls="layoutPasteImport">粘贴文章</button>
+                <button class="ghost-button" id="layoutImportButton" type="button">从文件导入</button>
+                <input id="layoutArticleFile" class="layout-file-input" type="file" accept=".md,.markdown,.txt,.html,.htm,text/markdown,text/plain,text/html">
               </div>
+            </header>
+
+            <details class="layout-paste-import" id="layoutPasteImport">
+              <summary>粘贴文章</summary>
+              <label for="layoutPasteTitle"><span>文章标题</span><input id="layoutPasteTitle" type="text" maxlength="120" required placeholder="输入文章标题"></label>
+              <label for="layoutPasteEditor"><span>文章正文</span><textarea id="layoutPasteEditor" placeholder="在此粘贴正文（⌘V / Ctrl+V）"></textarea></label>
+              <button class="secondary-button" id="layoutPasteButton" type="button">导入文章</button>
+            </details>
+
+            <div class="layout-editor-workbench">
+              <aside class="layout-inspector" aria-label="排版方案与组件">
+                <section class="layout-inspector-group">
+                  <div class="layout-group-heading"><h3>排版方案</h3><span>主题与结构</span></div>
+                  <label class="gzh-theme-select">
+                    <span>主题</span>
+                    <select id="gzhThemeSelect">
+                      <option>观澜判断感 / 观澜蓝内参风</option>
+                      <option>石墨极简风</option>
+                      <option>橄榄手记</option>
+                      <option>红白色系</option>
+                      <option>摸鱼绿</option>
+                      <option>留白禅意风</option>
+                      <option>摸鱼票据风</option>
+                    </select>
+                  </label>
+                  <div class="layout-preset-list" role="group" aria-label="版式预设">
+                    <button type="button" data-layout-preset="judgment" aria-pressed="false">判断内参</button>
+                    <button type="button" data-layout-preset="briefing" aria-pressed="false">要点简报</button>
+                    <button type="button" data-layout-preset="reading" aria-pressed="false">轻阅读</button>
+                  </div>
+                </section>
+
+                <section class="layout-inspector-group">
+                  <div class="layout-group-heading"><h3>文章组件</h3><span>生成时应用</span></div>
+                  <fieldset class="gzh-layout-options">
+                    <legend class="visually-hidden">排版要求，可多选</legend>
+                    <div class="gzh-layout-option-list">
+                      <label><input type="checkbox" data-gzh-feature="sectionNumbers" checked><span>章节编号</span></label>
+                      <label><input type="checkbox" data-gzh-feature="outline" checked><span>文章导读</span></label>
+                      <label><input type="checkbox" data-gzh-feature="quoteCard" checked><span>核心判断</span></label>
+                      <label><input type="checkbox" data-gzh-feature="keywordEmphasis" checked><span>关键词强调</span></label>
+                      <label><input type="checkbox" data-gzh-feature="richLists" checked><span>行动清单</span></label>
+                    </div>
+                  </fieldset>
+                </section>
+
+                <section class="layout-inspector-group">
+                  <div class="layout-group-heading"><h3>插入内容</h3><span>写入当前光标处</span></div>
+                  <div class="layout-insert-list">
+                    <button type="button" data-layout-insert="heading">小标题</button>
+                    <button type="button" data-layout-insert="quote">核心判断</button>
+                    <button type="button" data-layout-insert="list">行动清单</button>
+                  </div>
+                </section>
+              </aside>
+
+              <section class="layout-editor-pane" aria-label="文章编辑器">
+                <header class="layout-editor-pane-header">
+                  <div><h2>正文编辑</h2><p id="layoutContentStats">0 字 · 0 个小标题 · 0 个列表</p></div>
+                  <div class="layout-editor-tabs" role="tablist" aria-label="编辑视图">
+                    <button type="button" data-layout-surface="markdown" aria-selected="true">正文</button>
+                    <button type="button" data-layout-surface="html" aria-selected="false">HTML</button>
+                  </div>
+                </header>
+                <div class="layout-editor-surface" data-layout-surface-panel="markdown">
+                  <label class="visually-hidden" for="layoutMarkdownEditor">公众号排版 Markdown 正文</label>
+                  <textarea id="layoutMarkdownEditor" class="large-editor" aria-label="公众号排版 Markdown 正文"></textarea>
+                </div>
+                <div class="layout-editor-surface" data-layout-surface-panel="html" hidden>
+                  <label class="visually-hidden" for="layoutHtmlEditor">公众号 HTML 片段</label>
+                  <textarea id="layoutHtmlEditor" class="large-editor" aria-label="公众号 HTML 片段">等待生成 HTML。产物应为纯 section 片段，不包含 html/head/body。</textarea>
+                </div>
+                <footer class="layout-editor-pane-footer">标题与正文保持分离；版式组件只作用于本次生成的公众号 HTML。</footer>
+              </section>
+
+              <aside class="layout-delivery-panel" aria-label="排版交付">
+                <div class="layout-group-heading"><h3>交付检查</h3><span id="layoutDeliveryState">未生成</span></div>
+                <div class="layout-delivery-status" id="layoutDeliveryStatus">
+                  <strong id="layoutValidationTitle">等待生成 HTML</strong>
+                  <p id="layoutValidationDetail">先确认结构与主题，再生成可编辑的公众号 HTML。</p>
+                </div>
+                <dl class="layout-delivery-facts">
+                  <div><dt>主题</dt><dd id="layoutCurrentTheme">观澜判断感 / 观澜蓝内参风</dd></div>
+                  <div><dt>内容结构</dt><dd id="layoutStructureSummary">0 个小标题</dd></div>
+                </dl>
+                <div class="layout-delivery-actions" aria-label="排版操作">
+                  <button class="primary-button" type="button" data-gzh-action="html">生成排版</button>
+                  <button class="secondary-button" type="button" data-gzh-action="preview">预览编辑</button>
+                  <button class="ghost-button" id="savePendingPublishButton" type="button" data-save-pending-publication title="保存到待发布栏目">保存稿件</button>
+                </div>
+              </aside>
             </div>
           </section>
 
@@ -658,6 +693,6 @@
   </div>
   <script src="data/topics-2026-07.js"></script>
   <script src="assets/generated/manifest.js"></script>
-  <script src="app.js?v=20260715-topic-schedule-16"></script>
+  <script src="app.js?v=20260715-layout-workbench-17"></script>
 </body>
 </html>

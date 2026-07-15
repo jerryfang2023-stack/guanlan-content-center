@@ -2331,6 +2331,16 @@ const DEFAULT_GZH_LAYOUT_OPTIONS = Object.freeze({
   keywordEmphasis: true,
   richLists: true,
 });
+const GZH_LAYOUT_PRESETS = Object.freeze({
+  judgment: { sectionNumbers: true, outline: true, quoteCard: true, keywordEmphasis: true, richLists: false },
+  briefing: { sectionNumbers: true, outline: true, quoteCard: false, keywordEmphasis: true, richLists: true },
+  reading: { sectionNumbers: false, outline: false, quoteCard: true, keywordEmphasis: true, richLists: true },
+});
+const GZH_LAYOUT_INSERTIONS = Object.freeze({
+  heading: "## 小标题\n\n",
+  quote: "> 在这里写一句需要被读者记住的核心判断。\n\n",
+  list: "- 第一个行动要点\n- 第二个行动要点\n- 第三个行动要点\n\n",
+});
 
 function normalizeGzhLayoutOptions(value = {}) {
   const source = value && typeof value === "object" ? value : {};
@@ -2350,6 +2360,84 @@ function applyGzhLayoutOptions(value) {
   document.querySelectorAll("[data-gzh-feature]").forEach((input) => {
     input.checked = options[input.dataset.gzhFeature];
   });
+}
+
+function gzhLayoutOptionsMatch(left, right) {
+  const first = normalizeGzhLayoutOptions(left);
+  const second = normalizeGzhLayoutOptions(right);
+  return Object.keys(DEFAULT_GZH_LAYOUT_OPTIONS).every((key) => first[key] === second[key]);
+}
+
+function updateLayoutPresetControls() {
+  const options = currentGzhLayoutOptions();
+  document.querySelectorAll("[data-layout-preset]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(gzhLayoutOptionsMatch(options, GZH_LAYOUT_PRESETS[button.dataset.layoutPreset])));
+  });
+}
+
+function setLayoutEditorSurface(surface = "markdown") {
+  const target = surface === "html" ? "html" : "markdown";
+  document.querySelectorAll("[data-layout-surface]").forEach((button) => {
+    button.setAttribute("aria-selected", String(button.dataset.layoutSurface === target));
+  });
+  document.querySelectorAll("[data-layout-surface-panel]").forEach((panel) => {
+    panel.hidden = panel.dataset.layoutSurfacePanel !== target;
+  });
+}
+
+function updateLayoutWorkbenchStatus({ message = "" } = {}) {
+  const snapshot = activeLayoutSnapshot();
+  const markdown = document.querySelector("#layoutMarkdownEditor")?.value || "";
+  const html = document.querySelector("#layoutHtmlEditor")?.value || "";
+  const analysis = analyzeArticleForLayout(markdown, snapshot?.title || "文章");
+  const parsed = parseMarkdownForLayout(markdown, snapshot?.title || "文章");
+  const listCount = parsed.blocks.filter((block) => block.type === "list").length;
+  const stats = document.querySelector("#layoutContentStats");
+  const structure = document.querySelector("#layoutStructureSummary");
+  const theme = document.querySelector("#layoutCurrentTheme");
+  const state = document.querySelector("#layoutDeliveryState");
+  const title = document.querySelector("#layoutValidationTitle");
+  const detail = document.querySelector("#layoutValidationDetail");
+  if (stats) stats.textContent = `${analysis.wordCount} 字 · ${analysis.headingCount} 个小标题 · ${listCount} 个列表`;
+  if (structure) structure.textContent = `${analysis.headingCount} 个小标题 · ${analysis.paragraphCount} 段正文`;
+  if (theme) theme.textContent = document.querySelector("#gzhThemeSelect")?.value || DEFAULT_GZH_THEME;
+  updateLayoutPresetControls();
+
+  const hasHtml = html && !html.startsWith("等待生成");
+  const check = hasHtml ? validateGzhHtml(html) : null;
+  if (!snapshot) {
+    if (state) state.textContent = "待选择";
+    if (title) title.textContent = "等待接收文章";
+    if (detail) detail.textContent = "从公众号写作提交稿件，或在这里粘贴、导入一篇文章。";
+    return;
+  }
+  if (!hasHtml) {
+    if (state) state.textContent = "待生成";
+    if (title) title.textContent = "等待生成 HTML";
+    if (detail) detail.textContent = message || "正文或排版方案已变化；生成后可进入预览编辑。";
+    return;
+  }
+  if (check?.valid) {
+    if (state) state.textContent = "可预览";
+    if (title) title.textContent = "HTML 可进入预览编辑";
+    if (detail) detail.textContent = "已通过公众号结构检查；可在预览中逐段调整，再复制到公众号。";
+    return;
+  }
+  if (state) state.textContent = "需检查";
+  if (title) title.textContent = "HTML 需要修正";
+  if (detail) detail.textContent = check?.errors?.[0] || message || "请检查 HTML 结构后再进入预览。";
+}
+
+function insertLayoutBlock(kind) {
+  const editor = document.querySelector("#layoutMarkdownEditor");
+  const insertion = GZH_LAYOUT_INSERTIONS[kind];
+  if (!editor || !insertion || editor.disabled) return;
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const prefix = start > 0 && !editor.value.slice(0, start).endsWith("\n\n") ? "\n\n" : "";
+  editor.setRangeText(`${prefix}${insertion}`, start, end, "end");
+  editor.focus();
+  editor.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
 function gzhThemePalette(theme) {
@@ -2767,7 +2855,7 @@ function renderGzhBlock(block, palette, index, headingIndex, theme, context = {}
   }
   if (block.type === "heading") {
     if ((block.level || 2) >= 3) {
-      return `<p style="margin:28px 10px 12px;padding-left:10px;border-left:3px solid ${palette.accent};font-size:16px;line-height:1.5;color:${palette.ink};font-weight:800;"><span leaf="">${renderInlineMarkdown(block.text, palette)}</span></p>`;
+      return `<p style="margin:28px 10px 12px;padding-top:10px;border-top:1px solid ${palette.line};font-size:16px;line-height:1.5;color:${palette.ink};font-weight:800;"><span leaf="">${renderInlineMarkdown(block.text, palette)}</span></p>`;
     }
     const sectionNumber = String(headingIndex).padStart(2, "0");
     const label = gzhSectionLabel(block.text);
@@ -3181,6 +3269,7 @@ async function importLayoutArticle(file, { title = "" } = {}) {
   const analysis = analyzeArticleForLayout(normalized.markdown, normalized.title);
   document.querySelector("#layoutHtmlEditor").value = html;
   commitSnapshotLayout(snapshot, { ...snapshot.layout, html, validation: check });
+  updateLayoutWorkbenchStatus();
   showToast(check.valid
     ? (analysis.headingCount > 0 ? `文章已导入，识别 ${analysis.headingCount} 个小标题` : "文章已导入；未识别小标题，可在标题行前加 ##")
     : "文章已导入，请检查排版校验");
@@ -3677,8 +3766,9 @@ function rewriteOpening() {
   showToast("开头已重写");
 }
 
-function resetLayoutState() {
+function resetLayoutState(message = "") {
   document.querySelector("#layoutHtmlEditor").value = "等待生成 HTML。产物应为纯 section 片段，不包含 html/head/body。";
+  updateLayoutWorkbenchStatus({ message });
 }
 
 function commitSnapshotLayout(snapshot, nextLayout, failureMessage = "本地保存失败，排版修改已回滚") {
@@ -3978,6 +4068,7 @@ function renderLayoutFromDraft({ force = false } = {}) {
   draftSelect.disabled = snapshots.length === 0;
   layoutButtons.forEach((button) => { button.disabled = !snapshot; });
   document.querySelectorAll("[data-gzh-feature]").forEach((input) => { input.disabled = !snapshot; });
+  document.querySelectorAll("[data-layout-preset], [data-layout-insert], [data-layout-surface]").forEach((control) => { control.disabled = !snapshot; });
   document.querySelectorAll("[data-save-pending-publication]").forEach((button) => { button.disabled = !snapshot; });
   document.querySelector("#gzhThemeSelect").disabled = !snapshot;
   markdownEditor.disabled = !snapshot;
@@ -4002,6 +4093,7 @@ function renderLayoutFromDraft({ force = false } = {}) {
       resetLayoutState(`已接收写作稿 v${snapshot.revision}，等待生成 HTML`);
     }
   }
+  updateLayoutWorkbenchStatus();
 }
 
 function handoffToLayout() {
@@ -4611,6 +4703,36 @@ document.querySelector("#layoutDraftSelect").addEventListener("change", (event) 
   persistWorkspace();
 });
 
+document.querySelectorAll("[data-layout-surface]").forEach((button) => {
+  button.addEventListener("click", () => setLayoutEditorSurface(button.dataset.layoutSurface));
+});
+
+document.querySelectorAll("[data-layout-insert]").forEach((button) => {
+  button.addEventListener("click", () => insertLayoutBlock(button.dataset.layoutInsert));
+});
+
+document.querySelectorAll("[data-layout-preset]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const options = GZH_LAYOUT_PRESETS[button.dataset.layoutPreset];
+    const snapshot = activeLayoutSnapshot();
+    if (!options || !snapshot) return;
+    applyGzhLayoutOptions(options);
+    resetLayoutState("版式预设已应用，请重新生成 HTML");
+    if (!commitSnapshotLayout(snapshot, {
+      ...(snapshot.layout || {}),
+      theme: document.querySelector("#gzhThemeSelect").value,
+      options: currentGzhLayoutOptions(),
+      markdown: document.querySelector("#layoutMarkdownEditor").value,
+      html: "",
+      validation: null,
+      previewed: false,
+      sourceSnapshotId: snapshot.id,
+    })) return;
+    updateLayoutWorkbenchStatus();
+    showToast("已应用版式预设");
+  });
+});
+
 document.querySelectorAll("[data-save-pending-publication]").forEach((button) => {
   button.addEventListener("click", saveLayoutAsPendingPublication);
 });
@@ -4684,6 +4806,7 @@ document.querySelector("#gzhThemeSelect").addEventListener("change", () => {
     const saved = commitSnapshotLayout(snapshot, { theme: document.querySelector("#gzhThemeSelect").value, options: currentGzhLayoutOptions(), markdown: document.querySelector("#layoutMarkdownEditor").value, html: "", validation: null, previewed: false, sourceSnapshotId: snapshot.id });
     if (!saved) return;
   }
+  updateLayoutWorkbenchStatus();
   showToast("已切换公众号排版主题");
 });
 
@@ -4703,6 +4826,7 @@ document.querySelectorAll("[data-gzh-feature]").forEach((input) => {
         sourceSnapshotId: snapshot.id,
       });
     }
+    updateLayoutWorkbenchStatus();
   });
 });
 
@@ -4712,6 +4836,7 @@ document.querySelector("#layoutMarkdownEditor").addEventListener("input", () => 
   if (snapshot) {
     commitSnapshotLayout(snapshot, { ...(snapshot.layout || {}), markdown: document.querySelector("#layoutMarkdownEditor").value, html: "", validation: null, previewed: false, sourceSnapshotId: snapshot.id });
   }
+  updateLayoutWorkbenchStatus({ message: "正文已修改，请重新生成 HTML" });
 });
 
 document.querySelector("#layoutHtmlEditor").addEventListener("input", () => {
@@ -4719,6 +4844,7 @@ document.querySelector("#layoutHtmlEditor").addEventListener("input", () => {
   if (snapshot) {
     commitSnapshotLayout(snapshot, { ...(snapshot.layout || {}), html: document.querySelector("#layoutHtmlEditor").value, validation: null, previewed: false, sourceSnapshotId: snapshot.id });
   }
+  updateLayoutWorkbenchStatus();
 });
 
 document.querySelectorAll("[data-gzh-action]").forEach((button) => {
@@ -4736,6 +4862,7 @@ document.querySelectorAll("[data-gzh-action]").forEach((button) => {
       const analysis = analyzeArticleForLayout(document.querySelector("#layoutMarkdownEditor").value, snapshot.title);
       document.querySelector("#layoutHtmlEditor").value = html;
       if (!commitSnapshotLayout(snapshot, { theme, options: currentGzhLayoutOptions(), markdown: document.querySelector("#layoutMarkdownEditor").value, html, validation: null, previewed: false, sourceSnapshotId: snapshot.id })) return;
+      updateLayoutWorkbenchStatus();
       showToast(analysis.headingCount > 0 ? `已自动排版，识别 ${analysis.headingCount} 个小标题` : "未识别小标题，可在标题行前加 ##");
       return;
     }
@@ -4746,6 +4873,7 @@ document.querySelectorAll("[data-gzh-action]").forEach((button) => {
       }
       const check = validateGzhHtml(htmlEditor.value);
       if (!commitSnapshotLayout(snapshot, { theme, options: currentGzhLayoutOptions(), markdown: document.querySelector("#layoutMarkdownEditor").value, html: htmlEditor.value, validation: check, previewed: false, sourceSnapshotId: snapshot.id })) return;
+      updateLayoutWorkbenchStatus();
       if (check.valid) {
         showToast("校验通过：0 ERROR");
       } else {

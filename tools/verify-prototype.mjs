@@ -42,7 +42,7 @@ assert(JSON.stringify(scriptOrder) === JSON.stringify([
   "assets/generated/manifest.js",
   "app.js",
 ]), `Unexpected script order: ${scriptOrder.join(" -> ")}`);
-assert(scriptSources.some((source) => /^app\.js\?v=20260715-topic-schedule-16$/.test(source)), "Topic schedule cache-busting version is missing");
+assert(scriptSources.some((source) => /^app\.js\?v=20260715-layout-workbench-17$/.test(source)), "Layout workbench cache-busting version is missing");
 assert(!html.includes('class="layout-revision-panel"') && !html.includes('data-layout-revision='), "Legacy layout revision panel must stay removed");
 assert(app.includes('data-inline-op="bold"') && app.includes('data-block-op="colorBlock"'), "Preview-local text and block editing controls are missing");
 assert(app.includes('data-block-op="removeRule"') && app.includes('function removeHorizontalRules('), "Preview-local horizontal rule removal is missing");
@@ -54,6 +54,9 @@ assert(app.includes('function runHistory(direction)') && app.includes("runHistor
 assert(!app.includes('id="undoButton" type="button" title="撤销上一次编辑" disabled'), "Preview undo control must remain clickable when history is empty");
 assert(app.includes('function stripGzhPreviewMasthead('), "Legacy preview masthead stripping is missing");
 assert(!app.includes("WAVESIGHT BRIEFING") && !app.includes("const mastheadLabel"), "Generated layout must not include an article masthead");
+assert(html.includes('class="layout-editor-workbench"') && html.includes('class="layout-inspector"') && html.includes('class="layout-delivery-panel"'), "Layout editor must use the three-zone workbench structure");
+assert(html.includes('data-layout-preset="judgment"') && html.includes('data-layout-insert="quote"'), "Layout presets and insertable article components are missing");
+assert(app.includes('const GZH_LAYOUT_PRESETS') && app.includes('function insertLayoutBlock(') && app.includes('function updateLayoutWorkbenchStatus('), "Layout workbench controls are missing their functional handlers");
 assert(app.includes('const TOPIC_TIME_ZONE = "America/Los_Angeles"'), "Topic date filter must use the local editorial timezone");
 assert(app.includes('function availableDates(today = topicLocalDate())') && app.includes('.filter((date) => isCurrentOrPastTopicDate(date, today))'), "Future topic dates must be excluded from the date filter");
 
@@ -187,7 +190,7 @@ assert(html.includes('id="publicationForm"') && html.includes('id="saveRecapButt
 assert(app.includes('value="${escapeHtml(profile.id)}"'), "Writing style select must use stable ids");
 assert(app.includes('document.querySelector("#runWritingStyleTestButton")') && app.includes('document.querySelector("#analyzeReferenceButton")'), "Writing style lab handlers are missing");
 assert(htmlIds.includes("layoutArticleFile") && htmlIds.includes("layoutPasteTitle") && htmlIds.includes("layoutPasteEditor") && htmlIds.includes("layoutPasteToggleButton"), "Manual article import controls or separate pasted title are missing");
-assert(html.includes('<span>文章标题</span>\n                  <select id="layoutDraftSelect"') && app.includes("parsed.title !== \"粘贴文章\""), "Layout title selection or pasted-title extraction is missing");
+assert(html.includes('<span>文章标题</span>') && htmlIds.includes("layoutDraftSelect") && app.includes("parsed.title !== \"粘贴文章\""), "Layout title selection or pasted-title extraction is missing");
 assert(html.includes("⌘V / Ctrl+V") && app.includes('addEventListener("paste"'), "Copy and paste article import is missing");
 assert(app.includes("importLayoutArticle"), "Manual layout import flow is missing");
 assert(css.includes(".layout-paste-import label + label") && css.includes(".layout-paste-import[open] + .gzh-format-row"), "Layout paste field spacing or section separation is missing");
@@ -225,16 +228,16 @@ assert(libraryContext.libraryTopics().map((topic) => topic.id).join() === "queue
 libraryContext.selectedLibraryStatus = "all";
 libraryContext.selectedLibraryDate = "2026-07-01";
 assert(libraryContext.libraryTopics().map((topic) => topic.id).join() === "library-legacy", "Topic library date filtering is incorrect");
-assert(html.includes('aria-label="gzh-design 公众号排版引擎"') && (html.match(/data-gzh-feature=/g) || []).length === 5 && html.includes("可多选"), "gzh-design layout requirements are not exposed through multi-select controls");
-assert((html.match(/data-gzh-action="preview"/g) || []).length === 1 && html.includes("预览效果"), "Layout preview must remain a single visible primary-flow action");
+assert((html.match(/data-gzh-feature=/g) || []).length === 5 && html.includes("文章组件"), "Layout components are not exposed through multi-select controls");
+assert((html.match(/data-gzh-action="preview"/g) || []).length === 1 && html.includes("预览编辑"), "Layout preview must remain a single visible primary-flow action");
 assert(app.includes("currentGzhLayoutOptions") && app.includes("applyGzhLayoutOptions"), "Layout requirements are not connected to generation state");
-assert(html.includes('<details class="layout-html-details">') && !html.includes("查看稿件详情") && !htmlIds.includes("layoutArticleSummary"), "Redundant layout article details must stay removed");
+assert(html.includes('data-layout-surface="html"') && !html.includes("查看稿件详情") && !htmlIds.includes("layoutArticleSummary"), "The workbench HTML editing surface or article-details removal is missing");
 const layoutPageMarkup = html.slice(html.indexOf('id="layoutPage"'), html.indexOf('id="pendingPage"'));
 assert(!layoutPageMarkup.includes("<h2>公众号排版</h2>"), "Layout page repeats the global page title");
-assert(layoutPageMarkup.indexOf('class="layout-source-actions"') < layoutPageMarkup.indexOf('class="gzh-options-title"'), "Article import actions must appear before layout requirements");
-assert(layoutPageMarkup.indexOf('class="gzh-intake-row"') < layoutPageMarkup.indexOf('class="gzh-format-row"'), "Layout intake controls must appear before format controls");
-assert(layoutPageMarkup.indexOf('id="layoutPasteImport"') < layoutPageMarkup.indexOf('class="gzh-format-row"'), "Paste import panel must stay near article intake controls");
-assert(layoutPageMarkup.indexOf('class="layout-final-actions"') > layoutPageMarkup.indexOf('class="layout-editor-stack"'), "Layout actions must appear below the article editor");
+assert(layoutPageMarkup.indexOf('class="layout-source-actions"') < layoutPageMarkup.indexOf('class="layout-editor-workbench"'), "Article import actions must appear before the editing workspace");
+assert(layoutPageMarkup.includes('class="layout-inspector"') && layoutPageMarkup.includes('class="layout-editor-pane"') && layoutPageMarkup.includes('class="layout-delivery-panel"'), "Layout workbench zones are incomplete");
+assert(layoutPageMarkup.indexOf('id="layoutPasteImport"') < layoutPageMarkup.indexOf('class="layout-editor-workbench"'), "Paste import panel must stay near article intake controls");
+assert(layoutPageMarkup.indexOf('class="layout-delivery-actions"') > layoutPageMarkup.indexOf('class="layout-editor-pane"'), "Layout actions must remain in the delivery zone after the article editor");
 assert(app.includes("pickGzhKeyword") && app.includes("gzhSectionLabel") && app.includes("detectGzhArticleType"), "gzh-design skill structure intelligence is missing");
 assert(app.includes("THE NEXT MOVE") && app.includes("你会看到什么") && app.includes("{{作者名}}"), "gzh-design skill article skeleton is incomplete");
 assert(htmlIds.includes("pendingPage") && htmlIds.includes("pendingPublishList") && htmlIds.includes("savePendingPublishButton"), "Pending publication UI is missing");
