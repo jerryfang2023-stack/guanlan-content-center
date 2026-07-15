@@ -1,4 +1,5 @@
 const pageTitles = {
+  agent: "Agent 写作台",
   topics: "今日选题",
   library: "选题库",
   styles: "写作风格",
@@ -9,6 +10,7 @@ const pageTitles = {
 };
 
 const pageKickers = {
+  agent: "",
   topics: "TODAY TOPICS",
   library: "TOPIC LIBRARY",
   styles: "WRITING STYLE LAB",
@@ -69,7 +71,7 @@ const topics = [
     category: "客户入口",
     valueTag: "收入漏损",
     platform: "公众号主稿",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "queued",
     worth: "Cloudflare 在 2026-07-02 的商业信号里同时出现 AI 流量管理和 Monetization Gateway，说明网站、内容和搜索入口正在从“人访问”变成“人和智能体一起访问”。这正中老板的焦虑：客户还在不在原来的入口里。",
@@ -93,7 +95,7 @@ const topics = [
     category: "岗位 Agent",
     valueTag: "落地路径",
     platform: "公众号主稿",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "AWS GenAIIC Partner Agent Factory、Smartsheet 使用 Claude Platform API 改造工作流，以及社群里“培养 agent builder 团队”的讨论，共同指向一个老板能听懂的判断：AI 不应先变成大项目，而应先进入一个岗位动作。",
@@ -117,7 +119,7 @@ const topics = [
     category: "组织知识",
     valueTag: "资产沉淀",
     platform: "公众号主稿",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "Glean 年经常性收入超过 3 亿美元、Zillow 向 7000 名员工部署 Glean 并节省时间、Engram 携 9800 万美元启动，三条商业信号都在说同一件事：企业 AI 的核心不是单点工具，而是组织上下文。",
@@ -141,7 +143,7 @@ const topics = [
     category: "风控财务",
     valueTag: "结果可验收",
     platform: "公众号主稿",
-    style: "商业内参",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "library",
     worth: "Houston Methodist 全企业部署 Midstream Health 智能体财务行动平台，以及 Inscribe 使用 Amazon Bedrock 在数秒内拦截文档欺诈，都是老板更容易理解的 AI 价值：不是演示能力，而是减少损失。",
@@ -155,7 +157,7 @@ const topics = [
     outline: "一、开头：老板不缺 AI 演示，缺能减少损失的结果\n二、中段：Houston Methodist 与 Inscribe 的信号说明 AI 正进入财务和风控动作\n三、判断：可验收的异常拦截，比万能助手更容易落地\n四、方法：列出财务与风控的 5 个适合 AI 试点动作\n五、结尾：AI 化先从损失最大的流程开始",
     articleTitleDraft: "老板要的不是炫酷 Agent，是能拦住损失的流程结果",
     imagePrompt: "封面：财务流程看板中，AI 标记异常单据和欺诈风险，整体克制、专业。",
-    layout: "商业内参：案例开头；中段拆业务动作；结尾给财务风控试点清单。",
+    layout: "个人观点解读：事实开头；中段拆业务动作；结尾给财务风控试点清单。",
   },
   {
     id: "topic-005",
@@ -165,7 +167,7 @@ const topics = [
     category: "AI 服务",
     valueTag: "商业化",
     platform: "站内短评",
-    style: "商业内参",
+    style: "个人观点解读",
     length: "短篇 / 800-1200 字",
     status: "candidate",
     worth: "AppliedAI 与麦肯锡合作改造受监管企业流程，社群里也出现 AI 定制、企业培训、工具产品化等高分案例。它适合写给既焦虑又想行动的老板：AI 服务不是卖课，也不是卖工具，而是卖一套可复用动作。",
@@ -189,7 +191,7 @@ const topics = [
     category: "AI 成本",
     valueTag: "经营账",
     platform: "选题库",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "library",
     worth: "一线观点里出现 GPT-5.6 和“疯狂的推理”讨论，商业信号里又有 Together 融资、Meta 转售闲置 AI 算力等信息。这适合沉淀为后续文章：当 AI 真进入业务，推理成本会从技术问题变成经营问题。",
@@ -213,7 +215,7 @@ const topics = [
     category: "AI 基础设施",
     valueTag: "成本供给",
     platform: "选题库",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "Together 的大额融资和 Meta 转售闲置 AI 算力可以放在一起看：老板未来买到的 AI 能力，不只是软件订阅，也会受到推理供给、算力价格和模型服务稳定性的影响。",
@@ -237,7 +239,7 @@ const topics = [
     category: "组织知识",
     valueTag: "规模采用",
     platform: "公众号主稿",
-    style: "案例拆解",
+    style: "案例 / 事件拆解",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "Zillow 的员工规模和节省时间数字适合写给老板看：AI 的价值不在一个人多快，而在一个组织的重复检索、问答和协作成本能不能被系统性降低。",
@@ -261,7 +263,7 @@ const topics = [
     category: "风控财务",
     valueTag: "异常拦截",
     platform: "选题库",
-    style: "商业内参",
+    style: "个人观点解读",
     length: "短篇 / 800-1200 字",
     status: "library",
     worth: "这条适合沉淀为风控类案例。老板对 AI 的信任，往往来自它能不能在关键节点拦住错单、假资料、欺诈和流程风险。",
@@ -285,7 +287,7 @@ const topics = [
     category: "组织知识",
     valueTag: "长期趋势",
     platform: "选题库",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "library",
     worth: "Engram 的原始标题本身很适合做长期选题：真正了解组织的 AI，是老板理解企业 AI 化的一条主线。",
@@ -309,7 +311,7 @@ const topics = [
     category: "内容电商",
     valueTag: "获客转化",
     platform: "选题库",
-    style: "案例拆解",
+    style: "案例 / 事件拆解",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "这条社群情报能提供真实老板关心的增长和交付语境：内容不是为了热闹，而是为了订单、承接和复购。",
@@ -333,7 +335,7 @@ const topics = [
     category: "老板能力",
     valueTag: "组织升级",
     platform: "选题库",
-    style: "方法论",
+    style: "案例 / 事件拆解",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "这条社群情报直接命中内容工厂的目标读者：老板怎么从亲自救火，转向培养能搭 Agent、懂业务、能交付的小队。",
@@ -347,7 +349,7 @@ const topics = [
     outline: "一、开头：老板为什么总被事务困住\n二、中段：agent builder 团队不是技术团队，而是业务执行力\n三、方法：老板如何带出第一个 agent builder\n四、判断：企业 AI 化先从老板自己解放开始\n五、结尾：给老板一份 30 天训练表",
     articleTitleDraft: "老板想做好企业 AI 化，先培养自己的 agent builder 小队",
     imagePrompt: "封面：老板从日常事务中抽身，带着小型 agent builder 团队拆解任务、沉淀 SOP 和验收标准。",
-    layout: "方法论：老板处境开头；中段拆训练路径；结尾给 30 天动作表。",
+    layout: "案例 / 事件拆解：业务场景开头；中段拆训练路径；结尾给 30 天动作表。",
   },
 ];
 
@@ -363,7 +365,7 @@ const historicalTopics = [
     category: "项目起点",
     valueTag: "需求诊断",
     platform: "公众号主稿",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "这类材料能解释老板为什么越急着上 AI，越容易把问题推给工具。它适合做成一篇企业 AI 化的第一步判断：先定义业务入口，再决定工具。",
@@ -388,7 +390,7 @@ const historicalTopics = [
     category: "客户服务",
     valueTag: "问题资产",
     platform: "公众号主稿",
-    style: "案例拆解",
+    style: "案例 / 事件拆解",
     length: "中篇 / 1800-2400 字",
     status: "library",
     worth: "客服场景能直接连到老板关心的客户问题、成交阻力和复购机会。它适合沉淀为客户入口系列选题。",
@@ -413,7 +415,7 @@ const historicalTopics = [
     category: "AI 服务",
     valueTag: "交付升级",
     platform: "选题库",
-    style: "商业内参",
+    style: "个人观点解读",
     length: "短篇 / 800-1200 字",
     status: "candidate",
     worth: "这条适合提醒老板辨别 AI 服务的有效性：听懂概念不等于企业发生改变，陪跑交付才更接近结果。",
@@ -438,7 +440,7 @@ const historicalTopics = [
     category: "岗位 Agent",
     valueTag: "低成本试点",
     platform: "公众号主稿",
-    style: "方法论",
+    style: "案例 / 事件拆解",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "它直接回应老板的预算焦虑和落地焦虑：小公司不需要先证明一套大系统，只需要证明一个岗位动作值得复制。",
@@ -452,7 +454,7 @@ const historicalTopics = [
     outline: "一、开头：小公司为什么不适合先上大平台\n二、中段：岗位级 Agent 的低成本试点逻辑\n三、方法：如何选第一个岗位动作\n四、结尾：先做小动作，再复制成系统",
     articleTitleDraft: "小公司做 AI，不要先做平台，先做一个岗位动作",
     imagePrompt: "封面：一个岗位任务从人工清单变成 Agent 协作台。",
-    layout: "方法论：问题开头；中段给选择标准；结尾给试点清单。",
+    layout: "案例 / 事件拆解：问题开头；中段给选择标准；结尾给试点清单。",
   },
   {
     id: "topic-20260630-002",
@@ -463,7 +465,7 @@ const historicalTopics = [
     category: "流程改造",
     valueTag: "优先级",
     platform: "公众号主稿",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "library",
     worth: "工具榜单无法帮老板决定先改哪里，流程优先级表更能连接成本、收入、风险和交付结果。",
@@ -488,7 +490,7 @@ const historicalTopics = [
     category: "老板能力",
     valueTag: "经验沉淀",
     platform: "选题库",
-    style: "方法论",
+    style: "案例 / 事件拆解",
     length: "短篇 / 800-1200 字",
     status: "candidate",
     worth: "这条选题能解释老板经验如何进入企业 AI 化：不是把经验写成一句提示词，而是拆成任务、标准和检查点。",
@@ -510,7 +512,41 @@ topics.push(...historicalTopics);
 
 const topicCatalogs = Array.isArray(window.CONTENT_FACTORY_TOPIC_CATALOGS) ? window.CONTENT_FACTORY_TOPIC_CATALOGS : [];
 const julyTopicCatalog = topicCatalogs.find((catalog) => catalog.month === "2026-07") || null;
-if (julyTopicCatalog?.topics?.length) topics.push(...julyTopicCatalog.topics);
+const RESEARCHED_TOPIC_EVIDENCE = {
+  "guanlan-202607-130-SIG-20260525-A04": [
+    {
+      role: "result",
+      heading: "6% 到 25%：先看这套销售系统改掉了什么",
+      text: "来源称，上线 12 个月后，lead-to-SQL 转化率从 6% 升至 25%，单季度新增 1420 万美元管线，每名 SDR 的会议预约量提升 3 倍。",
+    },
+    {
+      role: "problem",
+      heading: "25 名 SDR 为什么消化不了每季度 1.2 万条线索",
+      text: "这家 B2B 网络安全 SaaS 公司每季度获得 12000 多条 MQL，25 名 SDR 有 65% 的时间花在 LinkedIn、Apollo、ZoomInfo 和 6sense 的资料研究上。",
+    },
+    {
+      role: "process",
+      heading: "Researcher、Qualifier、Outreach、Coach 如何接力",
+      text: "四个智能体分别负责研究客户背景、按 ICP 评分线索、起草个性化触达信息和追踪回复与转化，并将每一步写回 Salesforce 与 HubSpot。",
+    },
+    {
+      role: "timeline",
+      heading: "8 周、14 周、12 个月：从两个智能体到业务结果",
+      text: "Researcher 和 Qualifier 在第 8 周上线，完整四智能体团队在第 14 周进入生产，来源在第 12 个月统计年度结果。",
+    },
+    {
+      role: "boundary",
+      heading: "AI 没有替代销售：人工复核和合规过滤留在哪里",
+      text: "低置信度线索会转给人工 SDR；外呼信息需经 CAN-SPAM、GDPR 和 CCPA 过滤。所有效果数据均来自服务商 DreamzTech 的案例页，缺少客户侧独立佐证。",
+    },
+  ],
+};
+if (julyTopicCatalog?.topics?.length) {
+  julyTopicCatalog.topics.forEach((topic) => {
+    if (RESEARCHED_TOPIC_EVIDENCE[topic.id]) topic.evidenceItems = RESEARCHED_TOPIC_EVIDENCE[topic.id];
+  });
+  topics.push(...julyTopicCatalog.topics);
+}
 topics.forEach((topic) => { topic.date = normalizeDate(topic.scheduledDate || topic.date || dataBatchDate); });
 
 const CATALOG_VERSION = julyTopicCatalog?.catalogVersion || "built-in-r1";
@@ -529,7 +565,7 @@ const importedTopics = [
     category: "内容电商",
     valueTag: "获客转化",
     platform: "选题库",
-    style: "案例拆解",
+    style: "案例 / 事件拆解",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "2026-07-02 社群情报中有“从视频号到小红书：跑出百万+利润后，我重新理解了内容电商”，并带有知识库 + Agent 工作流、前端获客 + 后端交付拆分等方法标签，适合后续展开案例。",
@@ -552,7 +588,7 @@ const importedTopics = [
     category: "定价交付",
     valueTag: "经营提醒",
     platform: "选题库",
-    style: "方法论",
+    style: "案例 / 事件拆解",
     length: "短篇 / 800-1200 字",
     status: "candidate",
     worth: "一线观点里有推理成本讨论，社群情报里有 AI 社群服务涨价到 2399 元的材料。这个组合适合提醒老板：AI 工具成本、服务交付和价格体系会一起变化。",
@@ -570,158 +606,122 @@ const importedTopics = [
   },
 ];
 
-const WRITING_STEPS = ["brief", "title", "outline", "body", "images"];
+const WRITING_STEPS = ["title", "outline", "body", "images"];
+const TITLE_ENGINE_VERSION = 2;
+const WRITING_PREP_VERSION = 3;
+const OUTLINE_ENGINE_VERSION = 4;
+const DEEPSEEK_WRITING_API_BASE = String(window.CONTENT_FACTORY_WRITING_API_BASE || "http://127.0.0.1:8787").replace(/\/$/, "");
+const DEEPSEEK_WRITING_ENDPOINTS = {
+  title: `${DEEPSEEK_WRITING_API_BASE}/api/generate-titles`,
+  outline: `${DEEPSEEK_WRITING_API_BASE}/api/generate-outline`,
+  body: `${DEEPSEEK_WRITING_API_BASE}/api/generate-body`,
+  images: `${DEEPSEEK_WRITING_API_BASE}/api/generate-image-plan`,
+};
 const WRITING_STEP_LABELS = {
-  brief: "Brief",
-  title: "标题",
-  outline: "提纲",
-  body: "正文",
-  images: "图片资产",
+  title: "定标题",
+  outline: "组提纲",
+  body: "写正文",
+  images: "配图交付",
 };
 const BUILT_IN_WRITING_STYLES = [
   {
-    id: "style-wavesight-judgment",
-    name: "观澜判断感",
+    id: "style-weekly-roundup",
+    name: "每周热点总结",
+    typeLabel: "热点周报",
+    headerSummary: "从一周信息里找出真正改变业务判断的几条主线。",
     status: "published",
     isBuiltIn: true,
-    description: "写给对 AI 有兴趣也有焦虑的老板：从外部信号转向经营判断和下一个可验证动作。",
-    method: "1. 先找到老板真正在意的收入、成本、效率或风险。\n2. 用一条可核对的外部信号打开问题，不做新闻搬运。\n3. 在前三句给出一个有取舍的判断，说清什么比什么更重要。\n4. 把判断放回真实业务流程，拆输入、动作、责任人、输出和验收。\n5. 结尾只给一个今天能开始的小动作，不用宏大口号收尾。",
-    prompt: "你是观澜 AI 的企业 AI 化顾问。面向对 AI 有兴趣、又担心投入无效的企业老板写作。先用真实信号引出经营问题，前三句给出明确判断，再拆解业务流程和验收方式，最后给一个可执行小动作。保持克制、具体、不过度承诺。",
-    outputRules: "中文；短段落；不堆术语；不写“AI 将颠覆一切”；区分事实、判断与建议；结尾必须可行动。",
-    guardrails: "不把推测写成事实；不编造数据、客户效果或引语；不输出工具清单式文章；不用空泛焦虑制造转化。",
-    referenceText: "",
-    testTopic: "企业引入 AI Agent 时，为什么应该先改一个岗位动作",
-    testBrief: "读者是中小企业老板；他担心成本、实施周期和员工不会用。",
-    testOutput: "",
-    previousOutput: "",
-    dimensions: { judgment: 88, evidence: 76, narrative: 42, action: 92 },
-    scores: { fit: 96, natural: 84, specific: 90, reusable: 92 },
-    source: { name: "观澜 AI 自有方法", url: "", stars: "NATIVE", license: "自有", note: "结合观澜面向企业老板的顾问定位与 AI-Radar 选题流程。" },
+    description: "周度 AI 热点、产品发布、政策与投融资动态的编辑型总结。适合让企业老板在 5–8 分钟内知道“这周什么真变了”。",
+    perspective: "站在企业经营者而非新闻编辑的位置：不追求覆盖所有消息，只保留会改变成本、效率、竞争或风险判断的信号。",
+    traits: "高信息密度；明显的主次排序；短段落和小标题便于扫读；事实摘要后紧跟一句“为什么值得关心”；在必要处加入克制的编辑观点。",
+    voice: "像一位替读者先筛过一轮的主编，而不是中立的新闻播报员。口吻利落、略带判断，对重要信号愿意直说“这件事比看起来重要”，对普通消息也敢说“先不必追”。借鉴 TLDR AI 的压缩、Ben's Bites 的随手点评和 Stratechery 的商业串联，但不复刻原句。",
+    method: "1. 汇总一周原始来源，合并同一事件的重复报道。\n2. 用“影响范围 × 变化程度 × 可验证性”排序，只保留 4–6 条。\n3. 把单条新闻归入 2–4 条主线，例如模型能力、产品入口、企业应用、政策与资本。\n4. 每条按“发生了什么 → 为什么现在发生 → 对谁有影响 → 接下来看什么”写。\n5. 结尾不再重复摘要，只提炼一个周度主题和 2–3 个下周观察点。",
+    structure: "先读完本期原始材料，找出新闻之间真正存在的关系，再决定是按主线、时间、冲突还是影响展开。\n可选结构动作：最强信号、两条消息的共同机制、一条反常信号、原始事实对照、尚未形成结论的分歧。\n每篇只选有素材支撑的 3–5 个动作，顺序由本期信息关系决定。新闻本身已经有强故事时，可以直接从事件开始，不必先写总判断。\n不固定写“对老板的影响”“验收边界”“行动建议”；原始材料没有这些内容就不生造。",
+    titlePatterns: "先生成多角度矩阵，再选标题：周度总主张、两条信号的共同指向、反差、经营后果、编辑取舍。\n好标题要同时有“这周变了什么”和“为什么读者现在要点开”。\n优先使用时间窗口 + 最强变化，或看似分散的信号 + 共同机制。\n不用“本周 10 条 AI 大事”“一文看懂”等无立场清单标题，不虚构数字或时效压力。",
+    techniques: "首句先给编辑结论；一段只承担一个信息任务；用“事实 / 意味着 / 待观察”分开确定性；有关联的新闻相互引用；少用形容词，多用变化、对比和具体数字。",
+    signatureMoves: "1. 先说“这周只需看三件事”，公开取舍。\n2. 事实后跟一句有立场的编辑旁注，可以是反问或短句。\n3. 把两条看似无关的消息并在一起，指出共同机制。\n4. 重要消息多写，次要消息一句带过，不追求条目齐整。\n5. 允许偶尔出现“我会继续看”“这里我暂时不信”，但要给理由。",
+    antiAiRules: "不用“在当今快速变化的……”开头；不按“首先、其次、最后”串起全文；不让每条新闻都是同样的三句结构；不把所有变化都抬高为“重要转折”；不用“值得注意的是”代替真正判断；不在结尾重述全文或强行乐观升华。",
+    revisionPass: "1. 删掉任何换个周次也成立的开场白。\n2. 标出每段的唯一信息；两段做同一件事就合并。\n3. 把抽象名词换成公司、人、产品、时间、数字和动作。\n4. 打乱过度整齐的条目长度，留下一个短句判断和一个真正需要展开的长段。\n5. 检查每条编辑意见是否有证据，再整体删掉 15%–25% 套话。",
+    prompt: "你是观澜 AI 的周报主编，像一位替读者先筛过一轮的编辑，不是中立播报员。先读全部原始材料，找出消息之间最强的真实关系，再决定按主线、冲突、时间或影响组织。只保留会改变判断的高信号消息，重要处展开，次要处一句带过，允许有证据的编辑旁注。章节数量、顺序和结尾方式由本期材料决定；不自动添加“对老板的影响”“验收边界”“行动建议”，不用整齐条目和总结升华伪装完整。",
+    outputRules: "是否只保留了 4–6 条高信号消息？是否合并了重复事件？每条是否同时有事实、影响和来源？周度主线是否真的由多条信号支撑？",
+    guardrails: "不把传闻写成已确认事实；不为了覆盖面塞入低价值新闻；不使用“震撼”“颠覆”等情绪词放大信号；预测必须标明条件和时间范围。",
+    sources: [
+      { name: "TLDR AI", url: "https://tldr.tech/ai", note: "高密度新闻摘要与快速扫读" },
+      { name: "Ben's Bites", url: "https://www.bensbites.com", note: "编辑口吻、产品体验和信息分层" },
+      { name: "Stratechery", url: "https://stratechery.com", note: "把周度事件放回产业与商业逻辑" },
+      { name: "Last Week in AI", url: "https://lastweekin.ai", note: "周度研究、产品和投融资信号" },
+      { name: "Import AI", url: "https://importai.substack.com", note: "AI 政策、安全与能力边界" },
+    ],
+    aliases: ["观澜判断感"],
   },
   {
-    id: "style-research-brief",
-    name: "商业内参",
+    id: "style-case-event-breakdown",
+    name: "案例 / 事件拆解",
+    typeLabel: "案例深拆",
+    headerSummary: "还原一件事如何发生，找出真正可复用的动作和条件。",
     status: "published",
     isBuiltIn: true,
-    description: "适合重大商业信号、产业趋势和企业决策，先建证据结构，再给经营判断。",
-    method: "1. 将选题拆成事实、上下文、判断和待验证四层。\n2. 先列提纲和证据缺口，每一节只回答一个经营问题。\n3. 开头用反常识判断，中段用数据、案例和流程交叉验证。\n4. 区分“已经发生”与“可能意味”，不让观点冒充事实。\n5. 结尾输出决策问题或核对清单，不输出宽泛趋势总结。",
-    prompt: "以商业内参方式写作。先分离事实、上下文、判断和待验证项，再围绕一个经营问题建立提纲。开头给出反常识判断，中段用证据支撑并标出边界，结尾留下管理者需要核对的问题。",
-    outputRules: "先判断后论证；每节一个经营问题；引用可回溯；不用流行词代替证据。",
-    guardrails: "证据不足时明确标记；不编造行业增长率、客户数或高管引语。",
-    referenceText: "",
-    testTopic: "企业知识库为什么又成为 AI 热点",
-    testBrief: "面向正在评估知识库与企业搜索投资的管理者。",
-    testOutput: "",
-    previousOutput: "",
-    dimensions: { judgment: 78, evidence: 94, narrative: 30, action: 70 },
-    scores: { fit: 90, natural: 78, specific: 92, reusable: 88 },
-    source: { name: "ComposioHQ / content-research-writer", url: "https://github.com/ComposioHQ/awesome-claude-skills/blob/master/content-research-writer/SKILL.md", stars: "67.6k", license: "方法参考，请核对许可", note: "内化协作提纲、研究与引用、开头迭代和分节反馈；不直接复制原 Prompt。" },
+    description: "适合单个产品体验、工具用法、企业实践或突发事件。核心不是“讲个故事”，而是还原过程、成本、转折和可复用条件。",
+    perspective: "以当事人或调查者视角回答“它实际是怎么做成的”。让证据、时间线和原始产物在前，经验总结在后。",
+    traits: "细节多但不散；重要数字、工具、操作和结果均可核对；允许写进展更新、犹豫和失败；以真实过程建立信任，不以正确姿态教育读者。",
+    voice: "像一位亲手做过、愿意打开工作台的实践者。先把问题、操作和证据放在桌上，再说自己学到什么。借鉴 Simon Willison 对命令、日期、成本和 Update 的直接写法，以及 Ben's Bites 对使用感受的坦诚，但不模仿他们的句子。",
+    method: "1. 明确要拆的对象，收集时间、参与者、目标、限制和原始材料。\n2. 先写一句“结果或反常现象”，然后回到事件起点。\n3. 按时间或因果还原关键动作：当时知道什么、做了什么、产生什么。\n4. 找出 1–2 个转折点，说清原判断为何改变，谁做了什么决定。\n5. 呈现结果时同时写成本、人工兜底和未解问题。\n6. 结尾把“这个案例特有的条件”与“别人可复用的动作”分开。",
+    structure: "先盘点原始材料里实际拥有什么：结果、时间线、操作记录、产物、数字、失败或后续更新。\n可选结构动作：结果先行、问题起点、一次关键操作、判断变化、一个失败、具体成本、可复现条件、Update。\n哪种材料最强就从哪里开始；只有完整时间线时才按时间写，只有证据里出现转折时才设置“转折”。\n可以只有 3 节，也可以因工件丰富展开到 6 节。不为了完整而补写启示、行动清单或教程式收尾。",
+    titlePatterns: "标题矩阵至少覆盖：结果与意外转折、可复现方法、关键动作、真实成本、失败条件、人工接管。\n用“具体对象 + 结果 / 问题 + 决定性细节”，数字、工具名、日期和代价只在来源中真实存在时使用。\n好标题应让读者知道能复现什么，或能避开什么坑。\n避免“深度复盘”“底层逻辑”“三点启示”等无信息标签。",
+    techniques: "用具体时间、金额、代码、提示词或工件做锚点；在关键处保留第一人称的判断变化；用“Update”补充后续证据；先呈现问题再总结方法；让失败和人工复核留在叙事里。",
+    signatureMoves: "1. 用“我想解决 X，但 Y 卡住了”建立真问题。\n2. 保留命令、提示词、金额、耗时、日期、版本等不可随意替换的细节。\n3. 在关键处写“我原本以为……，后来发现……”，呈现判断变化。\n4. 可用一个 Update 补充后续证据，不把首稿伪装成最终真理。\n5. 收尾留下复现条件或未解问题，不强行提炼成“三点启示”。",
+    antiAiRules: "不虚构现场、对话或当事人心理；不把过程修成完美的五步法；不隐去失败、手工修改和意外支出；不用“这给我们带来三点启示”突然转为说教；不把时间顺序自动写成因果；证据不足时明说“还不知道”。",
+    revisionPass: "1. 确认文章至少有 3 个不可替换的真实细节，并能回到来源。\n2. 给句子标记“事实 / 推断 / 体验”，删掉身份不清的权威口吻。\n3. 强制保留一个失败、一次人工介入和一个未解问题。\n4. 删掉无法被过程证据支撑的“启示”。\n5. 最后检查读者能否按文中条件复现；不能就说清缺什么。",
+    prompt: "你是观澜 AI 的实践者与案例调查作者。先盘点原始材料里真正存在的结果、时间线、操作记录、数字、失败和后续更新，哪种材料最强就从哪里开始。只有来源提供了完整时间线才按时间写，只有真实发生判断变化才设置转折，失败、人工介入和复现条件也只在有证据时写入。优先使用可核对的命令、金额、耗时、日期或原始工件。不虚构现场，不补齐完美步骤，不固定用启示、行动或教程收尾。",
+    outputRules: "时间线和因果是否清楚？关键数字和原始工件是否可回溯？是否写了失败、成本和人工兜底？可复用结论是否标明了适用条件？",
+    guardrails: "不补写当事人没有提供的心理动机；不隐去不利于结论的失败或限制；不用单个成功案例推导行业普遍规律；不把相关性写成因果。",
+    sources: [
+      { name: "Simon Willison · uvx 案例", url: "https://simonwillison.net/2026/Jul/14/uvx-github-actions-cache/", note: "用具体问题、解法和更新构成技术案例" },
+      { name: "Simon Willison · sqlite-utils", url: "https://simonwillison.net/2026/Jul/5/sqlite-utils-fable/", note: "过程、成本、人工审查与可验证产物" },
+      { name: "Ben's Bites · Fable", url: "https://www.bensbites.com/p/my-thoughts-on-fable", note: "从个人使用体验进入产品特征" },
+      { name: "Stratechery", url: "https://stratechery.com", note: "将事件拆成商业模式、管理决策与长期后果" },
+    ],
+    aliases: ["案例拆解", "方法论"],
   },
   {
-    id: "style-case-coauthor",
-    name: "案例拆解",
+    id: "style-personal-analysis",
+    name: "个人观点解读",
+    typeLabel: "观点解读",
+    headerSummary: "从已知事实出发，给出一个值得被论证、被检验的个人观点。",
     status: "published",
     isBuiltIn: true,
-    description: "适合用一个真实案例说清业务动作、责任分工与可复用步骤。",
-    method: "1. 先收集案例的目标、受众、背景、限制和验收标准。\n2. 建立“原问题 → 关键动作 → 输出结果 → 复制条件”结构。\n3. 把案例中的偶然条件和可复用方法分开。\n4. 用一个未接触背景的读者视角测试：能否看懂、信任、执行。\n5. 结尾用复制条件收口，不把单一案例扩大成行业定律。",
-    prompt: "用真实案例拆解一个企业 AI 化问题。先交代原问题和限制，再还原关键动作、责任分工和验收结果，最后区分偶然因素与可复用条件。让不熟悉背景的老板也能看懂。",
-    outputRules: "案例必须有前置条件；动作要具体；结果要说明验收口径；结尾给复制条件。",
-    guardrails: "不用单个案例证明普遍结论；不删除失败、人工兜底和实施成本。",
-    referenceText: "",
-    testTopic: "一家中小企业如何用 AI 改造客户跟进",
-    testBrief: "用一个岗位动作案例拆解，不做企业数字化大叙事。",
-    testOutput: "",
-    previousOutput: "",
-    dimensions: { judgment: 70, evidence: 82, narrative: 84, action: 86 },
-    scores: { fit: 88, natural: 84, specific: 94, reusable: 86 },
-    source: { name: "Anthropic / doc-coauthoring", url: "https://github.com/anthropics/skills/blob/main/skills/doc-coauthoring/SKILL.md", stars: "160.7k", license: "方法参考，请核对许可", note: "内化上下文收集、结构迭代与读者测试；不直接复制原 Prompt。" },
-  },
-  {
-    id: "style-natural-editor",
-    name: "自然表达",
-    status: "published",
-    isBuiltIn: true,
-    description: "用于二次编辑：保留判断和事实，降低 AI 腔、套话、排比和过度对称。",
-    method: "1. 先标记空话、泛化主语、过度总结和机械排比。\n2. 保留原文事实、判断和特定词，不为了“人味”改变意思。\n3. 交替使用短句和完整句，让节奏由信息重量决定。\n4. 把抽象名词改回具体人、动作、表格、流程和结果。\n5. 最后检查是否有一个真实的说话者，而不是一个“标准 AI 作者”。",
-    prompt: "作为一名严格的中文编辑重写草稿。保留事实、核心判断和特定细节，删除空洞开场、过度排比、对称小标题和“值得注意的是”一类填充语。用具体动作替换抽象名词，让每一段只承担一个信息任务。",
-    outputRules: "不改变原意；不编造细节；避免高频转折词和套话；允许句式不完全对称。",
-    guardrails: "自然不等于随意；不故意加口语、网络梗或虚构经历；不删除证据边界。",
-    referenceText: "",
-    testTopic: "老板真正该盘点的不是 AI 工具，而是客户入口",
-    testBrief: "将一段机械的 AI 稿改成观澜顾问能够真实说出的文字。",
-    testOutput: "",
-    previousOutput: "",
-    dimensions: { judgment: 72, evidence: 70, narrative: 56, action: 66 },
-    scores: { fit: 84, natural: 96, specific: 86, reusable: 90 },
-    source: { name: "blader / humanizer", url: "https://github.com/blader/humanizer/blob/main/SKILL.md", stars: "29.0k", license: "MIT", note: "内化样本声音分析、AI 写作模式审计和保留原意的重写循环。" },
-  },
-  {
-    id: "style-brand-voice",
-    name: "品牌声音",
-    status: "published",
-    isBuiltIn: true,
-    description: "从已发布文章提炼稳定的词汇、节奏、写法和品牌边界。",
-    method: "1. 选取 3-5 篇代表文章，标记常用词、禁用词、句长和段落节奏。\n2. 定义品牌与读者的关系：同行、实践者或媒体。\n3. 将声音拆成方法拆解、经验分享、场景叙述和技巧提炼。\n4. 为不同内容任务保留同一声音，但允许结构变化。\n5. 用新选题试写，检查读者是否能在隐去署名时仍识别品牌。",
-    prompt: "按已定义的品牌声音写作。以同行交流的口吻，从真实业务切入，讲清做法、经验和可复用技巧；不端着讲道理，也不把文章写成说教。词汇和节奏从参考文案的统计特征中提炼。",
-    outputRules: "风格稳定但不套模板；优先使用品牌词库；保留不同选题的结构自由。",
-    guardrails: "不从单篇文章得出整个品牌规则；不将写作风格等同于高频口号。",
-    referenceText: "",
-    testTopic: "AI 不应只是企业采购清单上的一个工具",
-    testBrief: "检查观澜声音在新选题上是否仍然稳定。",
-    testOutput: "",
-    previousOutput: "",
-    dimensions: { judgment: 82, evidence: 72, narrative: 50, action: 80 },
-    scores: { fit: 92, natural: 88, specific: 82, reusable: 94 },
-    source: { name: "alirezarezvani / content-creator", url: "https://github.com/alirezarezvani/claude-skills/wiki/Skills-Overview", stars: "22.5k", license: "MIT", note: "内化品牌声音分析、内容框架与渠道适配；不直接复制原 Prompt。" },
-  },
-  {
-    id: "style-method-playbook",
-    name: "方法论",
-    status: "published",
-    isBuiltIn: true,
-    description: "把模糊的 AI 化问题拆成可执行步骤、表格和验收条件。",
-    method: "1. 先定义读者要完成的业务任务。\n2. 给出选择标准，再给步骤，避免无条件的清单。\n3. 每一步包含输入、动作、产物和停止条件。\n4. 用一个小案例证明方法如何工作。\n5. 结尾给可直接使用的表格或清单。",
-    prompt: "将选题写成可执行方法论。先给选择标准，再拆步骤；每步说明输入、动作、产物和停止条件。用一个具体业务场景说明，结尾交付一个可直接使用的表格或清单。",
-    outputRules: "先标准后步骤；步骤必须可验收；不用无条件的十点清单。",
-    guardrails: "不把个人经验伪装成通用定律；方法必须标出适用条件。",
-    referenceText: "",
-    testTopic: "如何选择企业第一个 AI Agent 试点",
-    testBrief: "读者需要一个可在会议上直接使用的选择方法。",
-    testOutput: "",
-    previousOutput: "",
-    dimensions: { judgment: 72, evidence: 70, narrative: 30, action: 96 },
-    scores: { fit: 86, natural: 78, specific: 92, reusable: 96 },
-    source: { name: "观澜 AI 自有方法", url: "", stars: "NATIVE", license: "自有", note: "从观澜顾问交付的诊断、步骤、表格与验收逻辑提炼。" },
-  },
-  {
-    id: "style-short-comment",
-    name: "短评",
-    status: "published",
-    isBuiltIn: true,
-    description: "用一条信号、一个判断、一个动作完成高密度短文。",
-    method: "1. 只选一条信号。\n2. 只给一个核心判断。\n3. 用一个真实业务场景解释。\n4. 结尾给一个今天可以检查的动作。",
-    prompt: "写一篇高密度商业短评。用一条信号开场，立即给出一个与老板有关的判断，用一个业务场景说清，最后只留一个可执行检查动作。",
-    outputRules: "800-1200 字；不做全面综述；不超过 4 个小节。",
-    guardrails: "短不等于武断；保留必要的事实边界。",
-    referenceText: "",
-    testTopic: "企业 AI 化最容易漏掉的是验收标准",
-    testBrief: "写成一篇可在观澜站内发布的短评。",
-    testOutput: "",
-    previousOutput: "",
-    dimensions: { judgment: 90, evidence: 60, narrative: 28, action: 86 },
-    scores: { fit: 88, natural: 84, specific: 82, reusable: 88 },
-    source: { name: "观澜 AI 自有方法", url: "", stars: "NATIVE", license: "自有", note: "用于观澜站内短评和公众号短稿的高密度表达。" },
+    description: "适合对一条新闻、政策、产品变化或行业争议给出独立解读。文章不求中立罗列，而是让一个明确观点经过证据和反方检验。",
+    perspective: "站在长期跟踪 AI 产业的实践者视角，坦率使用“我认为”“我更担心”“截至目前”，同时清楚区分事实、解释和预测。",
+    traits: "立场鲜明但不武断；先承认最强反方再推进论证；把当下事件放进历史、激励机制或商业模式；语气像有经验的同行交流，不像老师下结论。",
+    voice: "像一位有立场、也知道自己可能错的长期观察者。可以直说“我的判断”“我更担心”“截至现在”，但要展示证据、利益和约束。借鉴 Interconnects 的利益相关者分析、Stratechery 的机制推演和 Simon Willison 的证据边界，但不复制其标志性措辞。",
+    method: "1. 用一句话写出真正要捍卫的主张，确保它可以被反驳。\n2. 列出已知事实、不确定信息和自己的推断，不让三者混在一段。\n3. 解释事件背后的机制：参与者想要什么，激励如何运作，哪个约束最关键。\n4. 主动写出最有力的反方，说明为什么它仍未改变主结论，或哪些条件会让自己改变观点。\n5. 把观点推到对企业的二阶影响，不停在对新闻的赞成或反对。\n6. 结尾给出应继续观察的证据，而不是口号或教育性总结。",
+    structure: "先找到本篇真正要争论的那一点，再看原始材料适合从事件、个人经历、一句反方论点还是一个具体数字开始。\n可选结构动作：直接主张、原始事件还原、一个关键利益关系、历史类比、最强反例、判断变化、可能的二阶后果。\n只选能把主张向前推进的部分，反方不强就不单设一节，没有足够事实就缩小判断，不用对称的五段式伪装完整。\n收尾可以是一个尚未解决的矛盾、一个新证据，也可以在主张说完后直接结束。不强制给读者布置行动。",
+    titlePatterns: "先从核心主张、反常识、利益机制、读者代价、二阶影响、可证伪条件六个角度生成候选。\n标题必须直接暴露一个可争论主张，或点出主流解释与你的判断之间的冲突。\n需要预测时使用“判断 + 时间窗口”，需要个性时可用“我为什么……”，但必须真有不同理由。\n避免“我的几点思考”“聊聊 X”“全面解读”等隐藏主张的标题。",
+    techniques: "在推测前使用置信词；用“这里的问题是”推进机制分析；用对方最强论点而非稻草人；引用原始证据后立即解释其意义；长段论证中穿插短句收紧节奏。",
+    signatureMoves: "1. 开头直接给出一个可能被证伪的个人判断。\n2. 用“截至现在”“我认为最可能”标记时间和置信度。\n3. 点名参与者，写他们得到什么、害怕失去什么。\n4. 在长段机制分析后用一个短句压实结论。\n5. 公平写出最强反方，并说明什么新证据会让自己改口。",
+    antiAiRules: "不为了看起来全面而硬写“一方面、另一方面”；不用三个对称分点伪装完整论证；不把利益推断写成已证实动机；不用“我们必须拥抱变化”类口号收尾；不为追求平滑而抹掉情绪和判断；不重复总结已经说清的观点。",
+    revisionPass: "1. 划出全文那句“可能是错的”核心主张；如果找不到，重写开头。\n2. 补上作者为什么会看到这件事，但不虚构经历。\n3. 找出与结论冲突的最强事实，决定修正判断还是回应它。\n4. 把“行业、生态、格局”换成具体参与者、激励和约束。\n5. 读出声：打断过度相似的句长，删掉结论复述，以观察条件或未解问题收尾。",
+    prompt: "你是观澜 AI 的长期产业观察者，有立场，也知道自己可能错。先确定原始材料中最有力的入口是事件、一个数字、亲身经验、反方论点还是作者主张，由它决定开头和论证顺序。分开已知事实、不确定信息和你的推断，从具体参与者的激励、商业模式、政策或技术约束解释原因。反方、历史类比和二阶影响只在它们真正推进主张时使用。可以以矛盾、新证据、一句判断或直接结束；不做对称总结，不向读者布置行动。",
+    outputRules: "主张是否清晰且可被反驳？事实、解释和预测是否分开？是否真正回应了最强反方？是否说明观点改变条件？对企业的影响是否超过了“值得关注”？",
+    guardrails: "不为了显得有观点而选择极端立场；不将利益动机当作已证实事实；不回避与自己结论冲突的证据；不用说教式“你应该”收尾。",
+    sources: [
+      { name: "Simon Willison", url: "https://simonwillison.net", note: "第一人称观察、证据边界与持续更新" },
+      { name: "Interconnects", url: "https://www.interconnects.ai", note: "明确立场、政策机制与预测条件" },
+      { name: "Stratechery", url: "https://stratechery.com", note: "从事件推到激励机制、商业模式和二阶影响" },
+      { name: "Exponential View", url: "https://www.exponentialview.co", note: "技术变化的商业与社会语境" },
+    ],
+    aliases: ["商业内参", "自然表达", "品牌声音", "短评"],
   },
 ].map((profile) => ({
   ...profile,
+  methodVersion: 4,
   publishedName: profile.name,
   updatedAt: "2026-07-13T00:00:00.000Z",
 }));
 const BUILT_IN_WRITING_STYLE_BY_ID = Object.fromEntries(BUILT_IN_WRITING_STYLES.map((profile) => [profile.id, profile]));
 let writingStylesById = Object.fromEntries(BUILT_IN_WRITING_STYLES.map((profile) => [profile.id, JSON.parse(JSON.stringify(profile))]));
-let selectedWritingStyleId = "style-wavesight-judgment";
-let defaultWritingStyleId = "style-wavesight-judgment";
-let deletedWritingStyleIds = new Set();
+let selectedWritingStyleId = "style-weekly-roundup";
+let defaultWritingStyleId = "style-weekly-roundup";
 let activeWritingStyleTab = "method";
 let writingStyleDirty = false;
 const WORKSPACE_STORAGE_KEY = "content-factory-lite-v0.1-workspace-v3";
@@ -732,13 +732,20 @@ let pendingPublicationDraftsById = {};
 let imageTasksById = { ...manifestImageTasks };
 let imageAssetsById = { ...manifestImageAssets };
 const imageObjectUrlsByAssetId = {};
-let activeWritingStep = "brief";
+let activeWritingStep = "title";
 let activeLayoutSnapshotId = "";
 let selectedPendingPublicationId = "";
 let isHydratingDraft = false;
 let hydratedWriterDraftId = "";
 let draftAutosaveTimer = null;
+const writingGenerationInFlight = { title: false, outline: false, body: false };
+let imageGenerationInFlight = false;
 let workspaceSaveError = "";
+let agentWorkspace = {
+  selectedTopicId: "",
+  planStatus: "ready",
+  messages: [],
+};
 const REVIEW_DECISION_LABELS = {
   continue: "继续写",
   rewrite: "改写再发",
@@ -808,8 +815,8 @@ function persistWorkspace() {
       imageTasks: imageTasksById,
       imageAssets: imageAssetsById,
       writingStyles: writingStylesById,
-      deletedWritingStyleIds: [...deletedWritingStyleIds],
       publications: publicationEntries,
+      agent: agentWorkspace,
       ui: {
         selectedDate,
         selectedTopicId,
@@ -856,14 +863,33 @@ if (restoredWorkspace?.version === 3) {
     imageAssetsById = { ...restoredWorkspace.imageAssets, ...manifestImageAssets };
   }
   if (restoredWorkspace.writingStyles && typeof restoredWorkspace.writingStyles === "object") {
-    writingStylesById = { ...writingStylesById, ...restoredWorkspace.writingStyles };
-  }
-  if (Array.isArray(restoredWorkspace.deletedWritingStyleIds)) {
-    deletedWritingStyleIds = new Set(restoredWorkspace.deletedWritingStyleIds);
-    deletedWritingStyleIds.forEach((id) => { delete writingStylesById[id]; });
+    Object.entries(restoredWorkspace.writingStyles).forEach(([id, profile]) => {
+      if (!BUILT_IN_WRITING_STYLE_BY_ID[id] || !profile) return;
+      const currentMethod = writingStylesById[id];
+      if (Number(profile.methodVersion || 1) < Number(currentMethod.methodVersion || 1)) {
+        writingStylesById[id] = {
+          ...currentMethod,
+          status: profile.status || currentMethod.status,
+          id,
+          isBuiltIn: true,
+          hasUnpublishedChanges: false,
+        };
+        return;
+      }
+      writingStylesById[id] = { ...currentMethod, ...profile, id, isBuiltIn: true };
+    });
   }
   if (Array.isArray(restoredWorkspace.publications)) {
     publicationEntries = restoredWorkspace.publications.filter((entry) => entry?.id && entry?.title);
+  }
+  if (restoredWorkspace.agent && typeof restoredWorkspace.agent === "object") {
+    agentWorkspace = {
+      selectedTopicId: String(restoredWorkspace.agent.selectedTopicId || ""),
+      planStatus: ["ready", "confirmed"].includes(restoredWorkspace.agent.planStatus) ? restoredWorkspace.agent.planStatus : "ready",
+      messages: Array.isArray(restoredWorkspace.agent.messages)
+        ? restoredWorkspace.agent.messages.filter((message) => ["user", "assistant"].includes(message?.role) && message?.text).slice(-8)
+        : [],
+    };
   }
   const ui = restoredWorkspace.ui || {};
   if (ui.selectedDate) selectedDate = normalizeDate(ui.selectedDate);
@@ -964,7 +990,7 @@ function renderPublishedWritingStyles(preferredStyle = "") {
 }
 
 function setWritingStyleTab(tab) {
-  if (!["method", "reference", "prompt", "test"].includes(tab)) return;
+  if (!["method", "structure", "voice", "prompt"].includes(tab)) return;
   activeWritingStyleTab = tab;
   document.querySelectorAll("[data-style-tab]").forEach((button) => {
     if (button.dataset.styleTab === tab) button.setAttribute("aria-current", "page");
@@ -980,60 +1006,14 @@ function setWritingStyleTab(tab) {
 function renderWritingStyleList() {
   const container = document.querySelector("#writingStyleList");
   if (!container) return;
-  const query = String(document.querySelector("#writingStyleSearch")?.value || "").trim().toLowerCase();
-  const profiles = Object.values(writingStylesById).filter((profile) => {
-    const haystack = `${profile.name} ${profile.description} ${profile.method} ${profile.source?.name || ""}`.toLowerCase();
-    return !query || haystack.includes(query);
-  });
+  const profiles = BUILT_IN_WRITING_STYLES.map((item) => writingStylesById[item.id]).filter(Boolean);
   container.innerHTML = profiles.map((profile) => `
-    <div class="style-profile-row">
-      <button class="style-profile-item${profile.id === selectedWritingStyleId ? " is-selected" : ""}" type="button" role="option" aria-selected="${profile.id === selectedWritingStyleId}" data-writing-style-id="${escapeHtml(profile.id)}">
-        <strong>${escapeHtml(profile.name)}</strong>
-        <span>${escapeHtml(profile.source?.name || "自定义方法")}</span>
-        <em>${profile.status === "published" ? "已发布" : "草稿"}</em>
-      </button>
-      <button class="style-profile-delete" type="button" data-delete-writing-style-id="${escapeHtml(profile.id)}" title="删除${escapeHtml(profile.name)}" aria-label="删除${escapeHtml(profile.name)}">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>
-      </button>
-    </div>
-  `).join("") || '<div class="topic-empty">没有匹配风格</div>';
-}
-
-function deleteWritingStyle(styleId) {
-  const profile = writingStylesById[styleId];
-  if (!profile) return;
-  if (Object.keys(writingStylesById).length <= 1) {
-    showToast("至少保留一套写作风格");
-    return;
-  }
-  if (profile.status === "published" && publishedWritingStyles().length <= 1) {
-    showToast("公众号写作至少需要一套已发布风格");
-    return;
-  }
-  const referencedDrafts = Object.values(draftsByTopicId).filter((draft) => draft.styleId === styleId);
-  const referenceNote = referencedDrafts.length ? `\n\n有 ${referencedDrafts.length} 篇草稿正在引用，删除后将切换到默认风格。` : "";
-  if (!window.confirm(`确定删除“${profile.name}”？${referenceNote}`)) return;
-
-  const nextDefaultId = styleId === defaultWritingStyleId ? writingStyleFallbackId(styleId) : defaultWritingStyleId;
-  const fallbackProfile = writingStylesById[nextDefaultId] || Object.values(writingStylesById).find((item) => item.id !== styleId);
-  referencedDrafts.forEach((draft) => {
-    draft.styleId = fallbackProfile.id;
-    draft.style = fallbackProfile.publishedName || fallbackProfile.name;
-    draft.confirmedSteps = (draft.confirmedSteps || []).filter((step) => step === "brief");
-    draft.dirty = true;
-    draft.updatedAt = new Date().toISOString();
-  });
-
-  delete writingStylesById[styleId];
-  deletedWritingStyleIds.add(styleId);
-  defaultWritingStyleId = nextDefaultId;
-  if (selectedWritingStyleId === styleId) selectedWritingStyleId = defaultWritingStyleId || writingStyleFallbackId();
-  writingStyleDirty = false;
-  normalizeWritingStyleSelections();
-  renderPublishedWritingStyles(defaultWritingStyleId);
-  renderWritingStyleLab();
-  persistWorkspace();
-  showToast(`已删除“${profile.name}”${referencedDrafts.length ? `，${referencedDrafts.length} 篇草稿已切换风格` : ""}`);
+    <button class="style-profile-item${profile.id === selectedWritingStyleId ? " is-selected" : ""}" type="button" role="option" aria-selected="${profile.id === selectedWritingStyleId}" data-writing-style-id="${escapeHtml(profile.id)}">
+      <span>${escapeHtml(profile.typeLabel)}</span>
+      <strong>${escapeHtml(profile.name)}</strong>
+      <em>${profile.id === defaultWritingStyleId ? "默认" : "已发布"}</em>
+    </button>
+  `).join("");
 }
 
 function setStyleControlValue(selector, value) {
@@ -1041,53 +1021,50 @@ function setStyleControlValue(selector, value) {
   if (control) control.value = value ?? "";
 }
 
-function updateWritingStyleRangeOutputs() {
-  ["Judgment", "Evidence", "Narrative", "Action"].forEach((key) => {
-    const input = document.querySelector(`#style${key}Score`);
-    const output = document.querySelector(`#style${key}Value`);
-    if (input && output) output.value = input.value;
-  });
-}
-
 function updateWritingStylePublishNote(profile = currentWritingStyle()) {
   const note = document.querySelector("#writingStylePublishNote");
   if (!note || !profile) return;
   if (profile.status !== "published") {
-    note.textContent = "还是草稿，发布后才会出现在公众号写作中。";
+    note.textContent = "草稿";
     return;
   }
   note.textContent = profile.hasUnpublishedChanges
-    ? "已有修改，发布后公众号写作才会使用新版本。"
+    ? "有修改待发布"
     : profile.id === defaultWritingStyleId
-      ? "当前版本已发布，并作为公众号默认风格使用。"
-      : "当前版本已发布，可在公众号写作中选择。";
+      ? "默认已发布"
+      : "已发布";
 }
 
 function renderWritingStyleLab() {
   const profile = currentWritingStyle();
   if (!profile) return;
   renderWritingStyleList();
-  setStyleControlValue("#writingStyleName", profile.name);
+  document.querySelector("#writingStyleName").textContent = profile.name;
+  document.querySelector("#writingStyleTypeTag").textContent = profile.typeLabel;
   setStyleControlValue("#writingStyleDescription", profile.description);
+  setStyleControlValue("#writingStylePerspective", profile.perspective);
+  setStyleControlValue("#writingStyleTraits", profile.traits);
   setStyleControlValue("#writingStyleMethod", profile.method);
   setStyleControlValue("#writingStyleGuardrails", profile.guardrails);
-  setStyleControlValue("#writingStyleReference", profile.referenceText);
+  setStyleControlValue("#writingStyleStructure", profile.structure);
+  setStyleControlValue("#writingStyleTitlePatterns", profile.titlePatterns);
+  setStyleControlValue("#writingStyleTechniques", profile.techniques);
+  setStyleControlValue("#writingStyleVoice", profile.voice);
+  setStyleControlValue("#writingStyleSignatureMoves", profile.signatureMoves);
+  setStyleControlValue("#writingStyleAntiAiRules", profile.antiAiRules);
+  setStyleControlValue("#writingStyleRevisionPass", profile.revisionPass);
   setStyleControlValue("#writingStylePrompt", profile.prompt);
   setStyleControlValue("#writingStyleOutputRules", profile.outputRules);
-  setStyleControlValue("#writingStyleTestTopic", profile.testTopic);
-  setStyleControlValue("#writingStyleTestBrief", profile.testBrief);
-  setStyleControlValue("#writingStyleTestOutput", profile.testOutput);
-  const dimensions = profile.dimensions || {};
-  setStyleControlValue("#styleJudgmentScore", dimensions.judgment ?? 70);
-  setStyleControlValue("#styleEvidenceScore", dimensions.evidence ?? 70);
-  setStyleControlValue("#styleNarrativeScore", dimensions.narrative ?? 50);
-  setStyleControlValue("#styleActionScore", dimensions.action ?? 70);
-  updateWritingStyleRangeOutputs();
+  const sourceList = document.querySelector("#writingStyleSourceList");
+  if (sourceList) sourceList.innerHTML = (profile.sources || []).map((source) => `
+    <a href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">
+      <strong>${escapeHtml(source.name)}</strong>
+      <span>${escapeHtml(source.note || source.license || "方法参考")}</span>
+    </a>
+  `).join("");
   updateWritingStylePublishNote(profile);
   const resetButton = document.querySelector("#resetWritingStyleButton");
-  resetButton.disabled = !profile.isBuiltIn;
-  const comparison = document.querySelector("#writingStyleComparison");
-  comparison.hidden = true;
+  if (resetButton) resetButton.disabled = !profile.isBuiltIn;
   setWritingStyleTab(activeWritingStyleTab);
 }
 
@@ -1095,22 +1072,20 @@ function captureWritingStyleLab() {
   const profile = currentWritingStyle();
   if (!profile) return null;
   const value = (selector, fallback = "") => document.querySelector(selector)?.value ?? fallback;
-  profile.name = value("#writingStyleName", profile.name).trim() || profile.name;
   profile.description = value("#writingStyleDescription", profile.description).trim();
+  profile.perspective = value("#writingStylePerspective", profile.perspective).trim();
+  profile.traits = value("#writingStyleTraits", profile.traits).trim();
   profile.method = value("#writingStyleMethod", profile.method).trim();
   profile.guardrails = value("#writingStyleGuardrails", profile.guardrails).trim();
-  profile.referenceText = value("#writingStyleReference", profile.referenceText);
+  profile.structure = value("#writingStyleStructure", profile.structure).trim();
+  profile.titlePatterns = value("#writingStyleTitlePatterns", profile.titlePatterns).trim();
+  profile.techniques = value("#writingStyleTechniques", profile.techniques).trim();
+  profile.voice = value("#writingStyleVoice", profile.voice).trim();
+  profile.signatureMoves = value("#writingStyleSignatureMoves", profile.signatureMoves).trim();
+  profile.antiAiRules = value("#writingStyleAntiAiRules", profile.antiAiRules).trim();
+  profile.revisionPass = value("#writingStyleRevisionPass", profile.revisionPass).trim();
   profile.prompt = value("#writingStylePrompt", profile.prompt).trim();
   profile.outputRules = value("#writingStyleOutputRules", profile.outputRules).trim();
-  profile.testTopic = value("#writingStyleTestTopic", profile.testTopic).trim();
-  profile.testBrief = value("#writingStyleTestBrief", profile.testBrief).trim();
-  profile.testOutput = value("#writingStyleTestOutput", profile.testOutput);
-  profile.dimensions = {
-    judgment: Number(value("#styleJudgmentScore", 70)),
-    evidence: Number(value("#styleEvidenceScore", 70)),
-    narrative: Number(value("#styleNarrativeScore", 50)),
-    action: Number(value("#styleActionScore", 70)),
-  };
   return profile;
 }
 
@@ -1119,7 +1094,6 @@ function markWritingStyleDirty() {
   if (!profile) return;
   writingStyleDirty = true;
   profile.hasUnpublishedChanges = true;
-  updateWritingStyleRangeOutputs();
   updateWritingStylePublishNote(profile);
 }
 
@@ -1135,129 +1109,19 @@ function saveWritingStyle({ notify = true } = {}) {
   return saved;
 }
 
-function referenceMetrics(text) {
-  const clean = String(text || "").replace(/\s+/g, " ").trim();
-  const sentences = clean.split(/[.!?。！？；;]/).map((item) => item.trim()).filter(Boolean);
-  const paragraphs = String(text || "").split(/\n+/).map((item) => item.trim()).filter(Boolean);
-  const averageLength = sentences.length ? Math.round(sentences.reduce((sum, item) => sum + item.length, 0) / sentences.length) : 0;
-  const questionRate = sentences.length ? Math.round((((clean.match(/[？?]/g) || []).length) / sentences.length) * 100) : 0;
-  const judgmentWords = (clean.match(/真正|不是|而是|关键|必须|先|只有|意味着/g) || []).length;
-  const actionWords = (clean.match(/盘点|检查|拆解|建立|记录|验收|执行|停止/g) || []).length;
-  return { characters: clean.length, sentences: sentences.length, paragraphs: paragraphs.length, averageLength, questionRate, judgmentWords, actionWords };
-}
-
-function analyzeReferenceCopy() {
-  const profile = captureWritingStyleLab();
-  const text = profile?.referenceText.trim() || "";
-  if (!profile || text.length < 80) {
-    showToast("请先粘贴至少 80 字参考文案");
-    return;
-  }
-  const metrics = referenceMetrics(text);
-  const rhythm = metrics.averageLength <= 18 ? "以短句推进，每句交代一个动作或细节" : metrics.averageLength >= 34 ? "以完整长句讲清来龙去脉，再用短句收口" : "中等句长为主，场景描述与方法说明交替";
-  const opening = metrics.questionRate >= 12 ? "常用问题打开场景，随后立即回应" : metrics.judgmentWords >= 3 ? "以对比或反常识现象打开，再转入做法" : "先交代具体事实，再转向经验";
-  const landing = metrics.actionWords >= 3 ? "结尾倾向清单、检查或一个可直接上手的技巧" : "结尾倾向停在经验回顾，可补一个具体技巧";
-  const extracted = [
-    `1. 节奏：${rhythm}。`,
-    `2. 开头：${opening}。`,
-    `3. 结构：样本约 ${metrics.paragraphs} 个段落、${metrics.sentences} 个句子；应保留“场景 → 做法 → 经验”的信息层次。`,
-    `4. 方法：强调性词组出现 ${metrics.judgmentWords} 次；把它们改写成清晰的做法与取舍。`,
-    `5. 技巧：${landing}。`,
-  ].join("\n");
-  profile.method = extracted;
-  profile.dimensions.judgment = Math.min(100, 62 + metrics.judgmentWords * 5);
-  profile.dimensions.narrative = Math.min(100, 35 + Math.max(0, metrics.paragraphs - 3) * 4);
-  profile.dimensions.action = Math.min(100, 58 + metrics.actionWords * 6);
-  setStyleControlValue("#writingStyleMethod", extracted);
-  setStyleControlValue("#styleJudgmentScore", profile.dimensions.judgment);
-  setStyleControlValue("#styleNarrativeScore", profile.dimensions.narrative);
-  setStyleControlValue("#styleActionScore", profile.dimensions.action);
-  updateWritingStyleRangeOutputs();
-  const report = document.querySelector("#styleExtractionReport");
-  report.innerHTML = `<strong>已提炼为可编辑方法</strong><p>${metrics.characters} 字 · ${metrics.paragraphs} 段 · 平均句长 ${metrics.averageLength} 字。结果已写入“方法定义”，请人工修改后再发布。</p>`;
-  markWritingStyleDirty();
-  showToast("参考文案已提炼");
-}
-
 function rebuildPromptFromMethod() {
   const profile = captureWritingStyleLab();
   if (!profile) return;
-  profile.prompt = `你正在使用“${profile.name}”写作。\n\n写作方法：\n${profile.method}\n\n表达边界：\n${profile.guardrails}\n\n输出时优先服务读者的业务理解与下一步行动，不复制参考文案的句子。`;
+  profile.prompt = `你正在使用“${profile.name}”写作。\n\n写作视角：\n${profile.perspective}\n\n风格特点：\n${profile.traits}\n\n作者声音：\n${profile.voice}\n\n写作方法：\n${profile.method}\n\n文章结构：\n${profile.structure}\n\n标题方法：\n${profile.titlePatterns}\n\n行文技巧：\n${profile.techniques}\n\n标志性表达动作：\n${profile.signatureMoves}\n\n反模板规则：\n${profile.antiAiRules}\n\n表达边界：\n${profile.guardrails}\n\n初稿完成后，按以下流程人工改稿：\n${profile.revisionPass}\n\n交稿前按以下标准检查：\n${profile.outputRules}`;
   setStyleControlValue("#writingStylePrompt", profile.prompt);
   markWritingStyleDirty();
-  showToast("Prompt 已根据方法重建");
-}
-
-function writingStyleSample(profile) {
-  const topic = profile.testTopic || "企业 AI 化的第一步";
-  const brief = profile.testBrief || "面向对 AI 感到焦虑的企业老板。";
-  const dimensions = profile.dimensions || {};
-  const opening = Number(dimensions.judgment || 0) >= 80
-    ? `老板真正要解决的，不是“${topic}”这个技术问题，而是它能不能进入一个可验收的业务动作。`
-    : `最近，“${topic}”又成为企业讨论的高频词。但老板需要先回到真实场景。`;
-  const evidence = Number(dimensions.evidence || 0) >= 82
-    ? "先把事实、对业务的解读和仍待验证的推测分开。没有基线数据和责任人，任何“降本增效”都只是演示稿。"
-    : "不用先追问模型排名。先写下这个场景的输入、动作、输出和责任人，问题就会清楚很多。";
-  const narrative = Number(dimensions.narrative || 0) >= 70
-    ? "假设销售团队每天都要从聊天记录里整理客户需求。AI 能不能把关键信息写入 CRM，并由销售确认，这是动作；“部署一个销售 Agent”，还不是。"
-    : "例如客户跟进：输入是聊天记录，动作是提取需求并回写 CRM，输出是待确认跟进任务，责任人仍是销售。";
-  const action = Number(dimensions.action || 0) >= 80
-    ? "今天就选一个高频、低风险的动作，写出原始耗时、错误率、人工兜底和停止条件。连续记录两周，再决定要不要扩大。"
-    : "下一步，不妨先把一个真实流程画出来，看看 AI 应该出现在哪个节点。";
-  return `# ${topic}\n\n${opening}\n\n${brief}\n\n${evidence}\n\n${narrative}\n\n${action}`;
-}
-
-function evaluateWritingStyleSample(profile) {
-  const output = String(profile.testOutput || "");
-  const length = output.replace(/\s/g, "").length;
-  const concreteWords = (output.match(/收入|成本|风险|流程|责任人|输入|输出|验收|CRM|两周/g) || []).length;
-  const aiPhrases = (output.match(/值得注意|随着|赋能|颠覆|不仅仅|总而言之/g) || []).length;
-  profile.scores = {
-    fit: Math.max(60, Math.min(98, 76 + Number(profile.dimensions?.judgment || 0) / 8 + Number(profile.dimensions?.action || 0) / 12)),
-    natural: Math.max(55, Math.min(98, 92 - aiPhrases * 8)),
-    specific: Math.max(58, Math.min(98, 68 + concreteWords * 3)),
-    reusable: Math.max(60, Math.min(98, 70 + (profile.method.length > 120 ? 14 : 4) + (profile.guardrails.length > 40 ? 8 : 2))),
-  };
-  Object.keys(profile.scores).forEach((key) => { profile.scores[key] = Math.round(profile.scores[key]); });
-  if (length < 180) profile.scores.specific = Math.max(55, profile.scores.specific - 8);
-}
-
-function runWritingStyleTest() {
-  const profile = captureWritingStyleLab();
-  if (!profile || profile.testTopic.length < 6) {
-    showToast("请先输入测试选题");
-    return;
-  }
-  profile.previousOutput = profile.testOutput || profile.previousOutput || "";
-  profile.testOutput = writingStyleSample(profile);
-  setStyleControlValue("#writingStyleTestOutput", profile.testOutput);
-  evaluateWritingStyleSample(profile);
-  markWritingStyleDirty();
-  showToast("样稿已生成，可继续手动修改");
-}
-
-function compareWritingStyleVersions() {
-  const profile = captureWritingStyleLab();
-  if (!profile?.previousOutput) {
-    showToast("运行至少两次样稿后才能对比");
-    return;
-  }
-  const previous = referenceMetrics(profile.previousOutput);
-  const current = referenceMetrics(profile.testOutput);
-  const comparison = document.querySelector("#writingStyleComparison");
-  comparison.hidden = false;
-  comparison.innerHTML = `<strong>与上一版比较</strong><p>字数 ${previous.characters} → ${current.characters}；平均句长 ${previous.averageLength} → ${current.averageLength}；判断词 ${previous.judgmentWords} → ${current.judgmentWords}；行动词 ${previous.actionWords} → ${current.actionWords}。请优先判断哪一版更准确，而不是哪一版更像模板。</p>`;
+  showToast("Prompt 已重建");
 }
 
 function publishWritingStyle() {
   const profile = captureWritingStyleLab();
   if (!profile || profile.name.length < 2 || profile.method.length < 60 || profile.prompt.length < 60) {
     showToast("请先补齐风格名、写作方法和 Prompt");
-    return;
-  }
-  if (!profile.isBuiltIn && profile.testOutput.replace(/\s/g, "").length < 100) {
-    showToast("请先运行并检查一次样稿");
-    setWritingStyleTab("test");
     return;
   }
   const previousPublishedName = profile.publishedName;
@@ -1275,27 +1139,6 @@ function publishWritingStyle() {
   showToast(`“${profile.name}”已发布，并设为公众号默认风格`);
 }
 
-function createWritingStyle(sourceProfile = null) {
-  const now = Date.now();
-  const source = sourceProfile || currentWritingStyle();
-  const id = `style-custom-${now}`;
-  const profile = source ? JSON.parse(JSON.stringify(source)) : JSON.parse(JSON.stringify(BUILT_IN_WRITING_STYLES[0]));
-  profile.id = id;
-  profile.name = sourceProfile ? `${source.name} 副本` : `新写作风格`;
-  profile.publishedName = "";
-  profile.status = "draft";
-  profile.isBuiltIn = false;
-  profile.hasUnpublishedChanges = true;
-  profile.updatedAt = new Date().toISOString();
-  profile.source = { name: sourceProfile ? `基于 ${source.source?.name || source.name}` : "自定义方法", url: source.source?.url || "", stars: "CUSTOM", license: "请核对原参考", note: "从内置方法复制后独立调试，发布前请确认参考边界。" };
-  writingStylesById[id] = profile;
-  selectedWritingStyleId = id;
-  writingStyleDirty = true;
-  renderWritingStyleLab();
-  setWritingStyleTab("method");
-  document.querySelector("#writingStyleName")?.focus();
-}
-
 function resetBuiltInWritingStyle() {
   const profile = currentWritingStyle();
   const original = BUILT_IN_WRITING_STYLE_BY_ID[profile?.id];
@@ -1308,22 +1151,6 @@ function resetBuiltInWritingStyle() {
   saveWritingStyle({ notify: false });
   renderPublishedWritingStyles(original.name);
   showToast("已还原内置方法");
-}
-
-function exportWritingStyleSkill() {
-  const profile = captureWritingStyleLab();
-  if (!profile) return;
-  const skillName = profile.name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-").replace(/^-|-$/g, "") || "wechat-writing-style";
-  const content = `---\nname: ${skillName}\ndescription: 在需要使用“${profile.name}”风格起草、改写或评估公众号文章时使用。\n---\n\n# ${profile.name}\n\n## 适用场景\n\n${profile.description}\n\n## 写作流程\n\n${profile.method}\n\n## Prompt\n\n${profile.prompt}\n\n## 输出规则\n\n${profile.outputRules}\n\n## 表达边界\n\n${profile.guardrails}\n`;
-  const url = URL.createObjectURL(new Blob([content], { type: "text/markdown;charset=utf-8" }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `${skillName}-SKILL.md`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-  showToast("Skill.md 已导出");
 }
 
 function rankOfTopic(topicId) {
@@ -1483,9 +1310,11 @@ function currentSelectedImageAsset(draft, role) {
 
 function imageBundleForDraft(draft) {
   ensureImagePlan(draft, topics.find((topic) => topic.id === draft?.topicId));
-  const cover = currentSelectedImageAsset(draft, "cover");
-  const inline = currentSelectedImageAsset(draft, "inline");
+  const skipped = Boolean(draft?.imagesSkipped);
+  const cover = skipped ? null : currentSelectedImageAsset(draft, "cover");
+  const inline = skipped ? null : currentSelectedImageAsset(draft, "inline");
   return {
+    deliveryMode: skipped ? "skipped" : (cover || inline ? "assets" : "none"),
     coverAssetId: cover?.id || null,
     inlineAssetIds: inline?.id ? [inline.id] : [],
     assets: [cover, inline].filter(Boolean).map((asset) => ({ ...asset })),
@@ -1501,19 +1330,25 @@ function createDraftFromTopic(topic) {
   const draft = {
     topicId: topic.id,
     status: "drafting",
-    currentStep: "brief",
+    currentStep: "title",
     styleId: initialStyle?.id || defaultWritingStyleId,
-    style: initialStyle?.publishedName || initialStyle?.name || topic.style || "观澜判断感",
+    style: initialStyle?.publishedName || initialStyle?.name || topic.style || "每周热点总结",
     length: topic.length || "中篇 / 1800-2400 字",
-    painScene: `老板对${topic.category}有具体焦虑：${topic.writingAngles.business}`,
-    coreJudgment: topic.opinion,
-    articleGoal: `让读者看完后能够判断${topic.category}会先影响收入、成本、效率还是风险，并知道下一个小切口如何验证。`,
-    notWrite: "不做新闻搬运，不堆工具名，不写泛泛的“AI 改变一切”，不夸大未经来源支持的结果。",
+    painScene: "",
+    coreJudgment: "",
+    articleGoal: "",
+    notWrite: "",
+    writingPrepVersion: WRITING_PREP_VERSION,
     titleSeed: 0,
+    titleEngineVersion: TITLE_ENGINE_VERSION,
     titleCandidates: [],
     selectedTitle: topic.articleTitleDraft || topic.title,
-    outline: topic.outline || "",
+    outlineSeed: 0,
+    outlineEngineVersion: OUTLINE_ENGINE_VERSION,
+    outline: "",
     bodyMarkdown: "",
+    imagesSkipped: false,
+    imageVisualPlans: {},
     imageBrief: topic.imagePrompt || "",
     inlineImageBrief: `正文配图：把${topic.category}的关键流程、责任人与验收点拆成一张克制的业务图卡，只服务阅读理解。`,
     confirmedSteps: [],
@@ -1522,10 +1357,11 @@ function createDraftFromTopic(topic) {
     updatedAt: new Date().toISOString(),
     handedOffRevision: null,
   };
+  applyWritingPreparation(topic, draft, { force: true });
   draft.imagePlan = createImagePlan(draft.imageBrief, draft.inlineImageBrief);
   ensureImagePlan(draft, topic);
   draft.titleCandidates = buildTitleCandidates(topic, draft);
-  draft.bodyMarkdown = buildBodyDraft(topic, draft);
+  draft.outline = buildOutlineDraft(topic, draft);
   return draft;
 }
 
@@ -1534,12 +1370,42 @@ function ensureDraft(topic) {
   if (!draftsByTopicId[topic.id]) draftsByTopicId[topic.id] = createDraftFromTopic(topic);
   const draft = draftsByTopicId[topic.id];
   if (!Array.isArray(draft.confirmedSteps)) draft.confirmedSteps = [];
+  if (typeof draft.imagesSkipped !== "boolean") draft.imagesSkipped = false;
+  if (!draft.imageVisualPlans || typeof draft.imageVisualPlans !== "object") draft.imageVisualPlans = {};
+  draft.confirmedSteps = draft.confirmedSteps.filter((step) => WRITING_STEPS.includes(step));
+  if (!WRITING_STEPS.includes(draft.currentStep)) draft.currentStep = "title";
   if (!draft.styleId || !writingStylesById[draft.styleId]) {
     draft.styleId = writingStyleByName(draft.style)?.id || writingStyleByName(topic.style)?.id || defaultWritingStyleId;
   }
+  if (Number(draft.titleEngineVersion || 1) < TITLE_ENGINE_VERSION) {
+    draft.titleEngineVersion = TITLE_ENGINE_VERSION;
+    draft.titleSeed = 0;
+    draft.titleCandidates = [];
+    draft.titleCandidateDetails = {};
+  }
   const style = writingStylesById[draft.styleId];
-  draft.style = style?.publishedName || style?.name || draft.style || "观澜判断感";
+  draft.style = style?.publishedName || style?.name || draft.style || "每周热点总结";
+  if (Number(draft.writingPrepVersion || 1) < WRITING_PREP_VERSION) {
+    const legacyPreparation = /这篇文章要回到原始材料|老板对.+焦虑/.test(String(draft.painScene || ""))
+      || /用“?.+已有的事实和细节|让读者能够|让读者看完/.test(String(draft.articleGoal || ""));
+    const hasNewResearch = Array.isArray(topic.evidenceItems) && topic.evidenceItems.length > 0;
+    applyWritingPreparation(topic, draft, { force: legacyPreparation || hasNewResearch });
+  }
+  if (Number(draft.outlineEngineVersion || 1) < OUTLINE_ENGINE_VERSION) {
+    draft.outlineEngineVersion = OUTLINE_ENGINE_VERSION;
+    draft.outlineSeed = 0;
+    const currentOutline = String(draft.outline || "").trim();
+    const legacyOutline = !currentOutline
+      || currentOutline === String(topic.outline || "").trim()
+      || (Array.isArray(topic.evidenceItems) && topic.evidenceItems.length > 0)
+      || /开头：先给出核心判断|事实边界|收束建议|本周总判断|结果或异常|核心主张：对|究竟是怎样做出来的|从哪一刻开始变了|没有被藏起来的代价|为什么不是一条孤立消息|主流解释遗漏了什么|原始来源记录的事件为|Multi-Agent AI Sales Crew Case Study/.test(currentOutline);
+    if (legacyOutline) {
+      draft.outline = buildOutlineDraft(topic, draft);
+      draft.confirmedSteps = draft.confirmedSteps.filter((step) => step !== "outline");
+    }
+  }
   ensureImagePlan(draft, topic);
+  if (imageDeliveryReady(draft) && !draft.confirmedSteps.includes("images")) draft.confirmedSteps.push("images");
   return draft;
 }
 
@@ -1811,43 +1677,115 @@ function uniqueList(items) {
   return [...new Set(items.filter(Boolean))];
 }
 
-function titleCandidateSets(topic, draft) {
-  const category = topic.category || "业务入口";
-  const valueTag = topic.valueTag || "经营结果";
-  const judgment = draft?.coreJudgment || topic.opinion;
-  return [
-    [
-      `老板该先看的不是 AI 工具，而是${category}`,
-      `企业 AI 化的关键，可能藏在${valueTag}里`,
-      `${topic.title}，真正提醒老板的是什么`,
-      `别急着买 AI，先盘点你的${category}`,
-    ],
-    [
-      `${category}正在变化，老板该先补哪张表`,
-      `企业 AI 化别先追热点，先看${valueTag}`,
-      `这条 AI 信号背后，老板真正要管的是${category}`,
-      `你的${category}，可能已经被 AI 改写了`,
-    ],
-    [
-      `老板最容易漏看的，不是模型，而是${category}`,
-      `从${valueTag}开始，重做企业 AI 化的第一步`,
-      `企业买 AI 前，先问清楚${category}有没有变`,
-      `AI 不是新工具清单，而是一张${category}检查表`,
-    ],
-    [
-      judgment.length <= 32 ? judgment : `${judgment.slice(0, 30)}……`,
-      `这不只是 AI 新闻，而是老板的${valueTag}问题`,
-      `从一条信号看懂${category}：老板今天先做什么`,
-      `${category}的真正分水岭，是能不能被验收`,
-    ],
+function titleFragment(value, maxLength = 22) {
+  const normalized = String(value || "")
+    .replace(/[\n\r]+/g, " ")
+    .replace(/[《》]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[。；;]+$/, "");
+  const firstSentence = normalized.split(/[。！？!?]/)[0] || normalized;
+  if (firstSentence.length <= maxLength) return firstSentence;
+  const firstClause = firstSentence.split(/[，,：:]/)[0];
+  if (firstClause.length >= 8 && firstClause.length <= maxLength) return firstClause;
+  return `${firstSentence.slice(0, maxLength - 1).trim()}…`;
+}
+
+function fitTitle(value, maxLength = 38) {
+  const title = String(value || "").replace(/\s+/g, " ").trim().replace(/[。；;]+$/, "");
+  return title.length <= maxLength ? title : `${title.slice(0, maxLength - 1).trim()}…`;
+}
+
+function titleCandidateMatrix(topic, draft) {
+  const category = titleFragment(topic.category || "业务入口", 12);
+  const valueTag = titleFragment(topic.valueTag || "经营结果", 12);
+  const subject = titleFragment(topic.title, 20);
+  const profile = writingStylesById[draft?.styleId] || writingStyleByName(draft?.style);
+  const judgment = titleFragment(profile?.id === "style-case-event-breakdown" ? topic.opinion : (draft?.coreJudgment || topic.opinion), 32);
+  const entry = (title, angle, reason) => ({ title: fitTitle(title), angle, reason });
+  let matrix = [];
+
+  if (profile?.id === "style-weekly-roundup") matrix = [
+    entry(`这一周，${subject}只是表面`, "冲突", "留出一个未说完的共同变化"),
+    entry(`${subject}之后，企业最先要重算的是${valueTag}`, "结果", "把新闻直接连到经营后果"),
+    entry(`这周的 AI 热点很多，真正改变${category}的只有几条`, "筛选", "明确承诺替读者做过取舍"),
+    entry(`${subject}与${category}，正在指向同一个变化`, "机制", "将分散信号组成一条主线"),
+    entry(`模型继续变强，${valueTag}为什么反而更难算`, "反差", "用相反走势制造张力"),
+    entry(`7 天里的几个信号：${category}的旧判断正在失效`, "时间", "给出时间边界和判断变化"),
+    entry(`${subject}看起来最热闹，但老板更该看后半段`, "读者代价", "把热度与真实业务影响分开"),
+    entry(`从${subject}到${valueTag}：这周 AI 只变了一件大事`, "收束", "用一个总判断统领周度信息"),
+    entry(`${category}的门槛真的降了吗？这周的答案没那么简单`, "代价", "同时提供机会与代价"),
+    entry(`别被${subject}带跑：本周更值得追的是${valueTag}`, "取舍", "用反共识选择展示编辑立场"),
   ];
+  else if (profile?.id === "style-case-event-breakdown") matrix = [
+    entry(`${subject}：最费时间的环节藏在哪里`, "转折", "从关键意外进入真实过程"),
+    entry(`怎么复现${subject}：动作、成本和失败条件`, "复现", "承诺可执行过程，不只讲成功故事"),
+    entry(`${subject}背后的成本，比结果更值得看`, "代价", "把读者注意力从结果拉回过程"),
+    entry(`拆开${subject}：哪一步仍需人工接管`, "细节", "用一个可核对的过程问题打开案例"),
+    entry(`从问题到结果，${subject}哪一步改变了走向`, "关键动作", "让读者预期看到决定性节点"),
+    entry(`${subject}看起来顺利，哪里仍然不能自动化`, "限制", "用诚实的能力边界建立信任"),
+    entry(`一次${category}实验，最后留下的不是 Demo`, "反差", "用结果与资产的反差制造好奇"),
+    entry(`${subject}：${valueTag}是怎么一步步被做出来的`, "过程", "明确告诉读者会获得什么"),
+    entry(`先别只看结果：${subject}还有哪些隐形成本`, "冲突", "用成果与隐性代价形成张力"),
+    entry(`${subject}之后，什么动作真正值得复用`, "收益", "给出清晰、单一的阅读收益"),
+  ];
+  else if (profile?.id === "style-personal-analysis") matrix = [
+    entry(`${subject}，真正的问题不是技术`, "主张", "直接暴露文章的核心判断"),
+    entry(`关于${subject}，市场可能看反了`, "反常识", "对主流解释提出可争论的反论"),
+    entry(`我为什么不急着看好${subject}`, "个人判断", "使用第一人称建立真实立场"),
+    entry(`${subject}之后，谁得到红利，谁承担成本`, "激励", "承诺拆开利益与代价"),
+    entry(`${subject}没有改变规则，它只是暴露了规则`, "机制", "把事件推向更深层的运作逻辑"),
+    entry(`未来半年，${category}最先变的不是模型`, "时间窗口", "给出可被验证的预测范围"),
+    entry(`${subject}值得担心，但理由不是大家说的那个`, "冲突", "用不同的因果解释制造张力"),
+    entry(`如果${judgment}，企业现在最该重算什么`, "读者代价", "把个人判断转成读者的决策问题"),
+    entry(`${subject}后的第二阶影响，比新闻本身更重要`, "二阶影响", "明确文章会推演新闻之后的后果"),
+    entry(`我会在什么情况下改口：重新看${subject}`, "可证伪", "用改变观点的条件展示理性与个性"),
+  ];
+  else matrix = [
+    entry(`老板该先看的不是 AI 工具，而是${category}`, "主张", "直接暴露核心判断"),
+    entry(`${subject}之后，企业最先要重算的是${valueTag}`, "结果", "连接到读者的经营问题"),
+    entry(`${category}的分水岭，是能不能被验收`, "机制", "给出一个可检验标准"),
+    entry(`别急着买 AI，先问清${category}哪里会失败`, "风险", "用具体风险替代空泛机会"),
+  ];
+
+  if (judgment.length >= 8 && judgment.length <= 32) matrix.unshift(entry(judgment, "核心主张", "不隐藏文章最想说的那句话"));
+  return matrix.filter((item) => item.title.length >= 8);
+}
+
+function titleStrengthScore(title, topic) {
+  const compact = String(title || "").replace(/\s/g, "");
+  const length = compact.length;
+  let score = 50;
+  if (length >= 16 && length <= 30) score += 18;
+  else if (length >= 11 && length <= 36) score += 10;
+  else score -= 6;
+  if (/[0-9A-Za-z]/.test(title)) score += 5;
+  if (String(topic.category || "").split(/[\/\s]/).some((token) => token.length >= 2 && title.includes(token))) score += 7;
+  if (String(topic.valueTag || "").split(/[\/\s]/).some((token) => token.length >= 2 && title.includes(token))) score += 5;
+  if (/不是|但|却|反而|比|真正|失效|代价/.test(title)) score += 10;
+  if (/怎么|为什么|谁|哪里|什么/.test(title)) score += 5;
+  if (/成本|结果|风险|红利|时间|失败|验收|重算/.test(title)) score += 6;
+  if (/重磅|震惊|彻底颠覆|必看|疯传|引爆|万万没想到/.test(title)) score -= 18;
+  if (/深度解析|全面解读|一文看懂|几点思考/.test(title)) score -= 12;
+  return Math.max(45, Math.min(94, score));
 }
 
 function buildTitleCandidates(topic, draft = currentDraft()) {
   if (!topic || !draft) return [];
-  const sets = titleCandidateSets(topic, draft);
-  const generated = sets[(draft.titleSeed || 0) % sets.length];
-  return uniqueList([draft.selectedTitle || topic.articleTitleDraft, ...generated]).slice(0, 5);
+  const matrix = titleCandidateMatrix(topic, draft);
+  const offset = (Number(draft.titleSeed || 0) * 5) % Math.max(1, matrix.length);
+  const rotated = [...matrix.slice(offset), ...matrix.slice(0, offset)];
+  const originalTitle = fitTitle(draft.selectedTitle || topic.articleTitleDraft || topic.title);
+  const entries = [
+    { title: originalTitle, angle: draft.titleSeed ? "已选" : "原题", reason: draft.titleSeed ? "保留你当前的选择" : "与新候选直接对比" },
+    ...rotated,
+  ].filter((item, index, items) => item.title && items.findIndex((candidate) => candidate.title === item.title) === index).slice(0, 6);
+  draft.titleCandidateDetails = Object.fromEntries(entries.map((item) => [item.title, {
+    angle: item.angle,
+    reason: item.reason,
+    score: titleStrengthScore(item.title, topic),
+  }]));
+  return entries.map((item) => item.title);
 }
 
 function renderTitleCandidates(topic, draft = currentDraft()) {
@@ -1855,14 +1793,17 @@ function renderTitleCandidates(topic, draft = currentDraft()) {
   if (!container || !topic || !draft) return;
   const candidates = draft.titleCandidates?.length ? draft.titleCandidates : buildTitleCandidates(topic, draft);
   draft.titleCandidates = candidates;
+  if (!draft.titleCandidateDetails || candidates.some((title) => !draft.titleCandidateDetails[title])) buildTitleCandidates(topic, draft);
   const selectedIndex = candidates.indexOf(draft.selectedTitle);
   container.innerHTML = candidates.map((title, index) => {
     const selected = title === draft.selectedTitle;
     const tabbable = selected || (selectedIndex === -1 && index === 0);
+    const detail = draft.titleCandidateDetails?.[title] || { angle: "候选", reason: "与核心主张和读者收益对齐", score: titleStrengthScore(title, topic) };
     return `
       <button class="title-option${selected ? " is-selected" : ""}" type="button" role="radio" data-title-index="${index}" aria-checked="${selected}" tabindex="${tabbable ? 0 : -1}">
-        <span>${String(index + 1).padStart(2, "0")}</span>
-        <strong>${escapeHtml(title)}</strong>
+        <span class="title-option-index">${String(index + 1).padStart(2, "0")}</span>
+        <span class="title-option-copy"><strong>${escapeHtml(title)}</strong><small>${escapeHtml(detail.reason)}</small></span>
+        <span class="title-option-meta"><em>${escapeHtml(detail.angle)}</em><b>${detail.score} 分</b></span>
       </button>
     `;
   }).join("");
@@ -1870,38 +1811,239 @@ function renderTitleCandidates(topic, draft = currentDraft()) {
 
 function buildOpeningDraft(topic, draft = currentDraft()) {
   const judgment = draft?.coreJudgment || topic.opinion;
-  const style = draft?.style || "观澜判断感";
+  const style = draft?.style || "每周热点总结";
   const profile = writingStylesById[draft?.styleId] || writingStyleByName(style);
-  if (style === "案例拆解") return `这不是一条普通的 AI 案例。它暴露了一个老板必须正面回答的问题：${judgment}`;
-  if (style === "商业内参") return `先给判断：${judgment}这条信号的价值，不在技术热度，而在它已经开始改变企业的业务动作。`;
-  if (style === "方法论") return `大多数老板容易从工具开始谈 AI。但更有用的起点是：${judgment}`;
-  if (style === "短评") return `${judgment}这件事对老板的提醒，比一个新模型、新工具更直接。`;
-  if (profile?.id === "style-natural-editor") return `${judgment}把这句话放回真实业务里，问题其实很具体：哪个人的哪个动作变了？`;
-  if (profile?.id === "style-brand-voice") return `观澜先给一个判断：${judgment}老板需要的不是更多 AI 名词，而是看清这个变化会落到哪个经营动作上。`;
-  if (profile && Number(profile.dimensions?.judgment || 0) >= 80) return `先给判断：${judgment}接下来要看的不是模型参数，而是它是否改变了一个可验收的业务动作。`;
-  return `老板真正该焦虑的，不是模型又升级了。这条信号真正提醒的是：${judgment}`;
+  if (profile?.id === "style-weekly-roundup") return `${judgment}这是本期原始材料里最值得被单独拿出来的变化。`;
+  if (profile?.id === "style-case-event-breakdown") return `${topic.worth || topic.title}案例要从这个已经发生的细节开始，不补写材料中没有的完美过程。`;
+  if (profile?.id === "style-personal-analysis") return `我的判断是：${judgment}`;
+  return judgment;
+}
+
+function outlineFragment(value, maxLength = 42) {
+  const normalized = String(value || "")
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/^原始来源记录的事件为[\s“"]*/, "")
+    .replace(/[”"]+$/, "")
+    .replace(/^[\s、，。；：:]+|[\s、，。；：:]+$/g, "")
+    .trim();
+  if (normalized.length <= maxLength) return normalized;
+  const clipped = normalized.slice(0, maxLength);
+  const naturalEnd = Math.max(clipped.lastIndexOf("，"), clipped.lastIndexOf("、"), clipped.lastIndexOf(" "));
+  return `${(naturalEnd > maxLength * 0.55 ? clipped.slice(0, naturalEnd) : clipped).trim()}…`;
+}
+
+function outlineAnchorTokens(value) {
+  return [...new Set((String(value || "").toLowerCase().replace(/×/g, "x").match(/\d+(?:\.\d+)?|[a-z][a-z0-9.+-]{1,}/g) || [])
+    .filter((token) => !["case", "study", "the", "and", "with", "from", "for"].includes(token)))];
+}
+
+function outlineFragmentsEquivalent(left, right) {
+  const normalize = (value) => String(value || "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+  const leftKey = normalize(left);
+  const rightKey = normalize(right);
+  if (!leftKey || !rightKey) return false;
+  if (leftKey.includes(rightKey) || rightKey.includes(leftKey)) return true;
+  const leftAnchors = outlineAnchorTokens(left);
+  const rightAnchors = new Set(outlineAnchorTokens(right));
+  const shared = leftAnchors.filter((token) => rightAnchors.has(token));
+  return shared.length >= 2 && shared.some((token) => /\d/.test(token) || token.length <= 4);
+}
+
+function sourceOutlineFragments(topic) {
+  const generic = /老板|验收|行动|小切口|建议|应该|这类材料说明|这条信号|先从|沉淀为|值得关注/;
+  const evidence = Array.isArray(topic?.evidenceItems)
+    ? topic.evidenceItems.flatMap((item) => [item?.heading, item?.text]).filter(Boolean)
+    : [];
+  const raw = [...evidence, topic?.worth, topic?.provenance?.originalTitle]
+    .filter(Boolean)
+    .flatMap((value) => String(value).split(/[\n。；;!?！？]+/));
+  return raw
+    .map((value) => outlineFragment(value, 48))
+    .filter((value) => value.length >= 8 && !generic.test(value))
+    .filter((value, index, values) => values.findIndex((item) => outlineFragmentsEquivalent(item, value)) === index)
+    .sort((a, b) => {
+      const signalScore = (value) => (/\d/.test(value) ? 4 : 0) + (/[A-Z][A-Za-z0-9.-]+/.test(value) ? 2 : 0) + Math.min(value.length, 36) / 36;
+      return signalScore(b) - signalScore(a);
+    })
+    .slice(0, 4);
+}
+
+function stableOutlineHash(value) {
+  return Array.from(String(value || "")).reduce((hash, character) => ((hash * 31) + character.charCodeAt(0)) >>> 0, 7);
+}
+
+function uniqueOutlineSections(sections, limit) {
+  return sections
+    .map((section) => outlineFragment(section, 52))
+    .filter(Boolean)
+    .filter((section, index, values) => values.findIndex((item) => outlineFragmentsEquivalent(item, section)) === index)
+    .slice(0, limit);
+}
+
+function numberedOutline(sections) {
+  const numerals = ["一", "二", "三", "四", "五", "六"];
+  return sections.map((section, index) => `${numerals[index]}、${section}`).join("\n");
+}
+
+function writingMaterialSignals(topic) {
+  const facts = sourceOutlineFragments(topic);
+  const researchedEvidence = Array.isArray(topic?.evidenceItems)
+    ? topic.evidenceItems.flatMap((item) => [item?.heading, item?.text]).filter(Boolean)
+    : [];
+  const material = [topic?.title, topic?.worth, topic?.opinion, topic?.evidenceBoundary, ...researchedEvidence].filter(Boolean).join(" ");
+  return {
+    facts,
+    hasNumber: /(?:\d[\d,.]*|[0-9]+\s*%|美元|人民币|万|亿|小时|天|次|份)/.test(material),
+    hasProcess: /过程|流程|操作|提示词|命令|提交|步骤|时间线|使用|通过|部署|开发|复现/.test(material),
+    hasOutcome: /结果|完成|发布|上线|启动|收购|融资|节省|增长|下降|收入|成本|失败|修复/.test(material),
+    hasConstraint: /失败|问题|限制|人工|成本|代价|风险|不足|未能|尚未/.test(material),
+    hasUncertainty: /传闻|可能|尚未|未确认|待定|预计|或将|仍不清楚/.test(material),
+  };
+}
+
+function buildWritingPreparation(topic, draft = null) {
+  draft = draft || {};
+  const profile = writingStylesById[draft.styleId] || writingStyleByName(draft.style) || writingStylesById[defaultWritingStyleId];
+  const signals = writingMaterialSignals(topic);
+  const sourceName = topic?.provenance?.sourceName || topic?.source || "原始来源";
+  const sourceDate = topic?.sourceDate ? ` · ${topic.sourceDate}` : "";
+  const evidenceItems = Array.isArray(topic?.evidenceItems) ? topic.evidenceItems.filter((item) => item?.heading) : [];
+  const evidence = evidenceItems.length
+    ? `${sourceName}${sourceDate}：\n${evidenceItems.map((item) => `· ${item.heading}`).join("\n")}`
+    : `${sourceName}${sourceDate}：${topic?.worth || topic?.title || "待补充原始材料"}`;
+  const strongestFact = signals.facts[0] || topic?.title || "待补充的事实";
+
+  if (profile?.id === "style-case-event-breakdown") {
+    const available = [signals.hasNumber && "数字", signals.hasProcess && "过程", signals.hasOutcome && "结果", signals.hasConstraint && "限制"].filter(Boolean);
+    const missing = [!signals.hasProcess && "过程记录", !signals.hasOutcome && "明确结果"].filter(Boolean);
+    const researchedBoundary = evidenceItems.find((item) => item.role === "boundary")?.text;
+    return {
+      title: "案例材料准备",
+      summary: `已有${available.length ? available.join("、") : "事件摘要"}${missing.length ? ` · 缺${missing.join("、")}` : " · 可进入拆解"}`,
+      labels: { focus: "拆解焦点", evidence: "现有证据", gap: "材料缺口" },
+      values: {
+        coreJudgment: `围绕“${topic.title}”还原一个具体事件，优先展开：${strongestFact}。`,
+        painScene: evidence,
+        notWrite: missing.length
+          ? `现有材料缺少${missing.join("和")}；不把事件摘要硬写成完整复盘，不虚构转折、失败或复用方法。`
+          : (researchedBoundary || "只写来源能支撑的过程和结果；案例特有的细节不上升为普遍方法。"),
+      },
+      outlineHint: "案例拆解先看手里有哪种证据。有数字就可以从结果开始；有完整记录才展开过程；没有过程时，只组织事件本身，不写“关键转折”和“复用条件”。",
+      basis: [strongestFact, ...available.map((item) => `已有${item}`), ...missing.map((item) => `缺${item}`)].slice(0, 4),
+    };
+  }
+
+  if (profile?.id === "style-personal-analysis") {
+    return {
+      title: "观点论证准备",
+      summary: `${signals.facts.length || 1} 个事实锚点 · ${signals.hasUncertainty ? "有不确定信息" : "可形成个人判断"}`,
+      labels: { focus: "我的主张", evidence: "事实锚点", gap: "我还不确定" },
+      values: {
+        coreJudgment: topic?.opinion || `我对“${topic.title}”的判断是什么，以及这个判断为什么不同于常见解释。`,
+        painScene: evidence,
+        notWrite: topic?.evidenceBoundary || (signals.hasUncertainty
+          ? "原始材料中仍有未确认信息；只能把它作为推断线索，不当成已发生事实。"
+          : "当前材料能支持一个人观点，但不自动扩大到整个行业；如果没有强反方，就不单设反方章节。"),
+      },
+      outlineHint: "根据这篇材料最有力的入口决定开头：可以是一个事实、一个数字或作者主张。反方、历史类比和二阶影响都是可选论证动作，不是必备章节。",
+      basis: [outlineFragment(topic?.opinion, 30), strongestFact, signals.hasUncertainty ? "存在不确定信息" : "事实与观点分开"].filter(Boolean),
+    };
+  }
+
+  const sourceCount = Math.max(1, signals.facts.length);
+  return {
+    title: "周报编辑准备",
+    summary: `${sourceCount} 条可用信号${sourceCount < 3 ? " · 还不足以组成完整周报" : " · 可开始归纳主线"}`,
+    labels: { focus: "本期编辑取舍", evidence: "已有消息", gap: "还缺的信号" },
+    values: {
+      coreJudgment: topic?.opinion || `判断“${topic.title}”是本期主线、旁支还是应暂时放下的消息。`,
+      painScene: evidence,
+      notWrite: sourceCount < 3
+        ? "当前只有一个选题摘要，还需补充同周其他原始消息，才能判断共同主线；不用一条新闻伪装成周报。"
+        : "只保留能与其他消息形成真实关系的信号；不为了数量补低价值新闻。",
+    },
+    outlineHint: "周报不先套“总判断 + 三条主线 + 下周观察”。先将消息去重和排序，再看它们适合按共同机制、冲突、时间还是影响组织。",
+    basis: [strongestFact, `${sourceCount} 条可用信号`, sourceCount < 3 ? "需补充同周材料" : "可归纳主线"],
+  };
+}
+
+function applyWritingPreparation(topic, draft, { force = true } = {}) {
+  if (!topic || !draft) return null;
+  const preparation = buildWritingPreparation(topic, draft);
+  if (force) {
+    draft.coreJudgment = preparation.values.coreJudgment;
+    draft.painScene = preparation.values.painScene;
+    draft.notWrite = preparation.values.notWrite;
+    draft.articleGoal = "";
+  }
+  draft.writingPrepVersion = WRITING_PREP_VERSION;
+  return preparation;
 }
 
 function buildOutlineDraft(topic, draft = currentDraft()) {
-  const goal = draft?.articleGoal || `让老板看懂${topic.category}的业务影响`;
-  const profile = writingStylesById[draft?.styleId] || writingStyleByName(draft?.style);
-  const dimensions = profile?.dimensions || {};
-  const signalSection = Number(dimensions.evidence || 0) >= 82
-    ? `二、证据边界：分开“${topic.title}”中的事实、解读与待验证推测`
-    : `二、表层变化：交代“${topic.title}”所代表的真实信号，不做新闻搬运`;
-  const middleSection = Number(dimensions.narrative || 0) >= 70
-    ? `三、案例拆解：还原${topic.category}里的原问题、关键动作、责任人与复制条件`
-    : `三、业务拆解：把${topic.category}拆成输入、动作、责任人和验收结果`;
-  const landingSection = Number(dimensions.action || 0) >= 85
-    ? `五、技巧提炼：${goal}，并给出一个今天可以启动的检查动作`
-    : `五、收束建议：${goal}`;
-  return [
-    `一、开头：先给出核心判断，说清它为什么和老板有关`,
-    signalSection,
-    middleSection,
-    `四、经营判断：回到${topic.valueTag}，说明先影响收入、成本、效率还是风险`,
-    landingSection,
-  ].join("\n");
+  if (!topic) return "";
+  const profile = writingStylesById[draft?.styleId] || writingStyleByName(draft?.style) || writingStylesById[defaultWritingStyleId];
+  const title = outlineFragment(topic.title, 38);
+  const claim = outlineFragment(profile?.id === "style-case-event-breakdown" ? topic.opinion : (draft?.coreJudgment || topic.opinion), 48);
+  const signals = writingMaterialSignals(topic);
+  const facts = signals.facts;
+  const factA = facts[0] || title;
+  const factB = facts[1] || "";
+  const sourceName = outlineFragment(topic.provenance?.sourceName || topic.source, 22);
+  const seed = Number(draft?.outlineSeed || 0);
+  const hash = stableOutlineHash(`${topic.id || topic.title}:${seed}`);
+  const variant = hash % 3;
+  const limit = 3 + (hash % 3);
+  let sequences;
+
+  if (profile?.id === "style-case-event-breakdown") {
+    const evidenceItems = Array.isArray(topic.evidenceItems) ? topic.evidenceItems.filter((item) => item?.heading) : [];
+    if (evidenceItems.length >= 3) {
+      const byRole = Object.fromEntries(evidenceItems.map((item) => [item.role, item.heading]));
+      const evidenceSequences = [
+        [byRole.result, byRole.problem, byRole.process, byRole.timeline, byRole.boundary],
+        [byRole.problem, byRole.process, byRole.result, byRole.timeline, byRole.boundary],
+        [byRole.process, byRole.problem, byRole.result, byRole.boundary, byRole.timeline],
+      ];
+      return numberedOutline(uniqueOutlineSections(evidenceSequences[variant], 4 + (hash % 2)));
+    }
+    const processSection = signals.hasProcess ? `“${title}”在原始记录中经过了哪些步骤` : "";
+    const numberSection = signals.hasNumber ? `数字里真正需要解释的部分` : "";
+    const constraintSection = signals.hasConstraint ? `原始记录里的代价、限制或人工介入` : "";
+    const sourceSection = factB || `${sourceName || "原始来源"}如何描述这件事`;
+    sequences = [
+      [factA, processSection, sourceSection, numberSection, claim, constraintSection],
+      [claim, factA, numberSection, sourceSection, processSection, constraintSection],
+      [factA, sourceSection, claim, processSection, numberSection, constraintSection],
+    ];
+  } else if (profile?.id === "style-personal-analysis") {
+    const mechanismSection = `“${title}”背后，${outlineFragment(topic.category, 16) || "这个问题"}真正起作用的约束`;
+    const counterSection = signals.hasConstraint
+      ? `有一个事实不完全支持这个判断`
+      : `主流解释遗漏了什么`;
+    const uncertaintySection = signals.hasUncertainty ? `关于“${title}”，我现在还不愿下结论的部分` : factB;
+    sequences = [
+      [claim, factA, mechanismSection, counterSection, uncertaintySection],
+      [factA, claim, counterSection, mechanismSection, uncertaintySection],
+      [counterSection, factA, mechanismSection, claim, uncertaintySection],
+    ];
+  } else {
+    const connectionSection = factB
+      ? `把“${outlineFragment(factA, 20)}”和“${outlineFragment(factB, 20)}”放在一起看`
+      : `（材料缺口）补充同周消息后，再判断“${title}”能否形成主线`;
+    const openSection = signals.hasUncertainty
+      ? `${sourceName || "这组材料"}还没有回答的问题`
+      : `${outlineFragment(topic.valueTag, 16) || topic.category || "这条主线"}正在发生的变化`;
+    sequences = [
+      [factA, connectionSection, claim, factB, openSection],
+      [claim, factA, connectionSection, openSection, factB],
+      [factA, factB, connectionSection, openSection, claim],
+    ];
+  }
+
+  const sections = uniqueOutlineSections(sequences[variant], limit);
+  return numberedOutline(sections.length >= 3 ? sections : uniqueOutlineSections([title, factA, claim], 3));
 }
 
 function bodyTargetRange(length = "") {
@@ -1920,61 +2062,17 @@ function bodyLengthWithinTarget(draft) {
   return count >= range.min && count <= range.max;
 }
 
-function buildBodyDraft(topic, draft = currentDraft()) {
-  if (!topic || !draft) return "";
-  const targetHint = draft.length.startsWith("短篇") ? "文章要短，但判断不能轻。" : draft.length.startsWith("长篇") ? "长文要用更多事实、案例和流程细节支撑判断。" : "中篇应该让判断、业务拆解和行动建议保持均衡。";
-  const outlineHeadings = String(draft.outline || "").split("\n").map((line) => line.replace(/^[一二三四五六七八九十\d]+[、.\s]*/, "").trim()).filter(Boolean);
-  const heading = (index, fallback) => `## ${(outlineHeadings[index] || fallback).replace(/^[^:：]*[:：]\s*/, "")}`;
-  const base = [
-    buildOpeningDraft(topic, draft),
-    "",
-    heading(1, "这条信号真正改变了什么"),
-    "",
-    `今天发生的事是：${topic.title}。`,
-    "",
-    topic.worth,
-    "",
-    heading(2, "把问题放回业务流程"),
-    "",
-    `这和老板有什么关系？${draft.painScene}`,
-    "",
-    `${draft.coreJudgment}`,
-    "",
-    `具体到${topic.category}这条线，不要先问工具多强，而要先把流程拆成输入、动作、输出、责任人和验收标准。${topic.writingAngles.process}`,
-    "",
-    heading(3, "老板要看的经营结果"),
-    "",
-    `组织上也要同时回答：${topic.writingAngles.organization}`,
-    "",
-    `最后要沉淀什么？${topic.writingAngles.asset}`,
-    "",
-    heading(4, "今天可以开始的一个动作"),
-    "",
-    `${targetHint}${draft.articleGoal}`,
-    "",
-    `老板今天可以先做一件小事：选一个真实流程，写下它的输入、责任人、输出和验收标准。如果这四件事还说不清，就先不要采购更大的 AI 系统。`,
-  ].join("\n");
-  const expansions = [
-    `## 先核对事实，再放大判断\n\n这类信号最容易被写成趋势新闻，但老板需要的不是热度，而是证据。先把“${topic.title}”中可以核对的事实、仍待验证的推测和对企业的解读分开。只有这三层被分清，${draft.coreJudgment}才不会变成一句空洞口号。`,
-    `## 用经营账判断优先级\n\n第一步不是估算 AI 能省多少人，而是确认${topic.valueTag}会落到哪张经营报表上。它如果影响收入，就看转化率、客单价和流失；如果影响成本，就看重复工时、返工和服务交付；如果影响风险，就看责任归属、审批和追溯。没有基线数字，就不要轻易承诺效果。`,
-    `## 把流程拆到可以验收\n\n${topic.writingAngles.process}真正可执行的拆法，是把一个场景写成五列：输入材料是什么，AI 要完成什么动作，输出交给谁，哪个角色承担最终责任，用什么标准验收。五列中任何一列空白，都意味着项目还不适合扩大。`,
-    `## 组织不能只分为“技术”和“业务”\n\n${topic.writingAngles.organization}业务负责人应定义结果和验收线，一线人员提供真实输入和异常样本，技术人员负责稳定性、权限和日志，管理者则决定什么时候停止、回滚或扩大。这些责任没有写进流程，AI 项目就会变成没有业务主人的测试。`,
-    `## 先做一个两周可验证的小切口\n\n选一个频率足够高、风险可控、输入相对稳定的场景，保留人工兜底，连续记录两周。验证时不只看速度，还要看正确率、返工率、异常占比和一线接受度。如果节省的时间被额外检查和修改吃掉，这个切口就需要重新设计。`,
-    `## 采购之前先问清边界\n\n工具演示的是最顺利路径，企业使用遇到的却是权限、脏数据、例外和交接。因此采购清单上至少要有：数据如何保存，模型如何更新，权限如何分层，失败如何回滚，日志如何导出，以及供应商变更时能否迁移。这些问题比模型榜单更接近真实成本。`,
-    `## 把失败条件也写进方案\n\n可用的方案不只说成功会怎样，也要明确什么情况下不再继续。例如错误率连续超过红线、人工审核时间高于原流程、关键数据无法追溯，或者一线因责任不清而拒绝使用。预先设置停止条件，不是悲观，而是让企业可以用小成本获得真经验。`,
-    `## 用三十天把实验变成能力\n\n第一周画清流程和基线，第二周用小样本运行并记录异常，第三周调整提示、知识和人工审核节点，第四周再决定是否扩大。每周都要留下版本、样本、指标和复盘结论。${topic.writingAngles.asset}只有这些东西能被下一个团队复用，一次试验才会真正变成企业资产。`,
-  ];
-  const target = bodyTargetLength(draft.length);
-  let body = base;
-  expansions.forEach((section) => {
-    if (body.replace(/\s/g, "").length < target + 80) body += `\n\n${section}`;
-  });
-  let checklistIndex = 1;
-  while (body.replace(/\s/g, "").length < target + 80) {
-    body += `\n\n## 补充核对 ${checklistIndex}\n\n再回到一个真实业务样本，核对输入是否完整、输出是否可验收、异常是否有人处理、结果是否留下日志。只有当这四个问题都能回答，${topic.category}才能从演示走向稳定交付。`;
-    checklistIndex += 1;
-  }
-  return body;
+function bodyReadyForProgress(draft) {
+  return String(draft?.bodyMarkdown || "").replace(/[#>*_`\s-]/g, "").length >= 200;
+}
+
+function selectedImageAssetCount(draft) {
+  if (!draft || draft.imagesSkipped) return 0;
+  return ["cover", "inline"].filter((role) => Boolean(currentSelectedImageAsset(draft, role))).length;
+}
+
+function imageDeliveryReady(draft) {
+  return Boolean(draft?.imagesSkipped || selectedImageAssetCount(draft) > 0);
 }
 
 function buildImageBriefs(topic, draft = currentDraft()) {
@@ -2080,52 +2178,329 @@ async function paintImagePreview(role, asset) {
 
 function renderImageStudio(draft = currentDraft()) {
   const topic = queuedTopic();
-  const exportButton = document.querySelector("#exportImageTasksButton");
-  const pendingTaskCount = draft
-    ? ["cover", "inline"].flatMap((role) => imageSlotPlan(draft, role)?.taskIds || []).filter((id) => imageTasksById[id]?.status === "awaiting_codex").length
-    : 0;
-  if (exportButton) exportButton.hidden = pendingTaskCount === 0;
+  const assetCount = selectedImageAssetCount(draft);
+  const summary = document.querySelector("#imageDeliverySummary");
+  const generateAll = document.querySelector("#generateAllImagesButton");
+  const skip = document.querySelector("#skipImagesButton");
+  if (summary) {
+    summary.dataset.state = draft?.imagesSkipped ? "skipped" : assetCount ? "ready" : "empty";
+    summary.textContent = draft?.imagesSkipped
+      ? "本稿选择无图交付"
+      : assetCount ? `${assetCount} / 2 张图片已就绪，将随正文进入排版` : "配图为可选项，可生成、导入或直接跳过";
+  }
+  if (generateAll) {
+    generateAll.disabled = !draft || !topic || imageGenerationInFlight;
+    generateAll.textContent = imageGenerationInFlight ? "正在生成…" : assetCount ? "重新生成两张图" : "生成两张配图";
+  }
+  if (skip) skip.disabled = !draft || !topic || imageGenerationInFlight;
   ["cover", "inline"].forEach((role) => {
     const status = document.querySelector(`#${role}ImageStatus`);
     const meta = document.querySelector(`#${role}ImageTaskMeta`);
-    const adopt = document.querySelector(`[data-image-action="adopt"][data-image-role="${role}"]`);
     const open = document.querySelector(`[data-image-action="open"][data-image-role="${role}"]`);
-    const create = document.querySelector(`[data-image-action="create-task"][data-image-role="${role}"]`);
+    const create = document.querySelector(`[data-image-action="generate-asset"][data-image-role="${role}"]`);
     const importButton = document.querySelector(`[data-image-action="import"][data-image-role="${role}"]`);
     const fileInput = document.querySelector(`#${role}ImageFile`);
-    if (!status || !meta || !adopt || !open || !create || !importButton || !fileInput) return;
+    if (!status || !meta || !open || !create || !importButton || !fileInput) return;
     status.className = "image-task-status";
     if (!draft || !topic) {
       status.textContent = "未创建";
       meta.textContent = "请先放入一条公众号稿件。";
-      [adopt, open, create, importButton, fileInput].forEach((button) => { button.disabled = true; });
-      adopt.hidden = true;
+      [open, create, importButton, fileInput].forEach((button) => { button.disabled = true; });
       open.hidden = true;
       paintImagePreview(role, null);
       return;
     }
     ensureImagePlan(draft, topic);
     const state = imageTaskState(draft, role);
-    status.textContent = state.label;
+    status.textContent = imageGenerationInFlight ? "生成中" : state.key === "waiting" ? "旧任务未交付" : state.label;
     if (["ready", "adopted"].includes(state.key)) status.classList.add(`is-${state.key}`);
-    if (["waiting", "stale"].includes(state.key)) status.classList.add(`is-${state.key}`);
+    if (imageGenerationInFlight || ["waiting", "stale"].includes(state.key)) status.classList.add("is-waiting");
     const asset = state.selectedAsset || state.readyAsset;
-    const attempt = state.task?.attempt ? ` · 第 ${state.task.attempt} 次` : "";
-    meta.textContent = state.key === "waiting"
-      ? `任务 ${state.task.id}${attempt}，等待 Codex 执行；旧资产会继续保留。`
+    meta.textContent = imageGenerationInFlight
+      ? "正在提取视觉结构并渲染 PNG。"
+      : state.key === "waiting"
+      ? "这是旧版未完成任务，可直接重新生成或导入图片。"
       : state.key === "stale"
-        ? "Prompt 已变化，旧图仍保留；请重新生成或明确继续采用。"
-        : asset ? `${asset.width || "?"} × ${asset.height || "?"} · ${asset.storage === "project" ? "项目资产" : "本地导入"}${attempt}` : "Prompt 准备好后创建 Codex 任务。";
-    adopt.disabled = !state.readyAsset;
+        ? "标题或图片说明已变化，请重新生成或导入替换。"
+        : asset ? `${asset.width || "?"} × ${asset.height || "?"} · ${asset.storage === "project" ? "项目资产" : "已存入本地资产"}` : "生成后会自动采用，并随稿件进入排版。";
     open.disabled = !asset;
-    adopt.hidden = !state.readyAsset;
     open.hidden = !asset;
-    create.disabled = false;
-    importButton.disabled = false;
+    create.disabled = imageGenerationInFlight;
+    importButton.disabled = imageGenerationInFlight;
     fileInput.disabled = false;
-    create.textContent = state.task ? (role === "cover" ? "重新生成封面" : "重新生成配图") : (role === "cover" ? "生成封面图" : "生成正文配图");
+    create.textContent = asset ? (role === "cover" ? "重新生成封面" : "重新生成正文图") : (role === "cover" ? "生成封面图" : "生成正文图");
     paintImagePreview(role, asset);
   });
+}
+
+function roundRectPath(context, x, y, width, height, radius = 14) {
+  const r = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + width, y, x + width, y + height, r);
+  context.arcTo(x + width, y + height, x, y + height, r);
+  context.arcTo(x, y + height, x, y, r);
+  context.arcTo(x, y, x + width, y, r);
+  context.closePath();
+}
+
+function canvasTextLines(context, text, maxWidth, maxLines = 2) {
+  const characters = Array.from(String(text || ""));
+  const lines = [];
+  let line = "";
+  characters.forEach((character) => {
+    const next = line + character;
+    if (line && context.measureText(next).width > maxWidth) {
+      lines.push(line);
+      line = character;
+    } else {
+      line = next;
+    }
+  });
+  if (line) lines.push(line);
+  if (lines.length > maxLines) {
+    const clipped = lines.slice(0, maxLines);
+    clipped[maxLines - 1] = `${clipped[maxLines - 1].slice(0, -1)}…`;
+    return clipped;
+  }
+  return lines;
+}
+
+function drawCanvasNodes(context, plan, area) {
+  const nodes = plan.nodes || [];
+  const navy = "#0d355c";
+  const blue = "#2d6d98";
+  const gold = "#c8a766";
+  const pale = "#eef2f3";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.font = '600 20px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+
+  if (plan.composition === "layers") {
+    nodes.forEach((node, index) => {
+      const inset = index * 22;
+      const x = area.x + inset;
+      const y = area.y + index * (area.height / Math.max(nodes.length, 1));
+      const width = area.width - inset * 2;
+      const height = Math.max(54, area.height / nodes.length - 14);
+      roundRectPath(context, x, y, width, height, 12);
+      context.fillStyle = index === nodes.length - 1 ? navy : index % 2 ? "#dce7ec" : pale;
+      context.fill();
+      context.fillStyle = index === nodes.length - 1 ? "#fffdf8" : navy;
+      context.fillText(node, x + width / 2, y + height / 2);
+    });
+    return;
+  }
+
+  if (plan.composition === "funnel") {
+    nodes.forEach((node, index) => {
+      const ratio = 1 - (index / Math.max(nodes.length, 1)) * .46;
+      const width = area.width * ratio;
+      const height = area.height / nodes.length - 10;
+      const x = area.x + (area.width - width) / 2;
+      const y = area.y + index * (area.height / nodes.length);
+      roundRectPath(context, x, y, width, height, 10);
+      context.fillStyle = index === nodes.length - 1 ? gold : index % 2 ? blue : navy;
+      context.fill();
+      context.fillStyle = "#fffdf8";
+      context.fillText(node, area.x + area.width / 2, y + height / 2);
+    });
+    return;
+  }
+
+  if (plan.composition === "network") {
+    const centerX = area.x + area.width / 2;
+    const centerY = area.y + area.height / 2;
+    const radius = Math.min(area.width, area.height) * .36;
+    nodes.forEach((node, index) => {
+      const angle = -Math.PI / 2 + index * Math.PI * 2 / nodes.length;
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      context.strokeStyle = "rgba(13,53,92,.28)";
+      context.lineWidth = 3;
+      context.beginPath();
+      context.moveTo(centerX, centerY);
+      context.lineTo(x, y);
+      context.stroke();
+      roundRectPath(context, x - 60, y - 26, 120, 52, 14);
+      context.fillStyle = index % 2 ? pale : "#dce7ec";
+      context.fill();
+      context.fillStyle = navy;
+      context.fillText(node, x, y);
+    });
+    context.beginPath();
+    context.arc(centerX, centerY, 38, 0, Math.PI * 2);
+    context.fillStyle = gold;
+    context.fill();
+    return;
+  }
+
+  if (plan.composition === "comparison") {
+    const gap = 20;
+    const columnWidth = (area.width - gap) / 2;
+    nodes.forEach((node, index) => {
+      const column = index % 2;
+      const row = Math.floor(index / 2);
+      const x = area.x + column * (columnWidth + gap);
+      const y = area.y + row * 76;
+      roundRectPath(context, x, y, columnWidth, 58, 12);
+      context.fillStyle = column ? "#dce7ec" : navy;
+      context.fill();
+      context.fillStyle = column ? navy : "#fffdf8";
+      context.fillText(node, x + columnWidth / 2, y + 29);
+    });
+    return;
+  }
+
+  const gap = 14;
+  const nodeWidth = (area.width - gap * (nodes.length - 1)) / nodes.length;
+  const y = area.y + area.height / 2 - 34;
+  nodes.forEach((node, index) => {
+    const x = area.x + index * (nodeWidth + gap);
+    if (index) {
+      context.strokeStyle = gold;
+      context.lineWidth = 4;
+      context.beginPath();
+      context.moveTo(x - gap, y + 34);
+      context.lineTo(x, y + 34);
+      context.stroke();
+    }
+    roundRectPath(context, x, y, nodeWidth, 68, 14);
+    context.fillStyle = index === nodes.length - 1 ? navy : index % 2 ? "#dce7ec" : pale;
+    context.fill();
+    context.fillStyle = index === nodes.length - 1 ? "#fffdf8" : navy;
+    context.fillText(node, x + nodeWidth / 2, y + 34);
+  });
+}
+
+function renderVisualPlanToPng(role, plan) {
+  const width = 1200;
+  const height = role === "cover" ? 510 : 800;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  context.fillStyle = "#f8f7f4";
+  context.fillRect(0, 0, width, height);
+  context.fillStyle = "#0d355c";
+  context.fillRect(0, 0, 14, height);
+  context.fillStyle = "rgba(45,109,152,.08)";
+  context.beginPath();
+  context.arc(width - 70, 40, role === "cover" ? 250 : 360, 0, Math.PI * 2);
+  context.fill();
+
+  context.textAlign = "left";
+  context.textBaseline = "alphabetic";
+  context.fillStyle = "#9a7b38";
+  context.font = '700 18px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+  context.fillText("观澜 AI · 内容图解", 58, 58);
+
+  if (role === "cover") {
+    context.fillStyle = "#071827";
+    context.font = '700 46px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    const lines = canvasTextLines(context, plan.headline, 570, 2);
+    lines.forEach((line, index) => context.fillText(line, 58, 145 + index * 64));
+    context.fillStyle = "#526576";
+    context.font = '500 22px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    if (plan.subline) context.fillText(plan.subline, 58, 300);
+    drawCanvasNodes(context, plan, { x: 690, y: 88, width: 440, height: 330 });
+  } else {
+    context.fillStyle = "#071827";
+    context.font = '700 38px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    canvasTextLines(context, plan.headline, 920, 2).forEach((line, index) => context.fillText(line, 58, 126 + index * 52));
+    drawCanvasNodes(context, plan, { x: 76, y: 230, width: 1048, height: 360 });
+    context.fillStyle = "#526576";
+    context.font = '500 21px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    canvasTextLines(context, plan.caption, 1040, 2).forEach((line, index) => context.fillText(line, 76, 675 + index * 32));
+  }
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => blob ? resolve({ blob, width, height }) : reject(new Error("图片渲染失败")), "image/png", .94);
+  });
+}
+
+async function saveRenderedImageAsset(role, rendered, plan, draft) {
+  const slot = imageSlotPlan(draft, role);
+  const createdAt = new Date().toISOString();
+  const taskId = `render-${draft.topicId}-${role}-${Date.now()}`;
+  const assetId = `asset-${taskId}`;
+  await putImageBlob(assetId, rendered.blob);
+  (slot.taskIds || []).forEach((id) => {
+    const task = imageTasksById[id];
+    if (task?.status === "awaiting_codex") task.status = "superseded";
+  });
+  imageTasksById[taskId] = {
+    id: taskId,
+    topicId: draft.topicId,
+    role,
+    provider: "local-visual-renderer",
+    briefSnapshot: String(slot.prompt || ""),
+    titleSnapshot: String(draft.selectedTitle || ""),
+    promptSnapshot: JSON.stringify(plan),
+    status: "ready",
+    attempt: (slot.taskIds || []).length + 1,
+    assetIds: [assetId],
+    createdAt,
+    updatedAt: createdAt,
+  };
+  imageAssetsById[assetId] = {
+    id: assetId,
+    taskId,
+    topicId: draft.topicId,
+    role,
+    src: "",
+    mime: "image/png",
+    width: rendered.width,
+    height: rendered.height,
+    alt: role === "cover" ? `${draft.selectedTitle}封面图` : `${draft.selectedTitle}正文配图`,
+    storage: "indexeddb",
+    originalName: `${draft.topicId}-${role}.png`,
+    createdAt,
+  };
+  slot.taskIds.unshift(taskId);
+  slot.selectedAssetId = assetId;
+  slot.adoptionSnapshot = {
+    assetId,
+    briefSnapshot: String(slot.prompt || ""),
+    titleSnapshot: String(draft.selectedTitle || ""),
+    acceptedAt: createdAt,
+  };
+  draft.imageVisualPlans[role] = plan;
+  draft.imagesSkipped = false;
+}
+
+async function generateImageAssets(roles = ["cover", "inline"]) {
+  const topic = queuedTopic();
+  const draft = captureDraftFromEditor();
+  if (!topic || !draft || imageGenerationInFlight) return;
+  imageGenerationInFlight = true;
+  renderImageStudio(draft);
+  try {
+    const role = roles.length === 1 ? roles[0] : "all";
+    const response = await fetch(DEEPSEEK_WRITING_ENDPOINTS.images, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Content-Factory-Client": "content-factory-lite" },
+      body: JSON.stringify({ ...writingGenerationPayload(topic, draft), role }),
+    });
+    let result;
+    try { result = await response.json(); } catch { result = {}; }
+    if (!response.ok) throw new Error(result?.error || `图片方案生成失败（${response.status}）`);
+    for (const item of roles) {
+      if (!result[item]) throw new Error(`${item === "cover" ? "封面" : "正文图"}方案不完整，请重试`);
+      const rendered = await renderVisualPlanToPng(item, result[item]);
+      await saveRenderedImageAsset(item, rendered, result[item], draft);
+    }
+    if (!draft.confirmedSteps.includes("images")) draft.confirmedSteps.push("images");
+    draft.dirty = true;
+    invalidateDraftHandoff(draft);
+    saveCurrentDraft({ forceRevision: true });
+    showToast(roles.length === 2 ? "两张配图已生成并交付" : `${roles[0] === "cover" ? "封面图" : "正文图"}已生成并交付`);
+  } catch (error) {
+    showToast(generationErrorMessage(error, "图片生成失败，请重试"));
+  } finally {
+    imageGenerationInFlight = false;
+    renderImageStudio(draft);
+    updateWriterChrome();
+  }
 }
 
 function createCodexImageTask(role) {
@@ -2189,6 +2564,8 @@ function adoptReadyImage(role) {
     titleSnapshot: String(draft.selectedTitle || ""),
     acceptedAt: new Date().toISOString(),
   };
+  draft.imagesSkipped = false;
+  if (!draft.confirmedSteps.includes("images")) draft.confirmedSteps.push("images");
   draft.dirty = true;
   invalidateDraftHandoff(draft);
   persistWorkspace();
@@ -2314,6 +2691,8 @@ async function importImageFile(role, file) {
     titleSnapshot: String(draft.selectedTitle || ""),
     acceptedAt: createdAt,
   };
+  draft.imagesSkipped = false;
+  if (!draft.confirmedSteps.includes("images")) draft.confirmedSteps.push("images");
   draft.dirty = true;
   invalidateDraftHandoff(draft);
   persistWorkspace();
@@ -2385,47 +2764,15 @@ function setLayoutEditorSurface(surface = "markdown") {
   });
 }
 
-function updateLayoutWorkbenchStatus({ message = "" } = {}) {
+function updateLayoutWorkbenchStatus() {
   const snapshot = activeLayoutSnapshot();
   const markdown = document.querySelector("#layoutMarkdownEditor")?.value || "";
-  const html = document.querySelector("#layoutHtmlEditor")?.value || "";
   const analysis = analyzeArticleForLayout(markdown, snapshot?.title || "文章");
   const parsed = parseMarkdownForLayout(markdown, snapshot?.title || "文章");
   const listCount = parsed.blocks.filter((block) => block.type === "list").length;
   const stats = document.querySelector("#layoutContentStats");
-  const structure = document.querySelector("#layoutStructureSummary");
-  const theme = document.querySelector("#layoutCurrentTheme");
-  const state = document.querySelector("#layoutDeliveryState");
-  const title = document.querySelector("#layoutValidationTitle");
-  const detail = document.querySelector("#layoutValidationDetail");
   if (stats) stats.textContent = `${analysis.wordCount} 字 · ${analysis.headingCount} 个小标题 · ${listCount} 个列表`;
-  if (structure) structure.textContent = `${analysis.headingCount} 个小标题 · ${analysis.paragraphCount} 段正文`;
-  if (theme) theme.textContent = document.querySelector("#gzhThemeSelect")?.value || DEFAULT_GZH_THEME;
   updateLayoutPresetControls();
-
-  const hasHtml = html && !html.startsWith("等待生成");
-  const check = hasHtml ? validateGzhHtml(html) : null;
-  if (!snapshot) {
-    if (state) state.textContent = "待选择";
-    if (title) title.textContent = "等待接收文章";
-    if (detail) detail.textContent = "从公众号写作提交稿件，或在这里粘贴、导入一篇文章。";
-    return;
-  }
-  if (!hasHtml) {
-    if (state) state.textContent = "待生成";
-    if (title) title.textContent = "等待生成 HTML";
-    if (detail) detail.textContent = message || "正文或排版方案已变化；生成后可进入预览编辑。";
-    return;
-  }
-  if (check?.valid) {
-    if (state) state.textContent = "可预览";
-    if (title) title.textContent = "HTML 可进入预览编辑";
-    if (detail) detail.textContent = "已通过公众号结构检查；可在预览中逐段调整，再复制到公众号。";
-    return;
-  }
-  if (state) state.textContent = "需检查";
-  if (title) title.textContent = "HTML 需要修正";
-  if (detail) detail.textContent = check?.errors?.[0] || message || "请检查 HTML 结构后再进入预览。";
 }
 
 function insertLayoutBlock(kind) {
@@ -3400,9 +3747,23 @@ function stripGzhPreviewMasthead(html) {
 
 function buildPreviewDocument(title, html) {
   const safeHtml = stripGzhPreviewMasthead(sanitizePreviewHtml(html));
-  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)} · 公众号预览</title><style>
-    *{box-sizing:border-box}body{margin:0;background:#EEF1F4;color:#243447;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif}.toolbar{position:sticky;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:58px;padding:10px 18px;background:#fff;border-bottom:1px solid #D9E1E8}.toolbar-copy{min-width:0;overflow:hidden;color:#667789;font-size:13px;text-overflow:ellipsis;white-space:nowrap}.toolbar-actions,.tool-group{display:flex;align-items:center;flex-wrap:wrap;gap:7px}.toolbar button,.editor-tools button{border:1px solid #D9E1E8;border-radius:5px;background:#fff;color:#0D355C;font:600 13px/18px inherit;cursor:pointer}.toolbar button{min-height:36px;padding:8px 12px}.toolbar button:hover,.editor-tools button:hover{border-color:#8AB8D8;background:#F5F9FC}.toolbar button:focus-visible,.editor-tools button:focus-visible{outline:2px solid #2F7FB8;outline-offset:2px}.toolbar button.primary{border-color:#0D355C;background:#0D355C;color:#fff}.toolbar button[aria-pressed=true],.editor-tools button[data-applied=true]{border-color:#8AB8D8;background:#EAF2F8}.preview-workspace{min-height:calc(100vh - 58px)}.preview-workspace.has-tools{display:grid;grid-template-columns:minmax(0,1fr) 292px;align-items:start}.editor-tools{display:none}.editor-tools.is-open{display:grid;position:sticky;top:58px;max-height:calc(100vh - 58px);gap:14px;overflow:auto;padding:16px;background:#FAFBFC;border-left:1px solid #D9E1E8}.editor-context{display:grid;gap:4px;padding-bottom:12px;border-bottom:1px solid #D9E1E8}.editor-context strong{color:#0D355C;font-size:13px}.editor-context span{color:#667789;font-size:12px;line-height:1.6}.tool-row{display:grid;gap:16px}.tool-group{align-items:flex-start}.tool-label{width:100%;color:#667789;font-size:11px;font-weight:600}.editor-tools button{min-height:32px;padding:6px 9px;font-size:12px}.editor-tools button.swatch{width:28px;min-width:28px;padding:0;border-color:rgba(13,53,92,.18)}.stage{width:min(100% - 32px,700px);margin:26px auto 70px}.stage-note{margin:16px 0;color:#667789;font-size:12px}#gzhContent[contenteditable=true]{outline:2px solid #8AB8D8;outline-offset:8px;background:rgba(255,255,255,.55)}#gzhContent [data-editor-active=true]{outline:1px dashed #2F7FB8;outline-offset:4px}@media(max-width:900px){.preview-workspace.has-tools{grid-template-columns:minmax(0,1fr) 252px}.toolbar{align-items:flex-start;flex-direction:column}.toolbar-copy{width:100%}}@media(max-width:700px){.preview-workspace.has-tools{display:flex;flex-direction:column}.stage{order:1;margin-top:18px}.editor-tools.is-open{position:relative;top:auto;order:2;width:100%;max-height:none;border-top:1px solid #D9E1E8;border-left:0}.toolbar{position:relative}.toolbar-copy{white-space:normal}}
-  </style></head><body><header class="toolbar"><span class="toolbar-copy" id="message" aria-live="polite">已进入编辑模式：点击段落或拖选字词后使用右侧工具。</span><div class="toolbar-actions"><button id="undoButton" type="button" title="暂无可撤销的修改">撤销</button><button id="redoButton" type="button" title="撤销后可恢复修改">恢复</button><button id="copyButton" class="primary" type="button">复制到公众号</button></div></header><div class="preview-workspace has-tools" id="previewWorkspace"><main class="stage"><section id="gzhContent" contenteditable="true" spellcheck="false">${safeHtml}</section><p class="stage-note">当前预览可直接编辑和复制，不会改动 Markdown 原稿。</p></main><aside class="editor-tools is-open" id="editorTools" aria-label="局部二次排版工具"><div class="editor-context"><strong id="selectionStatus">点击正文选择要编辑的段落</strong><span>字词操作优先作用于选区；段落与模块操作作用于当前块。</span></div><div class="tool-row"><div class="tool-group" aria-label="字词样式"><span class="tool-label">字词</span><button type="button" data-inline-op="bold"><strong>B</strong> 粗体</button><button type="button" data-inline-op="italic"><em>I</em> 斜体</button><button type="button" data-inline-op="highlight">浅色强调</button><button type="button" data-inline-op="small">小字</button><button type="button" data-inline-op="large">大字</button><button class="swatch" type="button" data-inline-color="#0D355C" style="background:#0D355C" aria-label="观澜蓝字色" title="观澜蓝"></button><button class="swatch" type="button" data-inline-color="#A5413C" style="background:#A5413C" aria-label="判断红字色" title="判断红"></button><button class="swatch" type="button" data-inline-color="#92742A" style="background:#92742A" aria-label="内参金字色" title="内参金"></button><button type="button" data-inline-op="clear">清除字样式</button></div><div class="tool-group" aria-label="段落样式"><span class="tool-label">段落</span><button type="button" data-block-op="body">正文</button><button type="button" data-block-op="heading">小标题</button><button type="button" data-block-op="quote">引用</button><button type="button" data-block-op="left">左对齐</button><button type="button" data-block-op="center">居中</button><button type="button" data-block-op="right">右对齐</button><button type="button" data-block-op="indent">首行缩进</button><button type="button" data-block-op="noIndent">取消缩进</button></div><div class="tool-group" aria-label="模块样式"><span class="tool-label">模块</span><button type="button" data-block-op="colorBlock">加色块</button><button type="button" data-block-op="removeColor">去色块</button><button type="button" data-block-op="addRule">加横线</button><button type="button" data-block-op="removeRule">清除横线</button><button type="button" data-block-op="compact">紧凑间距</button><button type="button" data-block-op="air">增加留白</button><button type="button" data-block-op="vertical">改为纵向</button></div></div></aside></div><script>
+  const previewCss = `
+    *{box-sizing:border-box}body{margin:0;background:#EEF1F4;color:#243447;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif}.toolbar{position:sticky;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:58px;padding:10px 18px;background:#fff;border-bottom:1px solid #D9E1E8}.toolbar-copy{min-width:0;overflow:hidden;color:#667789;font-size:13px;text-overflow:ellipsis;white-space:nowrap}.toolbar-actions{display:flex;align-items:center;flex-wrap:wrap;gap:7px}.toolbar button,.editor-tools button{border:1px solid #D9E1E8;border-radius:5px;background:#fff;color:#0D355C;font:600 12px/18px inherit;cursor:pointer}.toolbar button{min-height:36px;padding:8px 12px;font-size:13px}.toolbar button:hover,.editor-tools button:hover{border-color:#8AB8D8;background:#F5F9FC}.toolbar button:focus-visible,.editor-tools button:focus-visible{outline:2px solid #2F7FB8;outline-offset:2px}.toolbar button.primary{border-color:#0D355C;background:#0D355C;color:#fff}.toolbar button[aria-pressed=true],.editor-tools button[data-applied=true],.editor-tools button[aria-pressed=true]{border-color:#0D355C;background:#EAF2F8;color:#0D355C}.preview-workspace{min-height:calc(100vh - 58px)}.preview-workspace.has-tools{display:grid;grid-template-columns:minmax(0,1fr) 328px;align-items:start}.editor-tools{display:none}.editor-tools.is-open{position:sticky;top:58px;display:grid;max-height:calc(100vh - 58px);overflow:auto;background:#fff;border-left:1px solid #D9E1E8}.inspector-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 15px;border-bottom:1px solid #D9E1E8}.inspector-kicker,.inspector-section-label{display:block;color:#718296;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.inspector-header h2{margin:3px 0 0;color:#0D355C;font-size:15px;line-height:21px}.scope-pill{flex:none;padding:4px 8px;border:1px solid #C9D8E5;border-radius:999px;background:#F5F9FC;color:#0D355C;font-size:11px;font-weight:700}.selection-card{display:grid;gap:5px;margin:14px 16px;padding:12px 13px;border:1px solid #D9E1E8;border-radius:6px;background:#FAFBFC}.selection-card span{color:#718296;font-size:11px}.selection-card strong{color:#0D355C;font-size:13px;line-height:19px}.selection-card small{color:#667789;font-size:11px;line-height:17px}.inspector-section{padding:14px 16px;border-top:1px solid #EEF1F4}.inspector-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:9px}.inspector-section h3{margin:0;color:#243447;font-size:12px;line-height:18px}.inspector-section-head span{color:#8593A1;font-size:10px}.control-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.control-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}.control-grid button{min-height:32px;padding:6px 7px;white-space:nowrap}.control-grid button.text-action{grid-column:span 2}.inline-row{display:flex;align-items:center;gap:6px}.inline-row button{min-height:32px;padding:6px 10px}.inline-row .icon-action{width:35px;padding:0;font-size:14px}.inline-row .swatch{width:28px;min-width:28px;padding:0;border-color:rgba(13,53,92,.18)}.control-subgroup{display:grid;gap:7px}.control-subgroup+.control-subgroup{margin-top:12px}.control-subgroup>span{color:#718296;font-size:10px;font-weight:700;letter-spacing:.05em}.structure-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.structure-grid button{min-height:34px;padding:6px 7px}.structure-grid button:last-child{grid-column:1 / -1}.inspector-footer{padding:13px 16px 18px;border-top:1px solid #D9E1E8;background:#FAFBFC;color:#718296;font-size:11px;line-height:17px}.stage{width:min(100% - 32px,700px);margin:26px auto 70px}.stage-note{margin:16px 0;color:#667789;font-size:12px}#gzhContent[contenteditable=true]{outline:2px solid #8AB8D8;outline-offset:8px;background:rgba(255,255,255,.55)}#gzhContent [data-editor-active=true]{outline:1px dashed #2F7FB8;outline-offset:4px}@media(max-width:900px){.preview-workspace.has-tools{grid-template-columns:minmax(0,1fr) 276px}.toolbar{align-items:flex-start;flex-direction:column}.toolbar-copy{width:100%}.control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.control-grid button.text-action{grid-column:span 1}}@media(max-width:700px){.preview-workspace.has-tools{display:flex;flex-direction:column}.stage{order:1;margin-top:18px}.editor-tools.is-open{position:relative;top:auto;order:2;width:100%;max-height:none;border-top:1px solid #D9E1E8;border-left:0}.toolbar{position:relative}.toolbar-copy{white-space:normal}}
+  `;
+  const previewWorkbenchCss = `.preview-workspace.has-tools{grid-template-columns:minmax(0,1fr) minmax(300px,328px)}.editor-tools.is-open{min-width:0;overflow-x:hidden;overflow-y:auto}.stage{width:min(760px,calc(100% - 48px));margin:26px 24px 70px}.inline-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.inline-row button{min-width:0;padding:6px 4px;white-space:normal}.inline-row .icon-action,.inline-row .swatch{width:auto;min-width:0}.control-grid button,.structure-grid button{min-width:0;white-space:normal}@media(max-width:900px){.preview-workspace.has-tools{grid-template-columns:minmax(0,1fr) minmax(252px,276px)}.inline-row{grid-template-columns:repeat(4,minmax(0,1fr))}.stage{width:calc(100% - 36px);margin:22px 18px 56px}}@media(max-width:700px){.stage{width:calc(100% - 32px);margin:18px 16px 42px}.inline-row{grid-template-columns:repeat(5,minmax(0,1fr))}}`;
+  const previewLayoutCss = `.preview-workspace.has-tools{grid-template-columns:minmax(0,1fr) minmax(300px,328px)}.stage{width:min(760px,calc(100% - 36px));margin:18px auto 64px}@media(max-width:1100px){.preview-workspace.has-tools{grid-template-columns:minmax(0,1fr) minmax(252px,276px)}.stage{width:calc(100% - 36px);margin:22px auto 56px}}`;
+  const previewWorkbench = `<body><header class="toolbar"><span class="toolbar-copy" id="message" aria-live="polite">已进入编辑模式：选择文字或段落后，在右侧检查器调整版式。</span><div class="toolbar-actions"><button id="undoButton" type="button" title="暂无可撤销的修改">撤销</button><button id="redoButton" type="button" title="撤销后可恢复修改">恢复</button><button id="copyButton" class="primary" type="button">复制到公众号</button></div></header><div class="preview-workspace has-tools" id="previewWorkspace"><main class="stage"><section id="gzhContent" contenteditable="true" spellcheck="false">${safeHtml}</section><p class="stage-note">当前预览可直接编辑和复制，不会改动 Markdown 原稿。</p></main><aside class="editor-tools is-open" id="editorTools" aria-label="版式检查器"><header class="inspector-header"><div><span class="inspector-kicker">Editorial inspector</span><h2>版式检查器</h2></div><span class="scope-pill" id="scopePill">段落</span></header><div class="selection-card"><span>当前选择</span><strong id="selectionStatus">点击正文选择要编辑的段落</strong><small id="selectionDetail">文本样式作用于选区，段落与区块作用于当前内容块。</small></div><section class="inspector-section" aria-labelledby="inlineToolsTitle"><div class="inspector-section-head"><h3 id="inlineToolsTitle">文本强调</h3><span>选中文字</span></div><div class="inline-row"><button class="icon-action" type="button" data-inline-op="bold" title="粗体" aria-label="粗体"><strong>B</strong></button><button class="icon-action" type="button" data-inline-op="italic" title="斜体" aria-label="斜体"><em>I</em></button><button type="button" data-inline-op="highlight">重点</button><button type="button" data-inline-op="small">小字</button><button type="button" data-inline-op="large">大字</button><button class="swatch" type="button" data-inline-color="#0D355C" style="background:#0D355C" aria-label="观澜蓝字色" title="观澜蓝"></button><button class="swatch" type="button" data-inline-color="#A5413C" style="background:#A5413C" aria-label="判断红字色" title="判断红"></button><button class="swatch" type="button" data-inline-color="#92742A" style="background:#92742A" aria-label="内参金字色" title="内参金"></button><button type="button" data-inline-op="clear">清除</button></div></section><section class="inspector-section" aria-labelledby="paragraphToolsTitle"><div class="inspector-section-head"><h3 id="paragraphToolsTitle">段落样式</h3><span>当前段落</span></div><div class="control-subgroup"><span>文字层级</span><div class="control-grid"><button type="button" data-block-op="body">正文</button><button type="button" data-block-op="heading">小标题</button><button type="button" data-block-op="quote">引言</button></div></div><div class="control-subgroup"><span>对齐与缩进</span><div class="control-grid compact"><button type="button" data-block-op="left">左对齐</button><button type="button" data-block-op="center">居中</button><button type="button" data-block-op="right">右对齐</button><button type="button" data-block-op="indent">首行缩进</button><button class="text-action" type="button" data-block-op="noIndent">取消缩进</button></div></div></section><section class="inspector-section" aria-labelledby="structureToolsTitle"><div class="inspector-section-head"><h3 id="structureToolsTitle">区块与节奏</h3><span>当前内容块</span></div><div class="structure-grid"><button type="button" data-block-op="colorBlock">重点色块</button><button type="button" data-block-op="removeColor">移除色块</button><button type="button" data-block-op="addRule">添加分隔线</button><button type="button" data-block-op="removeRule">清除横线</button><button type="button" data-block-op="compact">紧凑间距</button><button type="button" data-block-op="air">增加留白</button><button type="button" data-block-op="vertical">纵向适配</button></div></section><footer class="inspector-footer">修改会即时写入预览；复制时保留公众号兼容的内联样式。</footer></aside></div>`;
+  const previewWorkbenchWithPalette = previewWorkbench.replace(
+    '<div class="selection-card"><span>当前选择</span><strong id="selectionStatus">点击正文选择要编辑的段落</strong><small id="selectionDetail">文本样式作用于选区，段落与区块作用于当前内容块。</small></div>',
+    ''
+  ).replace(
+    '<button class="swatch" type="button" data-inline-color="#92742A" style="background:#92742A" aria-label="内参金字色" title="内参金"></button><button type="button" data-inline-op="clear">清除</button>',
+    '<button class="swatch" type="button" data-inline-color="#92742A" style="background:#92742A" aria-label="内参金字色" title="内参金"></button><button class="swatch" type="button" data-inline-color="#26394B" style="background:#26394B" aria-label="墨灰字色" title="墨灰"></button><button class="swatch" type="button" data-inline-color="#17613E" style="background:#17613E" aria-label="松绿字色" title="松绿"></button><button class="swatch" type="button" data-inline-color="#1E6B63" style="background:#1E6B63" aria-label="青绿字色" title="青绿"></button><button class="swatch" type="button" data-inline-color="#6B5B95" style="background:#6B5B95" aria-label="紫灰字色" title="紫灰"></button><button class="swatch" type="button" data-inline-color="#B5602A" style="background:#B5602A" aria-label="琥珀字色" title="琥珀"></button><button type="button" data-inline-op="clear">清除</button>'
+  ).replace(
+    '<footer class="inspector-footer">修改会即时写入预览；复制时保留公众号兼容的内联样式。</footer>',
+    ''
+  );
+  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)} · 公众号预览</title><style>${previewCss}${previewWorkbenchCss}${previewLayoutCss}</style></head>${previewWorkbenchWithPalette}<script>
     function parseStyle(style){return String(style||'').split(';').reduce(function(result,item){var parts=item.split(':');var key=(parts.shift()||'').trim().toLowerCase();var value=parts.join(':').trim();if(key&&value)result[key]=value;return result},{})}
     function writeStyle(el,map){var out=Object.keys(map).filter(function(key){return map[key]}).map(function(key){return key+':'+map[key]}).join(';');if(out)el.setAttribute('style',out);else el.removeAttribute('style')}
     function patchStyle(el,patch,remove){var map=parseStyle(el.getAttribute('style'));(remove||[]).forEach(function(key){delete map[key]});Object.keys(patch||{}).forEach(function(key){if(patch[key]===null)delete map[key];else map[key]=patch[key]});writeStyle(el,map)}
@@ -3412,14 +3773,15 @@ function buildPreviewDocument(title, html) {
     function closestBlock(node){var el=node&&node.nodeType===1?node:node&&node.parentElement;return el&&el.closest?el.closest('p,h1,h2,h3,h4,blockquote,li,table,section'):null}
     function clearActiveMark(){content.querySelectorAll('[data-editor-active]').forEach(function(el){el.removeAttribute('data-editor-active')})}
     function markActiveBlock(){clearActiveMark();if(activeBlock&&activeBlock!==content&&content.contains(activeBlock))activeBlock.setAttribute('data-editor-active','true')}
-    function updateSelection(){var selection=window.getSelection();if(!selection||!selection.rangeCount)return;var range=selection.getRangeAt(0);if(!selectionInside(range))return;savedRange=range.cloneRange();activeBlock=closestBlock(range.startContainer);markActiveBlock();var text=selection.toString().trim();var blocks=selectedBlocks();document.getElementById('selectionStatus').textContent=text?'已选 '+text.length+' 个字，段落操作将影响 '+blocks.length+' 个块':'当前：'+blockName(activeBlock)+'（字词样式作用于当前段落）'}
+    function updateInspectorState(){var selection=window.getSelection();var text=selection&&selection.rangeCount&&selectionInside(selection.getRangeAt(0))?selection.toString().trim():'';var blocks=selectedBlocks();var scope=document.getElementById('scopePill');if(text)scope.textContent='文本 · '+text.length+' 字';else scope.textContent=blocks.length>1?'多段落':'段落';document.querySelectorAll('[data-block-op]').forEach(function(button){button.setAttribute('aria-pressed','false')});if(!activeBlock)return;var tag=activeBlock.tagName.toLowerCase();var tier=tag==='blockquote'?'quote':tag.indexOf('h')===0?'heading':'body';var tierButton=document.querySelector('[data-block-op="'+tier+'"]');if(tierButton)tierButton.setAttribute('aria-pressed','true');var align=parseStyle(activeBlock.getAttribute('style'))['text-align'];var alignButton=align&&document.querySelector('[data-block-op="'+align+'"]');if(alignButton)alignButton.setAttribute('aria-pressed','true')}
+    function updateSelection(){var selection=window.getSelection();if(!selection||!selection.rangeCount)return;var range=selection.getRangeAt(0);if(!selectionInside(range))return;savedRange=range.cloneRange();activeBlock=closestBlock(range.startContainer);markActiveBlock();updateInspectorState()}
     function blockName(block){if(!block)return'未选择段落';var tag=block.tagName.toLowerCase();if(tag==='table')return'表格模块';if(tag==='section')return'内容模块';if(tag.indexOf('h')===0)return'标题段';if(tag==='blockquote')return'引用段';if(tag==='li')return'列表项';return'正文段'}
     function selectedBlocks(){if(!savedRange||!selectionInside(savedRange))return activeBlock?[activeBlock]:[];var selector='p,h1,h2,h3,h4,blockquote,li,table';var blocks=[].filter.call(content.querySelectorAll(selector),function(el){try{return savedRange.intersectsNode(el)}catch(error){return false}});return blocks.length?blocks:(activeBlock?[activeBlock]:[])}
     function restoreSelection(){if(!savedRange)return false;var selection=window.getSelection();selection.removeAllRanges();selection.addRange(savedRange);return true}
     function updateHistoryButtons(){var canUndo=historyIndex>0;var canRedo=historyIndex<history.length-1;var undo=document.getElementById('undoButton');var redo=document.getElementById('redoButton');undo.dataset.available=String(canUndo);redo.dataset.available=String(canRedo);undo.title=canUndo?'撤销上一次编辑':'暂无可撤销的修改';redo.title=canRedo?'恢复刚刚撤销的修改':'撤销后可恢复修改'}
     function captureContentHtml(){clearActiveMark();var html=content.innerHTML;markActiveBlock();return html}
     function markDirty(message){var html=captureContentHtml();if(history[historyIndex]===html){updateHistoryButtons();setMessage(message);return false}history=history.slice(0,historyIndex+1);history.push(html);historyIndex+=1;updateHistoryButtons();setMessage(message+' · 当前预览已更新');return true}
-    function restoreHistory(nextIndex,message){if(nextIndex<0||nextIndex>=history.length)return false;historyIndex=nextIndex;content.innerHTML=history[historyIndex];savedRange=null;activeBlock=null;document.getElementById('selectionStatus').textContent='历史已切换，请重新点击要编辑的段落';updateHistoryButtons();setMessage(message);return true}
+    function restoreHistory(nextIndex,message){if(nextIndex<0||nextIndex>=history.length)return false;historyIndex=nextIndex;content.innerHTML=history[historyIndex];savedRange=null;activeBlock=null;updateInspectorState();updateHistoryButtons();setMessage(message);return true}
     function wrapSelection(tag,style,clearNested){if(!savedRange||savedRange.collapsed||!selectionInside(savedRange))return false;restoreSelection();var range=window.getSelection().getRangeAt(0);var fragment=range.extractContents();if(clearNested){fragment.querySelectorAll('strong,b,em,i').forEach(function(el){el.replaceWith.apply(el,[].slice.call(el.childNodes))});fragment.querySelectorAll('[style]').forEach(function(el){patchStyle(el,{},['color','font-weight','font-size','background','background-color','font-style','text-decoration','padding','border-bottom'])})}var wrapper=document.createElement(tag);if(tag==='span')wrapper.setAttribute('leaf','');wrapper.setAttribute('style',style);wrapper.appendChild(fragment);range.insertNode(wrapper);range.selectNodeContents(wrapper);savedRange=range.cloneRange();window.getSelection().removeAllRanges();window.getSelection().addRange(range);activeBlock=closestBlock(wrapper);markActiveBlock();markDirty('已修改选中字词');return true}
     function leafTargets(block){var leaves=block&&block.querySelectorAll?[].slice.call(block.querySelectorAll('span[leaf]')):[];return leaves.length?leaves:[block]}
     function applyInlineOperation(operation,value){var styles={bold:'font-weight:600',italic:'font-style:italic',highlight:'background:#EAF2F8;padding:1px 3px;border-radius:2px',small:'font-size:14px',large:'font-size:18px',clear:'color:#26394B;font-weight:400;font-size:inherit;background:transparent;font-style:normal;text-decoration:none;padding:0;border-bottom:0'};var style=operation==='color'?'color:'+value:styles[operation];if(savedRange&&!savedRange.collapsed&&selectionInside(savedRange)){wrapSelection(operation==='bold'?'strong':'span',style,operation==='clear');return true}var blocks=selectedBlocks();if(!blocks.length){setMessage('请先在要编辑的段落内点击，或拖选字词');return false}blocks.forEach(function(block){leafTargets(block).forEach(function(el){if(operation==='clear')patchStyle(el,{},['color','font-weight','font-size','background','background-color','font-style','text-decoration','padding','border-bottom','border-radius']);else patchStyle(el,parseStyle(style),[])})});markDirty('已修改 '+blocks.length+' 个当前段落的字词样式');return true}
@@ -3430,15 +3792,15 @@ function buildPreviewDocument(title, html) {
     function applyBlockOperation(operation){var blocks=selectedBlocks();if(!blocks.length){setMessage('请先在要编辑的段落内点击');return false}var ruleChanges=0;blocks.forEach(function(block){if(operation==='body')setTextTier(block,{'font-size':'16px','line-height':'1.9','font-weight':'400',color:'#26394B','text-align':'left',margin:'0 0 20px'},['padding','background','background-color','border','border-left','border-right','border-radius','box-shadow']);if(operation==='heading')setTextTier(block,{'font-size':'22px','line-height':'1.55','font-weight':'600',color:'#0D355C','text-align':'left',margin:'28px 0 14px'},['padding','background','background-color','border','border-left','border-right','border-radius','box-shadow']);if(operation==='quote')setTextTier(block,{'font-size':'18px','line-height':'1.8','font-weight':'500',color:'#0D355C',margin:'0 0 22px',padding:'16px 18px',background:'#F7FAFC',border:'1px solid #D9E1E8','border-radius':'4px'},['border-left','border-right','box-shadow']);if(operation==='left'||operation==='center'||operation==='right')patchStyle(block,{'text-align':operation},[]);if(operation==='indent')patchStyle(block,{'text-indent':'2em'},[]);if(operation==='noIndent')patchStyle(block,{'text-indent':'0'},[]);if(operation==='colorBlock')patchStyle(block,{margin:'0 0 22px',padding:'16px 18px',background:'#EAF2F8',border:'1px solid #D9E1E8','border-radius':'4px'},['border-left','border-right','box-shadow']);if(operation==='removeColor')patchStyle(block,{},['padding','background','background-color','border','border-left','border-right','border-radius','box-shadow']);if(operation==='addRule')patchStyle(block,{'padding-bottom':'12px','border-bottom':'1px solid #D9E1E8'},[]);if(operation==='removeRule')ruleChanges+=removeHorizontalRules(block);if(operation==='compact')patchStyle(block,{'line-height':'1.72',margin:'0 0 12px'},[]);if(operation==='air')patchStyle(block,{'line-height':'1.9',margin:'0 0 28px'},[]);if(operation==='vertical')verticalize(block)});markActiveBlock();markDirty(operation==='removeRule'?(ruleChanges?'已清除当前模块的横向线':'当前块未发现横向线'):'已修改 '+blocks.length+' 个段落/模块');return true}
     function flashControl(button){button.setAttribute('data-applied','true');window.setTimeout(function(){button.removeAttribute('data-applied')},350)}
     function exportHtml(){return captureContentHtml()}
-    document.addEventListener('selectionchange',updateSelection);content.addEventListener('input',function(){markDirty('正文已手工修改')});content.addEventListener('keyup',updateSelection);content.addEventListener('mouseup',updateSelection);
+    document.addEventListener('selectionchange',updateSelection);content.addEventListener('input',function(){markDirty('正文已手工修改');updateSelection()});content.addEventListener('keyup',updateSelection);content.addEventListener('mouseup',updateSelection);
     document.querySelectorAll('#editorTools button').forEach(function(button){button.addEventListener('mousedown',function(event){event.preventDefault()})});
-    document.querySelectorAll('[data-inline-op]').forEach(function(button){button.addEventListener('click',function(){if(applyInlineOperation(button.dataset.inlineOp))flashControl(button)})});
-    document.querySelectorAll('[data-inline-color]').forEach(function(button){button.addEventListener('click',function(){if(applyInlineOperation('color',button.dataset.inlineColor))flashControl(button)})});
-    document.querySelectorAll('[data-block-op]').forEach(function(button){button.addEventListener('click',function(){if(applyBlockOperation(button.dataset.blockOp))flashControl(button)})});
+    document.querySelectorAll('[data-inline-op]').forEach(function(button){button.addEventListener('click',function(){if(applyInlineOperation(button.dataset.inlineOp)){flashControl(button);updateInspectorState()}})});
+    document.querySelectorAll('[data-inline-color]').forEach(function(button){button.addEventListener('click',function(){if(applyInlineOperation('color',button.dataset.inlineColor)){flashControl(button);updateInspectorState()}})});
+    document.querySelectorAll('[data-block-op]').forEach(function(button){button.addEventListener('click',function(){if(applyBlockOperation(button.dataset.blockOp)){flashControl(button);updateInspectorState()}})});
     function runHistory(direction){var isUndo=direction<0;var changed=restoreHistory(historyIndex+direction,isUndo?'已撤销上一次修改':'已恢复刚刚撤销的修改');if(!changed)setMessage(isUndo?'当前还没有可撤销的修改，请先编辑正文。':'当前没有可恢复的修改；先执行撤销后才能恢复。');return changed}
     document.getElementById('undoButton').addEventListener('click',function(){runHistory(-1)});document.getElementById('redoButton').addEventListener('click',function(){runHistory(1)});
     document.addEventListener('keydown',function(event){if(!(event.metaKey||event.ctrlKey)||event.key.toLowerCase()!=='z')return;event.preventDefault();runHistory(event.shiftKey?1:-1)});
-    document.getElementById('copyButton').addEventListener('click',async function(){var html=exportHtml();var copied=false;try{if(navigator.clipboard&&window.ClipboardItem){var htmlBlob=new Blob([html],{type:'text/html'});var textBlob=new Blob([content.innerText],{type:'text/plain'});await navigator.clipboard.write([new ClipboardItem({'text/html':htmlBlob,'text/plain':textBlob})]);copied=true}}catch(error){}if(!copied){var range=document.createRange();range.selectNodeContents(content);var selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);try{copied=document.execCommand('copy')}catch(error){}selection.removeAllRanges()}setMessage(copied?'已复制富文本，可直接粘贴到公众号编辑器。':'自动复制未完成，请手动全选预览正文后复制。')});updateHistoryButtons();
+    document.getElementById('copyButton').addEventListener('click',async function(){var html=exportHtml();var copied=false;try{if(navigator.clipboard&&window.ClipboardItem){var htmlBlob=new Blob([html],{type:'text/html'});var textBlob=new Blob([content.innerText],{type:'text/plain'});await navigator.clipboard.write([new ClipboardItem({'text/html':htmlBlob,'text/plain':textBlob})]);copied=true}}catch(error){}if(!copied){var range=document.createRange();range.selectNodeContents(content);var selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);try{copied=document.execCommand('copy')}catch(error){}selection.removeAllRanges()}setMessage(copied?'已复制富文本，可直接粘贴到公众号编辑器。':'自动复制未完成，请手动全选预览正文后复制。')});updateInspectorState();updateHistoryButtons();
   <\/script></body></html>`;
 }
 
@@ -3473,7 +3835,6 @@ function captureDraftFromEditor(draft = currentDraft()) {
   draft.length = value("#lengthSelect", draft.length);
   draft.painScene = value("#editorPainScene", draft.painScene);
   draft.coreJudgment = value("#editorCoreJudgment", draft.coreJudgment);
-  draft.articleGoal = value("#editorArticleGoal", draft.articleGoal);
   draft.notWrite = value("#editorNotWrite", draft.notWrite);
   draft.selectedTitle = value("#selectedTitleEditor", draft.selectedTitle);
   draft.outline = value("#outlineEditor", draft.outline);
@@ -3490,11 +3851,10 @@ function captureDraftFromEditor(draft = currentDraft()) {
 function draftStepContentValidity(draft = currentDraft()) {
   if (!draft) return Object.fromEntries(WRITING_STEPS.map((step) => [step, false]));
   return {
-    brief: [draft.painScene, draft.coreJudgment].every((item) => String(item || "").trim().length >= 12),
     title: String(draft.selectedTitle || "").trim().length >= 8,
     outline: String(draft.outline || "").trim().length >= 40,
-    body: bodyLengthWithinTarget(draft),
-    images: String(draft.imageBrief || "").trim().length >= 30 && String(draft.inlineImageBrief || "").trim().length >= 30,
+    body: bodyReadyForProgress(draft),
+    images: imageDeliveryReady(draft),
   };
 }
 
@@ -3511,20 +3871,44 @@ function invalidateStepConfirmations(draft, step = activeWritingStep) {
 }
 
 function writerQuality(draft = currentDraft()) {
-  if (!draft) return { title: false, judgment: false, boss: false, body: false, images: false, imageAssets: false, imageAssetCount: 0 };
+  if (!draft) return { title: false, judgment: false, material: false, body: false, images: false, imageAssets: false, imageAssetCount: 0 };
   const body = String(draft.bodyMarkdown || "");
+  const topic = topics.find((item) => item.id === draft.topicId);
   const firstThree = body.split(/[。！？.!?]/).slice(0, 3).join("");
   const coreKey = String(draft.coreJudgment || "").replace(/\s/g, "").slice(0, 8);
-  const imageAssetCount = ["cover", "inline"].filter((role) => Boolean(currentSelectedImageAsset(draft, role))).length;
+  const materialKeys = [topic?.title, ...sourceOutlineFragments(topic || {})]
+    .map((value) => String(value || "").replace(/\s/g, "").slice(0, 8))
+    .filter((value) => value.length >= 4);
+  const imageAssetCount = selectedImageAssetCount(draft);
   return {
     title: String(draft.selectedTitle || "").trim().length >= 8,
     judgment: (coreKey && firstThree.replace(/\s/g, "").includes(coreKey)) || /真正|关键|不是|而是|判断/.test(firstThree),
-    boss: /老板|企业|业务|经营/.test(body),
+    material: materialKeys.some((key) => body.replace(/\s/g, "").includes(key)),
     body: bodyLengthWithinTarget(draft),
-    images: String(draft.imageBrief || "").trim().length >= 30 && String(draft.inlineImageBrief || "").trim().length >= 30,
+    images: imageDeliveryReady(draft),
     imageAssets: imageAssetCount === 2,
     imageAssetCount,
   };
+}
+
+function renderWritingPreparationContext(topic, draft) {
+  const preparation = topic && draft ? buildWritingPreparation(topic, draft) : null;
+  const text = (selector, value) => {
+    const element = document.querySelector(selector);
+    if (element) element.textContent = value || "";
+  };
+  text("#writerTaskTitle", preparation?.title || "写法准备");
+  text("#writerTaskSummary", preparation?.summary || "按当前写作方法检查素材是否够用");
+  text("#writerTaskFocusLabel", preparation?.labels.focus || "本篇焦点");
+  text("#writerTaskEvidenceLabel", preparation?.labels.evidence || "已有材料");
+  text("#writerTaskGapLabel", preparation?.labels.gap || "还缺什么");
+  text("#outlineMethodLabel", draft?.style || writingStylesById[draft?.styleId]?.name || "当前方法");
+  text("#outlineMaterialFit", preparation?.summary || "正在检查材料");
+  text("#outlineMethodHint", preparation?.outlineHint || "先找材料里最有分量的事实，再决定章节数量和顺序。");
+  const basisList = document.querySelector("#outlineBasisList");
+  if (basisList) {
+    basisList.innerHTML = (preparation?.basis || []).map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  }
 }
 
 function updateWriterChrome() {
@@ -3538,16 +3922,17 @@ function updateWriterChrome() {
   document.querySelector("#qualityBodyTarget").textContent = `（${bodyTarget.label} 字）`;
   document.querySelector("#qualityTitle").checked = quality.title;
   document.querySelector("#qualityJudgment").checked = quality.judgment;
-  document.querySelector("#qualityBoss").checked = quality.boss;
+  document.querySelector("#qualityMaterial").checked = quality.material;
   document.querySelector("#qualityBody").checked = quality.body;
   document.querySelector("#qualityImages").checked = quality.images;
   document.querySelector("#qualityImageAssets").checked = quality.imageAssets;
   document.querySelector("#imageAssetReadiness").textContent = `图片资产 ${quality.imageAssetCount} / 2 已采用（非阻塞）`;
-  const requiredQualityCount = [quality.title, quality.judgment, quality.boss, quality.body, quality.images].filter(Boolean).length;
-  document.querySelector("#writerFinalCheckSummary").textContent = `${requiredQualityCount} / 5 必需`;
-  const styleLabel = document.querySelector("#styleSelect")?.selectedOptions?.[0]?.textContent?.replace(" · 默认", "") || "默认风格";
+  const requiredQualityCount = [quality.title, quality.judgment, quality.material, quality.body].filter(Boolean).length;
+  document.querySelector("#writerFinalCheckSummary").textContent = `${requiredQualityCount} / 4 必需`;
+  const styleLabel = document.querySelector("#styleSelect")?.selectedOptions?.[0]?.textContent?.replace(" · 默认", "") || "默认方法";
   const lengthLabel = String(document.querySelector("#lengthSelect")?.value || "中篇").split("/")[0].trim();
   document.querySelector("#writerSettingsSummary").textContent = `${styleLabel} · ${lengthLabel}`;
+  renderWritingPreparationContext(topic, draft);
 
   if (draft) {
     status.textContent = draft.status === "ready_for_layout" ? "待排版" : `写作中 · ${WRITING_STEP_LABELS[activeWritingStep]}`;
@@ -3561,18 +3946,21 @@ function updateWriterChrome() {
     const button = document.querySelector(`[data-writing-step="${step}"]`);
     const label = document.querySelector(`#stepStatus${step[0].toUpperCase()}${step.slice(1)}`);
     if (button) button.dataset.complete = String(Boolean(completion[step]));
-    if (label) label.textContent = completion[step] ? "已完成" : step === activeWritingStep ? "进行中" : "待完成";
+    if (label) label.textContent = step === "images" && draft?.imagesSkipped
+      ? "已跳过"
+      : completion[step] ? "已完成" : step === activeWritingStep ? "进行中" : "待完成";
   });
 
   const disabled = !draft || !topic;
   document.querySelectorAll("#editorPage input:not([type='checkbox']):not(.image-file-input), #editorPage textarea, #editorPage select, #editorPage [data-writing-action], #saveDraftButton, #handoffLayoutButton, #editorPage [data-title-action]").forEach((control) => {
     control.disabled = disabled;
   });
-  document.querySelector("#exportImageTasksButton").disabled = disabled;
   const handoffButton = document.querySelector("#handoffLayoutButton");
   if (handoffButton) {
     handoffButton.disabled = disabled || completedCount !== WRITING_STEPS.length;
-    handoffButton.textContent = draft?.status === "ready_for_layout" ? "查看排版稿" : "完成写作，进入排版";
+    handoffButton.textContent = draft?.status === "ready_for_layout"
+      ? "查看排版稿"
+      : selectedImageAssetCount(draft) > 0 ? "带图进入排版" : "进入排版";
   }
   const handoffNote = document.querySelector("#writerHandoffNote");
   if (handoffNote) handoffNote.hidden = activeWritingStep !== "images";
@@ -3595,7 +3983,7 @@ function renderDraftSelect() {
   select.disabled = false;
   select.innerHTML = queued.map((topic) => {
     const draft = draftsByTopicId[topic.id];
-    const suffix = draft?.status === "ready_for_layout" ? "待排版" : WRITING_STEP_LABELS[draft?.currentStep || "brief"];
+    const suffix = draft?.status === "ready_for_layout" ? "待排版" : WRITING_STEP_LABELS[draft?.currentStep || "title"];
     return `<option value="${escapeHtml(topic.id)}">${escapeHtml(topic.title)} · ${escapeHtml(suffix)}</option>`;
   }).join("");
   select.value = queuedTopicId;
@@ -3631,7 +4019,7 @@ function hydrateWriter({ preserveStep = false } = {}) {
   isHydratingDraft = true;
   if (!topic || !draft) {
     hydratedWriterDraftId = "";
-    ["#editorPainScene", "#editorCoreJudgment", "#editorArticleGoal", "#editorNotWrite", "#selectedTitleEditor", "#outlineEditor", "#bodyEditor", "#imageEditor", "#inlineImageEditor"].forEach((selector) => {
+    ["#editorPainScene", "#editorCoreJudgment", "#editorNotWrite", "#selectedTitleEditor", "#outlineEditor", "#bodyEditor", "#imageEditor", "#inlineImageEditor"].forEach((selector) => {
       document.querySelector(selector).value = "";
     });
     document.querySelector("#titleOptions").innerHTML = '<div class="topic-empty">暂无标题候选</div>';
@@ -3647,7 +4035,6 @@ function hydrateWriter({ preserveStep = false } = {}) {
   document.querySelector("#lengthSelect").value = draft.length;
   document.querySelector("#editorPainScene").value = draft.painScene;
   document.querySelector("#editorCoreJudgment").value = draft.coreJudgment;
-  document.querySelector("#editorArticleGoal").value = draft.articleGoal;
   document.querySelector("#editorNotWrite").value = draft.notWrite;
   document.querySelector("#selectedTitleEditor").value = draft.selectedTitle;
   document.querySelector("#outlineEditor").value = draft.outline;
@@ -3655,6 +4042,7 @@ function hydrateWriter({ preserveStep = false } = {}) {
   document.querySelector("#imageEditor").value = draft.imageBrief;
   document.querySelector("#inlineImageEditor").value = draft.inlineImageBrief;
   renderTitleCandidates(topic, draft);
+  renderWritingPreparationContext(topic, draft);
   renderImageStudio(draft);
   hydratedWriterDraftId = draft.topicId;
   isHydratingDraft = false;
@@ -3716,6 +4104,7 @@ function markDraftDirty(step = activeWritingStep) {
   const draft = captureDraftFromEditor();
   if (!draft) return;
   draft.dirty = true;
+  if (step === "images") draft.imagesSkipped = false;
   invalidateStepConfirmations(draft, step);
   invalidateDraftHandoff(draft);
   if (step === "title") renderTitleCandidates(queuedTopic(), draft);
@@ -3723,18 +4112,274 @@ function markDraftDirty(step = activeWritingStep) {
   scheduleDraftAutosave();
 }
 
+function writingGenerationSignature(draft) {
+  return JSON.stringify({
+    selectedTitle: draft?.selectedTitle || "",
+    styleId: draft?.styleId || "",
+    length: draft?.length || "",
+    painScene: draft?.painScene || "",
+    coreJudgment: draft?.coreJudgment || "",
+    notWrite: draft?.notWrite || "",
+    outline: draft?.outline || "",
+    bodyMarkdown: draft?.bodyMarkdown || "",
+  });
+}
+
+function writingGenerationPayload(topic, draft) {
+  const style = writingStylesById[draft.styleId] || writingStyleByName(draft.style) || {};
+  return {
+    topic: {
+      id: topic.id,
+      title: topic.title,
+      source: topic.source,
+      sourceDate: topic.sourceDate,
+      category: topic.category,
+      valueTag: topic.valueTag,
+      worth: topic.worth,
+      opinion: topic.opinion,
+      evidenceBoundary: topic.evidenceBoundary,
+      evidenceItems: topic.evidenceItems,
+      provenance: topic.provenance,
+      articleTitleDraft: topic.articleTitleDraft,
+    },
+    draft: {
+      selectedTitle: draft.selectedTitle,
+      style: draft.style,
+      length: draft.length,
+      painScene: draft.painScene,
+      coreJudgment: draft.coreJudgment,
+      notWrite: draft.notWrite,
+      outline: draft.outline,
+      bodyMarkdown: draft.bodyMarkdown,
+    },
+    style: {
+      id: style.id,
+      name: style.publishedName || style.name,
+      perspective: style.perspective,
+      traits: style.traits,
+      voice: style.voice,
+      structure: style.structure,
+      titlePatterns: style.titlePatterns,
+      techniques: style.techniques,
+      signatureMoves: style.signatureMoves,
+      antiAiRules: style.antiAiRules,
+      prompt: style.prompt,
+      outputRules: style.outputRules,
+      guardrails: style.guardrails,
+    },
+  };
+}
+
+const WRITING_GENERATION_LABELS = {
+  title: { idle: "生成标题", loading: "生成中…", statusId: "titleGenerationStatus" },
+  outline: { idle: "生成提纲", loading: "组织中…", statusId: "outlineGenerationStatus" },
+  body: { idle: "生成正文", loading: "写作中…", statusId: "bodyGenerationStatus" },
+};
+
+function generationErrorMessage(error, fallback) {
+  return String(error?.message || fallback).replace(/DeepSeek[：:]?\s*/gi, "").trim() || fallback;
+}
+
+function generationButton(target) {
+  if (target === "title") return document.querySelector("[data-title-action='regenerate']");
+  return document.querySelector(`[data-writing-action="generate"][data-writing-target="${target}"]`);
+}
+
+function setWritingGenerationState(target, state, message = "") {
+  const config = WRITING_GENERATION_LABELS[target];
+  const button = generationButton(target);
+  const status = document.querySelector(`#${config.statusId}`);
+  if (button) {
+    button.disabled = state === "loading";
+    button.setAttribute("aria-busy", state === "loading" ? "true" : "false");
+    button.textContent = state === "loading" ? config.loading : config.idle;
+  }
+  if (status) {
+    status.dataset.state = state;
+    status.textContent = message;
+  }
+}
+
+async function requestDeepSeekWriting(target, topic, draft) {
+  let response;
+  try {
+    response = await fetch(DEEPSEEK_WRITING_ENDPOINTS[target], {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Content-Factory-Client": "content-factory-lite",
+      },
+      body: JSON.stringify(writingGenerationPayload(topic, draft)),
+    });
+  } catch (error) {
+    throw new Error(error instanceof TypeError
+      ? "无法连接本地写作服务。请在项目目录运行 node server.mjs 后重试。"
+      : (error?.message || "生成请求失败"));
+  }
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    result = {};
+  }
+  if (!response.ok) throw new Error(result?.error || `生成失败（${response.status}）`);
+  return result;
+}
+
+async function generateTitleTarget(topic, draft) {
+  if (writingGenerationInFlight.title) return;
+  const requestSignature = writingGenerationSignature(draft);
+  writingGenerationInFlight.title = true;
+  setWritingGenerationState("title", "loading", "正在根据原始材料、本篇焦点和标题方法生成不同角度的候选。");
+  try {
+    const result = await requestDeepSeekWriting("title", topic, draft);
+    const liveDraft = queuedTopic()?.id === topic.id ? captureDraftFromEditor() : null;
+    if (!liveDraft || writingGenerationSignature(liveDraft) !== requestSignature) {
+      throw new Error("生成期间写作设置或材料已经变化，本次标题未覆盖当前内容，请重新生成");
+    }
+    const entries = (Array.isArray(result?.candidates) ? result.candidates : []).filter((item) => String(item?.title || "").trim());
+    if (entries.length < 3) throw new Error("返回的有效标题不足，请重试");
+    draft.titleCandidates = entries.map((item) => String(item.title).trim());
+    draft.titleCandidateDetails = Object.fromEntries(entries.map((item) => [String(item.title).trim(), {
+      angle: String(item.angle || "候选"),
+      reason: String(item.reason || "与本篇材料和写作方法对齐"),
+      score: titleStrengthScore(item.title, topic),
+    }]));
+    draft.titleSeed = Number(draft.titleSeed || 0) + 1;
+    draft.titleGeneration = {
+      provider: "deepseek",
+      model: result.model || "deepseek-v4-pro",
+      generatedAt: new Date().toISOString(),
+      usage: result.usage || null,
+    };
+    invalidateStepConfirmations(draft, "title");
+    draft.dirty = true;
+    invalidateDraftHandoff(draft);
+    renderTitleCandidates(topic, draft);
+    updateWriterChrome();
+    saveCurrentDraft({ forceRevision: true });
+    setWritingGenerationState("title", "success", `已生成 ${entries.length} 个不同角度的标题。`);
+    showToast("标题候选已生成");
+  } catch (error) {
+    const message = generationErrorMessage(error, "标题生成失败，请重试");
+    setWritingGenerationState("title", "error", message);
+    showToast(message);
+  } finally {
+    writingGenerationInFlight.title = false;
+    const button = generationButton("title");
+    if (button) {
+      button.disabled = false;
+      button.setAttribute("aria-busy", "false");
+      button.textContent = WRITING_GENERATION_LABELS.title.idle;
+    }
+  }
+}
+
+async function generateOutlineTarget(topic, draft) {
+  if (writingGenerationInFlight.outline) return;
+  const requestSignature = writingGenerationSignature(draft);
+  writingGenerationInFlight.outline = true;
+  setWritingGenerationState("outline", "loading", "正在判断本篇材料最适合的叙述顺序和章节数量，不套固定提纲。");
+  try {
+    const result = await requestDeepSeekWriting("outline", topic, draft);
+    const liveDraft = queuedTopic()?.id === topic.id ? captureDraftFromEditor() : null;
+    if (!liveDraft || writingGenerationSignature(liveDraft) !== requestSignature) {
+      throw new Error("生成期间标题、材料或提纲已经变化，本次结果未覆盖当前内容，请重新生成");
+    }
+    if (!String(result?.outline || "").trim()) throw new Error("没有返回有效提纲，请重试");
+    draft.outline = String(result.outline).trim();
+    draft.outlineSeed = Number(draft.outlineSeed || 0) + 1;
+    draft.outlineEngineVersion = OUTLINE_ENGINE_VERSION;
+    draft.outlineGeneration = {
+      provider: "deepseek",
+      model: result.model || "deepseek-v4-pro",
+      generatedAt: new Date().toISOString(),
+      usage: result.usage || null,
+    };
+    invalidateStepConfirmations(draft, "outline");
+    draft.dirty = true;
+    invalidateDraftHandoff(draft);
+    hydrateWriter({ preserveStep: true });
+    saveCurrentDraft({ forceRevision: true });
+    setWritingGenerationState("outline", "success", "已根据本篇材料重新组织提纲。");
+    showToast("提纲已生成");
+  } catch (error) {
+    const message = generationErrorMessage(error, "提纲生成失败，请重试");
+    setWritingGenerationState("outline", "error", message);
+    showToast(message);
+  } finally {
+    writingGenerationInFlight.outline = false;
+    const button = generationButton("outline");
+    if (button) {
+      button.disabled = false;
+      button.setAttribute("aria-busy", "false");
+      button.textContent = WRITING_GENERATION_LABELS.outline.idle;
+    }
+  }
+}
+
+async function generateBodyTarget(topic, draft) {
+  if (writingGenerationInFlight.body) return;
+  const requestSignature = writingGenerationSignature(draft);
+  writingGenerationInFlight.body = true;
+  setWritingGenerationState("body", "loading", "正在根据原始材料、当前写作方法和本篇提纲生成正文。请暂时不要修改本页内容。");
+  try {
+    const result = await requestDeepSeekWriting("body", topic, draft);
+    if (!String(result?.bodyMarkdown || "").trim()) throw new Error("没有返回正文，请重试");
+
+    const liveDraft = queuedTopic()?.id === topic.id ? captureDraftFromEditor() : null;
+    if (!liveDraft || writingGenerationSignature(liveDraft) !== requestSignature) {
+      throw new Error("生成期间标题、提纲或正文已经变化，本次结果未覆盖当前内容，请重新生成");
+    }
+    draft.bodyMarkdown = String(result.bodyMarkdown).trim();
+    draft.bodyGeneration = {
+      provider: "deepseek",
+      model: result.model || "deepseek-v4-pro",
+      generatedAt: new Date().toISOString(),
+      usage: result.usage || null,
+    };
+    invalidateStepConfirmations(draft, "body");
+    draft.dirty = true;
+    invalidateDraftHandoff(draft);
+    hydrateWriter({ preserveStep: true });
+    saveCurrentDraft({ forceRevision: true });
+    setWritingGenerationState("body", "success", "正文已按当前写作方法写入编辑器。");
+    showToast("正文已生成");
+  } catch (error) {
+    const message = generationErrorMessage(error, "正文生成失败，请重试");
+    setWritingGenerationState("body", "error", message);
+    showToast(message);
+  } finally {
+    writingGenerationInFlight.body = false;
+    const button = generationButton("body");
+    if (button) {
+      button.disabled = false;
+      button.setAttribute("aria-busy", "false");
+      button.textContent = WRITING_GENERATION_LABELS.body.idle;
+    }
+  }
+}
+
 function generateWritingTarget(target) {
   const topic = queuedTopic();
   const draft = captureDraftFromEditor();
   if (!topic || !draft) return;
-  if (target === "brief") {
-    draft.painScene = `老板对${topic.category}的焦虑不是“要不要用 AI”，而是它会先影响收入、成本、效率还是风险。${topic.writingAngles.business}`;
-    draft.coreJudgment = topic.opinion;
-    draft.articleGoal = `让读者能用一个可验收的小动作开始盘点${topic.category}，而不是继续收集工具清单。`;
-    draft.notWrite = "不做新闻搬运，不堆工具名，不夸大结果，不写空泛的 AI 焦虑。";
+  if (target === "body") {
+    generateBodyTarget(topic, draft);
+    return;
   }
-  if (target === "outline") draft.outline = buildOutlineDraft(topic, draft);
-  if (target === "body") draft.bodyMarkdown = buildBodyDraft(topic, draft);
+  if (target === "outline") {
+    generateOutlineTarget(topic, draft);
+    return;
+  }
+  if (target === "brief") {
+    applyWritingPreparation(topic, draft, { force: true });
+    draft.titleCandidates = [];
+    draft.titleSeed = 0;
+    draft.outlineSeed = 0;
+    draft.outlineEngineVersion = OUTLINE_ENGINE_VERSION;
+    draft.outline = buildOutlineDraft(topic, draft);
+  }
   if (target === "images") {
     const briefs = buildImageBriefs(topic, draft);
     draft.imageBrief = briefs.cover;
@@ -3743,12 +4388,17 @@ function generateWritingTarget(target) {
     draft.imagePlan.cover.prompt = briefs.cover;
     draft.imagePlan.inline[0].prompt = briefs.inline;
   }
-  invalidateStepConfirmations(draft, target);
+  invalidateStepConfirmations(draft, target === "brief" ? "title" : target);
   draft.dirty = true;
   invalidateDraftHandoff(draft);
   hydrateWriter({ preserveStep: true });
   saveCurrentDraft({ forceRevision: true });
-  showToast(target === "images" ? "配图 Brief 已生成" : `${WRITING_STEP_LABELS[target]} 已生成`);
+  const generatedLabel = target === "brief"
+    ? "已按当前写作方法重新检查材料"
+    : target === "images"
+      ? "配图 Brief 已生成"
+      : `${WRITING_STEP_LABELS[target]} 已生成`;
+  showToast(generatedLabel);
 }
 
 function rewriteOpening() {
@@ -3766,9 +4416,9 @@ function rewriteOpening() {
   showToast("开头已重写");
 }
 
-function resetLayoutState(message = "") {
+function resetLayoutState() {
   document.querySelector("#layoutHtmlEditor").value = "等待生成 HTML。产物应为纯 section 片段，不包含 html/head/body。";
-  updateLayoutWorkbenchStatus({ message });
+  updateLayoutWorkbenchStatus();
 }
 
 function commitSnapshotLayout(snapshot, nextLayout, failureMessage = "本地保存失败，排版修改已回滚") {
@@ -4140,6 +4790,20 @@ function handoffToLayout() {
   showToast("写作稿已锁定并交给公众号排版");
 }
 
+function skipImagesAndHandoff() {
+  const draft = captureDraftFromEditor();
+  if (!draft) return;
+  draft.imagesSkipped = true;
+  if (!draft.confirmedSteps.includes("images")) draft.confirmedSteps.push("images");
+  draft.dirty = true;
+  invalidateDraftHandoff(draft);
+  if (!saveCurrentDraft({ forceRevision: true })) {
+    showToast("保存失败，暂时无法跳过配图");
+    return;
+  }
+  handoffToLayout();
+}
+
 function renderDateFilter() {
   const dateFilters = document.querySelectorAll(".date-filter-select");
   if (dateFilters.length === 0) return;
@@ -4184,6 +4848,177 @@ function renderCalendarCoverage() {
   if (activeDate) activeDate.textContent = julyTopicCatalog?.source?.activeDate || "未读取";
 }
 
+function agentTopicCandidates() {
+  const today = dailyTopics();
+  const prioritized = [...today].sort((a, b) => {
+    const priority = { queued: 0, candidate: 1, library: 2, skipped: 3 };
+    return (priority[a.status] ?? 4) - (priority[b.status] ?? 4) || b.score - a.score;
+  });
+  return prioritized.slice(0, 2);
+}
+
+function agentSelectedTopic() {
+  const candidates = agentTopicCandidates();
+  const selected = topics.find((topic) => topic.id === agentWorkspace.selectedTopicId);
+  if (selected && candidates.some((topic) => topic.id === selected.id)) return selected;
+  const fallback = candidates.find((topic) => topic.id === selectedTopicId) || candidates[0] || currentTopic();
+  agentWorkspace.selectedTopicId = fallback?.id || "";
+  return fallback || null;
+}
+
+function agentWritingStyle() {
+  return writingStylesById[defaultWritingStyleId] || publishedWritingStyles()[0] || currentWritingStyle();
+}
+
+function agentMessageTime() {
+  return new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+}
+
+function agentDefaultMessageMarkup() {
+  return `
+    <article class="agent-message is-assistant">
+      <div class="agent-message-avatar" aria-hidden="true">H</div>
+      <div class="agent-message-body">
+        <div class="agent-message-meta"><strong>Hermes</strong><time>待接入</time></div>
+        <p>我先生成计划，确认后再创建草稿。</p>
+      </div>
+    </article>`;
+}
+
+function renderAgentThread() {
+  const thread = document.querySelector("#agentThread");
+  if (!thread) return;
+  const messages = agentWorkspace.messages.map((message) => `
+    <article class="agent-message is-${message.role}">
+      <div class="agent-message-avatar" aria-hidden="true">${message.role === "assistant" ? "H" : "我"}</div>
+      <div class="agent-message-body">
+        <div class="agent-message-meta"><strong>${message.role === "assistant" ? "Hermes · 本地预览" : "我"}</strong><time>${escapeHtml(message.time || "")}</time></div>
+        <p>${escapeHtml(message.text)}</p>
+      </div>
+    </article>`).join("");
+  thread.innerHTML = agentDefaultMessageMarkup() + messages;
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function renderAgentPlan() {
+  const topic = agentSelectedTopic();
+  const style = agentWritingStyle();
+  const confirmed = agentWorkspace.planStatus === "confirmed" && topic?.status === "queued";
+  const topicNode = document.querySelector("#agentPlanTopic");
+  const styleNode = document.querySelector("#agentPlanStyle");
+  const stateNode = document.querySelector("#agentPlanState");
+  const hintNode = document.querySelector("#agentPlanHint");
+  const confirmButton = document.querySelector("#agentConfirmPlanButton");
+  const plan = document.querySelector("#agentPlan");
+  if (!plan || !topicNode || !styleNode || !stateNode || !confirmButton) return;
+
+  topicNode.textContent = topic?.title || "今日没有可用选题";
+  styleNode.textContent = style ? `${style.publishedName || style.name}（已发布）` : "暂无已发布风格";
+  stateNode.textContent = confirmed ? "草稿已创建" : "待确认";
+  stateNode.classList.toggle("is-confirmed", confirmed);
+  hintNode.textContent = confirmed
+    ? "已保存到本地"
+    : "只创建草稿";
+  confirmButton.disabled = !topic || confirmed;
+  confirmButton.textContent = confirmed ? "草稿已创建" : "创建草稿";
+}
+
+function renderAgentContext() {
+  const candidates = agentTopicCandidates();
+  const selected = agentSelectedTopic();
+  const topicList = document.querySelector("#agentTopicList");
+  const topicCount = document.querySelector("#agentTopicCount");
+  const styleSummary = document.querySelector("#agentStyleSummary");
+  const taskList = document.querySelector("#agentTaskList");
+  const handoffButton = document.querySelector("#agentHandoffButton");
+  if (!topicList || !topicCount || !styleSummary || !taskList || !handoffButton) return;
+
+  topicCount.textContent = candidates.length ? `${dailyTopics().length} 条 · 优先 ${candidates.length} 条` : "今日暂无可用选题";
+  topicList.innerHTML = candidates.length ? candidates.map((topic) => `
+    <button class="agent-topic-item${topic.id === selected?.id ? " is-selected" : ""}" type="button" data-agent-topic-id="${escapeHtml(topic.id)}">
+      <span class="agent-topic-score">${topic.score}</span>
+      <span><strong>${escapeHtml(topic.title)}</strong><small>${escapeHtml(topic.category)} · ${escapeHtml(topic.valueTag)}</small></span>
+      <em>${escapeHtml(statusLabels[topic.status] || "待判断")}</em>
+    </button>`).join("") : '<p class="agent-empty-state">先去“今日选题”导入或新建选题。</p>';
+
+  const style = agentWritingStyle();
+  styleSummary.innerHTML = style ? `
+    <div class="agent-style-icon" aria-hidden="true">文</div>
+    <div><strong>${escapeHtml(style.publishedName || style.name)}</strong><span>已发布</span></div>`
+    : '<p class="agent-empty-state">暂无已发布写作风格。</p>';
+
+  const tasks = queuedTopics().slice(0, 3);
+  taskList.innerHTML = tasks.length ? tasks.map((topic) => {
+    const draft = draftsByTopicId[topic.id];
+    const completed = Boolean(String(draft?.bodyMarkdown || "").trim());
+    return `
+      <button class="agent-task-item" type="button" data-agent-task-id="${escapeHtml(topic.id)}">
+        <span class="agent-task-state ${completed ? "is-done" : "is-waiting"}" aria-hidden="true"></span>
+        <span><strong>${escapeHtml(topic.title)}</strong><small>${completed ? "草稿已生成，可继续编辑" : "已创建草稿，等待写作"}</small></span>
+        <em>${completed ? "查看草稿" : "继续"}</em>
+      </button>`;
+  }).join("") : '<p class="agent-empty-state">确认一份写作计划后，任务会出现在这里。</p>';
+  handoffButton.disabled = !selected;
+}
+
+function renderAgentWorkbench() {
+  if (!document.querySelector("#agentPage")) return;
+  renderAgentThread();
+  renderAgentPlan();
+  renderAgentContext();
+}
+
+function appendAgentMessage(role, text) {
+  agentWorkspace.messages.push({ role, text: String(text || "").trim(), time: agentMessageTime() });
+  agentWorkspace.messages = agentWorkspace.messages.slice(-8);
+}
+
+function submitAgentInstruction(value) {
+  const prompt = String(value || "").trim();
+  if (!prompt) {
+    showToast("请先输入一条写作指令");
+    return;
+  }
+  const topic = agentSelectedTopic();
+  appendAgentMessage("user", prompt);
+  appendAgentMessage("assistant", topic
+    ? `计划已更新：主选题为“${topic.title}”。`
+    : "今日没有可用选题，请先去“今日选题”导入或新建选题。");
+  agentWorkspace.planStatus = "ready";
+  persistWorkspace();
+  renderAgentWorkbench();
+}
+
+function confirmAgentPlan() {
+  const topic = agentSelectedTopic();
+  if (!topic) {
+    showToast("今日没有可用选题");
+    return;
+  }
+  agentWorkspace.planStatus = "confirmed";
+  selectedTopicId = topic.id;
+  setTopicStatus("queued", topic);
+  appendAgentMessage("assistant", `已为“${topic.title}”创建草稿。`);
+  persistWorkspace();
+  renderAgentWorkbench();
+  showToast("写作草稿已创建");
+}
+
+function handoffAgentDraft(topic = agentSelectedTopic()) {
+  if (!topic) {
+    showToast("请先选择一条今日选题");
+    return;
+  }
+  agentWorkspace.selectedTopicId = topic.id;
+  agentWorkspace.planStatus = "confirmed";
+  selectedTopicId = topic.id;
+  setTopicStatus("queued", topic);
+  queuedTopicId = topic.id;
+  persistWorkspace();
+  setPage("editor");
+  showToast("已交给原公众号写作台");
+}
+
 function syncTopicUi() {
   ensureTopicSelection();
   ensureLibrarySelection();
@@ -4193,6 +5028,7 @@ function syncTopicUi() {
   updateWriterChrome();
   updateMetrics();
   renderCalendarCoverage();
+  renderAgentWorkbench();
 }
 
 function reviewMetric(value) {
@@ -4331,8 +5167,11 @@ function setPage(page) {
     panel.classList.toggle("is-active", panel.dataset.pagePanel === page);
   });
   document.querySelector("#pageTitle").textContent = pageTitles[page] || "内容工厂";
-  document.querySelector("#pageKicker").textContent = pageKickers[page] || "CONTENT FACTORY";
+  const pageKicker = document.querySelector("#pageKicker");
+  pageKicker.textContent = pageKickers[page] || "";
+  pageKicker.hidden = !pageKickers[page];
   document.querySelector(".topbar-actions").classList.toggle("is-hidden", page !== "topics");
+  if (page === "agent") renderAgentWorkbench();
   if (page === "styles") renderWritingStyleLab();
   if (page === "library") renderLibrary();
   if (page === "editor") hydrateWriter();
@@ -4386,12 +5225,45 @@ document.querySelectorAll("[data-page]").forEach((button) => {
   button.addEventListener("click", () => setPage(button.dataset.page));
 });
 
+document.querySelector("#agentComposer")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const input = document.querySelector("#agentPrompt");
+  submitAgentInstruction(input.value);
+  input.value = "";
+});
+
+document.querySelectorAll("[data-agent-prompt]").forEach((button) => {
+  button.addEventListener("click", () => submitAgentInstruction(button.dataset.agentPrompt));
+});
+
+document.querySelector("#agentConfirmPlanButton")?.addEventListener("click", confirmAgentPlan);
+document.querySelector("#agentAdjustPlanButton")?.addEventListener("click", () => {
+  agentWorkspace.planStatus = "ready";
+  const input = document.querySelector("#agentPrompt");
+  input.value = "调整这份计划：";
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+  renderAgentWorkbench();
+});
+document.querySelector("#agentOpenTopicsButton")?.addEventListener("click", () => setPage("topics"));
+document.querySelector("#agentOpenStylesButton")?.addEventListener("click", () => setPage("styles"));
+document.querySelector("#agentHandoffButton")?.addEventListener("click", () => handoffAgentDraft());
+document.querySelector("#agentTopicList")?.addEventListener("click", (event) => {
+  const item = event.target.closest("[data-agent-topic-id]");
+  if (!item) return;
+  agentWorkspace.selectedTopicId = item.dataset.agentTopicId;
+  agentWorkspace.planStatus = "ready";
+  selectedTopicId = item.dataset.agentTopicId;
+  persistWorkspace();
+  renderAgentWorkbench();
+});
+document.querySelector("#agentTaskList")?.addEventListener("click", (event) => {
+  const item = event.target.closest("[data-agent-task-id]");
+  const topic = topics.find((candidate) => candidate.id === item?.dataset.agentTaskId);
+  if (topic) handoffAgentDraft(topic);
+});
+
 document.querySelector("#writingStyleList")?.addEventListener("click", (event) => {
-  const deleteButton = event.target.closest("[data-delete-writing-style-id]");
-  if (deleteButton) {
-    deleteWritingStyle(deleteButton.dataset.deleteWritingStyleId);
-    return;
-  }
   const item = event.target.closest("[data-writing-style-id]");
   if (!item || !writingStylesById[item.dataset.writingStyleId]) return;
   if (writingStyleDirty) saveWritingStyle({ notify: false });
@@ -4401,46 +5273,33 @@ document.querySelector("#writingStyleList")?.addEventListener("click", (event) =
   persistWorkspace();
 });
 
-document.querySelector("#writingStyleSearch")?.addEventListener("input", renderWritingStyleList);
-
 document.querySelectorAll("[data-style-tab]").forEach((button) => {
   button.addEventListener("click", () => setWritingStyleTab(button.dataset.styleTab));
 });
 
 [
-  "#writingStyleName",
   "#writingStyleDescription",
+  "#writingStylePerspective",
+  "#writingStyleTraits",
   "#writingStyleMethod",
   "#writingStyleGuardrails",
-  "#writingStyleReference",
+  "#writingStyleStructure",
+  "#writingStyleTitlePatterns",
+  "#writingStyleTechniques",
+  "#writingStyleVoice",
+  "#writingStyleSignatureMoves",
+  "#writingStyleAntiAiRules",
+  "#writingStyleRevisionPass",
   "#writingStylePrompt",
   "#writingStyleOutputRules",
-  "#writingStyleTestTopic",
-  "#writingStyleTestBrief",
-  "#writingStyleTestOutput",
-  "#styleJudgmentScore",
-  "#styleEvidenceScore",
-  "#styleNarrativeScore",
-  "#styleActionScore",
 ].forEach((selector) => {
   document.querySelector(selector)?.addEventListener("input", markWritingStyleDirty);
 });
 
-document.querySelector("#newWritingStyleButton")?.addEventListener("click", () => createWritingStyle());
 document.querySelector("#saveWritingStyleButton")?.addEventListener("click", () => saveWritingStyle());
 document.querySelector("#publishWritingStyleButton")?.addEventListener("click", publishWritingStyle);
 document.querySelector("#resetWritingStyleButton")?.addEventListener("click", resetBuiltInWritingStyle);
-document.querySelector("#analyzeReferenceButton")?.addEventListener("click", analyzeReferenceCopy);
-document.querySelector("#clearReferenceButton")?.addEventListener("click", () => {
-  setStyleControlValue("#writingStyleReference", "");
-  const report = document.querySelector("#styleExtractionReport");
-  if (report) report.innerHTML = '<strong>待提炼</strong><p>将识别句长节奏、开头方式、论证结构、词汇倾向和实用技巧。</p>';
-  markWritingStyleDirty();
-});
 document.querySelector("#buildPromptFromMethodButton")?.addEventListener("click", rebuildPromptFromMethod);
-document.querySelector("#runWritingStyleTestButton")?.addEventListener("click", runWritingStyleTest);
-document.querySelector("#compareWritingStyleButton")?.addEventListener("click", compareWritingStyleVersions);
-document.querySelector("#exportWritingSkillButton")?.addEventListener("click", exportWritingStyleSkill);
 
 document.querySelector("#openWritingStyleInEditorButton")?.addEventListener("click", () => {
   const profile = currentWritingStyle();
@@ -4521,10 +5380,11 @@ document.querySelector("#libraryDateFilter").addEventListener("change", (event) 
 });
 
 document.querySelector("#editorDraftSelect").addEventListener("change", (event) => {
+  const nextTopicId = event.target.value;
   saveCurrentDraft();
-  queuedTopicId = event.target.value;
+  queuedTopicId = nextTopicId;
   const draft = currentDraft();
-  activeWritingStep = WRITING_STEPS.includes(draft?.currentStep) ? draft.currentStep : "brief";
+  activeWritingStep = WRITING_STEPS.includes(draft?.currentStep) ? draft.currentStep : "title";
   hydrateWriter();
   persistWorkspace();
 });
@@ -4537,12 +5397,11 @@ document.querySelectorAll("[data-writing-step]").forEach((button) => {
 });
 
 [
-  { selector: "#styleSelect", step: "body" },
+  { selector: "#styleSelect", step: "title" },
   { selector: "#lengthSelect", step: "body" },
-  { selector: "#editorPainScene", step: "brief" },
-  { selector: "#editorCoreJudgment", step: "brief" },
-  { selector: "#editorArticleGoal", step: "brief" },
-  { selector: "#editorNotWrite", step: "brief" },
+  { selector: "#editorPainScene", step: "title" },
+  { selector: "#editorCoreJudgment", step: "title" },
+  { selector: "#editorNotWrite", step: "title" },
   { selector: "#selectedTitleEditor", step: "title" },
   { selector: "#outlineEditor", step: "outline" },
   { selector: "#bodyEditor", step: "body" },
@@ -4550,7 +5409,31 @@ document.querySelectorAll("[data-writing-step]").forEach((button) => {
   { selector: "#inlineImageEditor", step: "images" },
 ].forEach(({ selector, step }) => {
   const control = document.querySelector(selector);
-  control?.addEventListener(control.matches("select") ? "change" : "input", () => markDraftDirty(step));
+  control?.addEventListener(control.matches("select") ? "change" : "input", () => {
+    if (selector === "#styleSelect") {
+      const topic = queuedTopic();
+      const draft = captureDraftFromEditor();
+      if (topic && draft) {
+        applyWritingPreparation(topic, draft, { force: true });
+        draft.titleCandidates = [];
+        draft.titleSeed = 0;
+        draft.outlineSeed = 0;
+        draft.outlineEngineVersion = OUTLINE_ENGINE_VERSION;
+        draft.outline = buildOutlineDraft(topic, draft);
+        draft.confirmedSteps = [];
+        draft.dirty = true;
+        invalidateDraftHandoff(draft);
+        hydrateWriter({ preserveStep: true });
+        scheduleDraftAutosave();
+      }
+      return;
+    }
+    if (selector === "#editorCoreJudgment") {
+      const draft = captureDraftFromEditor();
+      if (draft) draft.titleCandidates = [];
+    }
+    markDraftDirty(step);
+  });
 });
 
 document.querySelectorAll("[data-writing-action]").forEach((button) => {
@@ -4586,8 +5469,7 @@ document.querySelectorAll("[data-image-action]").forEach((button) => {
   button.addEventListener("click", () => {
     const role = button.dataset.imageRole;
     const action = button.dataset.imageAction;
-    if (action === "create-task") createCodexImageTask(role);
-    if (action === "adopt") adoptReadyImage(role);
+    if (action === "generate-asset") generateImageAssets([role]);
     if (action === "open") openImageAsset(role);
     if (action === "import") document.querySelector(`#${role}ImageFile`)?.click();
   });
@@ -4602,7 +5484,8 @@ document.querySelectorAll(".image-file-input").forEach((input) => {
   });
 });
 
-document.querySelector("#exportImageTasksButton").addEventListener("click", exportPendingImageTasks);
+document.querySelector("#generateAllImagesButton")?.addEventListener("click", () => generateImageAssets(["cover", "inline"]));
+document.querySelector("#skipImagesButton")?.addEventListener("click", skipImagesAndHandoff);
 
 document.querySelector("#saveDraftButton").addEventListener("click", () => {
   saveCurrentDraft({ notify: true, forceRevision: true });
@@ -4647,17 +5530,9 @@ document.querySelector("#titleOptions").addEventListener("keydown", (event) => {
 
 document.querySelector("[data-title-action='regenerate']").addEventListener("click", () => {
   const topic = queuedTopic();
-  const draft = currentDraft();
+  const draft = captureDraftFromEditor();
   if (!topic || !draft) return;
-  draft.titleSeed = Number(draft.titleSeed || 0) + 1;
-  draft.titleCandidates = buildTitleCandidates(topic, draft);
-  invalidateStepConfirmations(draft, "title");
-  draft.dirty = true;
-  invalidateDraftHandoff(draft);
-  renderTitleCandidates(topic, draft);
-  updateWriterChrome();
-  scheduleDraftAutosave();
-  showToast("已重新生成标题候选");
+  generateTitleTarget(topic, draft);
 });
 
 document.querySelector("#newPublicationButton")?.addEventListener("click", openPublicationForm);
@@ -4836,7 +5711,7 @@ document.querySelector("#layoutMarkdownEditor").addEventListener("input", () => 
   if (snapshot) {
     commitSnapshotLayout(snapshot, { ...(snapshot.layout || {}), markdown: document.querySelector("#layoutMarkdownEditor").value, html: "", validation: null, previewed: false, sourceSnapshotId: snapshot.id });
   }
-  updateLayoutWorkbenchStatus({ message: "正文已修改，请重新生成 HTML" });
+  updateLayoutWorkbenchStatus();
 });
 
 document.querySelector("#layoutHtmlEditor").addEventListener("input", () => {
@@ -4964,7 +5839,7 @@ document.querySelector("#newTopicButton").addEventListener("click", () => {
     category: "人工新增",
     valueTag: "待补充",
     platform: "公众号",
-    style: "观澜判断感",
+    style: "个人观点解读",
     length: "中篇 / 1800-2400 字",
     status: "candidate",
     worth: "这是人工新增选题，需要在进入写作前补充判断依据。",
@@ -4975,10 +5850,10 @@ document.querySelector("#newTopicButton").addEventListener("click", () => {
       organization: "还可以从团队分工、责任和协作方式切入。",
       asset: "最后可以判断它是否能沉淀为方法、模板或长期内容资产。",
     },
-    outline: "一、开头：提出问题\n二、中段：拆解判断\n三、案例：补充一个可验证场景\n四、结尾：给出行动建议",
+    outline: "",
     articleTitleDraft: title.trim(),
     imagePrompt: "封面：观澜蓝标题 + 暖白背景 + 简洁业务桌面元素。",
-    layout: "公众号：四段式结构；每段一个判断；结尾给行动建议。",
+    layout: "公众号：根据补充后的原始材料决定结构。",
   };
   topics.unshift(topic);
   selectedTopicId = topic.id;

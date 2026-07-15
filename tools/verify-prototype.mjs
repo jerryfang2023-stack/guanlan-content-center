@@ -12,6 +12,8 @@ const assert = (condition, message) => { if (!condition) fail(message); };
 const html = read("index.html");
 const app = read("app.js");
 const css = read("style.css");
+const server = read("server.mjs");
+const product = read("PRODUCT.md");
 
 function functionSource(name) {
   const start = app.indexOf(`function ${name}(`);
@@ -30,9 +32,18 @@ const htmlIds = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
 const duplicateIds = [...new Set(htmlIds.filter((id, index) => htmlIds.indexOf(id) !== index))];
 assert(!duplicateIds.length, `Duplicate HTML ids: ${duplicateIds.join(", ")}`);
 assert(!html.includes("nav-sub-item") && !css.includes(".nav-sub-item"), "Sidebar navigation must remain a flat, single-level column list");
+assert(html.includes('data-page="agent"') && html.includes('data-page-panel="agent"'), "Agent writing workbench navigation or page is missing");
+assert(html.indexOf('data-page="agent"') < html.indexOf('data-page="topics"'), "Agent writing workbench must stay above Today Topics");
+assert(html.includes('data-page="editor"') && html.includes('data-page-panel="editor"'), "Legacy WeChat writer must remain available during the transition");
+assert(["agentComposer", "agentPlan", "agentTopicList", "agentTaskList", "agentHandoffButton"].every((id) => htmlIds.includes(id)), "Agent workbench core regions are incomplete");
+assert(app.includes("function renderAgentWorkbench()") && app.includes("function confirmAgentPlan()") && app.includes("function handoffAgentDraft("), "Agent workbench interactions or legacy handoff are incomplete");
+assert(product.includes("## Core Page Principle") && product.includes("非必要不展示"), "Content Center core page principle is missing");
+assert(!html.includes('class="agent-steps"') && !html.includes("Hermes API 尚未连接") && !html.includes("EXECUTION PLAN"), "Agent workbench still contains redundant helper content");
 
-const selectorIds = [...app.matchAll(/document\.querySelector\(["']#([A-Za-z][\w:-]*)["']\)/g)].map((match) => match[1]);
-const missingIds = [...new Set(selectorIds.filter((id) => !htmlIds.includes(id)))];
+// Optional hooks may be absent while their companion feature is not rendered.
+const optionalSelectorIds = new Set(["styleExtractionReport", "writingStyleComparison"]);
+const selectorIds = [...app.matchAll(/document\.querySelector\(["']#([A-Za-z][\w:-]*)["']\)(?!\?)/g)].map((match) => match[1]);
+const missingIds = [...new Set(selectorIds.filter((id) => !htmlIds.includes(id) && !optionalSelectorIds.has(id)))];
 assert(!missingIds.length, `app.js references missing ids: ${missingIds.join(", ")}`);
 
 const scriptSources = [...html.matchAll(/<script src="([^"]+)"/g)].map((match) => match[1]);
@@ -42,11 +53,34 @@ assert(JSON.stringify(scriptOrder) === JSON.stringify([
   "assets/generated/manifest.js",
   "app.js",
 ]), `Unexpected script order: ${scriptOrder.join(" -> ")}`);
-assert(scriptSources.some((source) => /^app\.js\?v=20260715-layout-workbench-17$/.test(source)), "Layout workbench cache-busting version is missing");
+assert(scriptSources.some((source) => /^app\.js\?v=20260715-agent-distill-39$/.test(source)), "Current app cache-busting version is missing");
+assert(["titleGenerationStatus", "outlineGenerationStatus", "bodyGenerationStatus"].every((id) => html.includes(`id="${id}"`)), "DeepSeek writing generation status UI is incomplete");
+assert(html.includes('>生成标题</button>') && html.includes('>生成提纲</button>') && html.includes('>生成正文</button>'), "Writing generation action labels are incomplete");
+assert(!html.includes("DeepSeek"), "Writing steps must not expose the model provider");
+assert(app.includes('const DEEPSEEK_WRITING_ENDPOINTS') && app.includes('async function generateTitleTarget(') && app.includes('async function generateOutlineTarget(') && app.includes('async function generateBodyTarget('), "DeepSeek writing generation clients are incomplete");
+assert(!app.includes('function buildBodyDraft('), "Local template body generator must stay removed");
+assert(!app.includes("DEEPSEEK_API_KEY") && server.includes("process.env.DEEPSEEK_API_KEY"), "DeepSeek key must stay in the local server only");
+assert(server.includes("https://api.deepseek.com/chat/completions") && server.includes('const DEFAULT_MODEL = "deepseek-v4-pro"'), "Current DeepSeek chat endpoint or model is missing");
+assert(server.includes('"/api/generate-titles"') && server.includes('"/api/generate-outline"') && server.includes('"/api/generate-body"') && server.includes('"/api/generate-image-plan"'), "Writing and visual planning endpoints are incomplete");
+const bodyProgressContext = {};
+vm.runInNewContext(functionSource("bodyReadyForProgress"), bodyProgressContext);
+assert(bodyProgressContext.bodyReadyForProgress({ bodyMarkdown: `## 正文\n\n${"真实内容".repeat(60)}` }), "A substantive body must allow the writer to continue even when it is under the target length");
+assert(!bodyProgressContext.bodyReadyForProgress({ bodyMarkdown: "## 正文" }), "An empty body shell must not count as complete");
 assert(!html.includes('class="layout-revision-panel"') && !html.includes('data-layout-revision='), "Legacy layout revision panel must stay removed");
 assert(app.includes('data-inline-op="bold"') && app.includes('data-block-op="colorBlock"'), "Preview-local text and block editing controls are missing");
 assert(app.includes('data-block-op="removeRule"') && app.includes('function removeHorizontalRules('), "Preview-local horizontal rule removal is missing");
 assert(app.includes('class="preview-workspace has-tools"') && app.includes('class="editor-tools is-open"'), "Preview side editing workspace must open by default");
+assert(app.includes('const previewWorkbench') && app.includes('版式检查器') && app.includes('function updateInspectorState()'), "Preview editor must keep the editorial inspector workbench");
+assert(app.includes('id="scopePill"') && app.includes('文本强调') && app.includes('段落样式') && app.includes('区块与节奏'), "Preview inspector context or editing sections are incomplete");
+assert(app.includes('const previewWorkbenchWithPalette') && app.includes('#17613E') && app.includes('#1E6B63') && app.includes('#6B5B95') && app.includes('#B5602A'), "Preview inspector must provide the full editorial color palette");
+const previewContext = { escapeHtml: (value) => value, sanitizePreviewHtml: (value) => value, stripGzhPreviewMasthead: (value) => value };
+vm.runInNewContext(functionSource("buildPreviewDocument"), previewContext);
+const previewDocument = previewContext.buildPreviewDocument("测试", "<section><p>正文</p></section>");
+assert(!previewDocument.includes('class="selection-card"'), "Preview inspector must not render the removed selection card");
+assert(!previewDocument.includes('class="inspector-footer"'), "Preview inspector must not render the removed footer note");
+assert(previewDocument.includes('grid-template-columns:minmax(0,1fr) minmax(300px,328px)'), "Preview inspector must stay pinned to the right edge on wide screens");
+assert(previewDocument.includes('width:min(760px,calc(100% - 36px));margin:18px auto 64px'), "Preview body must stay centered in the remaining workspace");
+assert(!app.includes('aria-label="局部二次排版工具"'), "Legacy stacked preview tools must stay removed");
 assert(app.includes('id="gzhContent" contenteditable="true"') && !app.includes('id="editButton"') && !app.includes('id="saveBackButton"'), "Preview must enter editing directly without edit or save-back controls");
 assert(app.includes('function captureContentHtml(') && app.includes('function restoreHistory('), "Preview undo history snapshots are missing");
 assert(app.includes('id="redoButton"') && app.includes('>恢复</button>'), "Redo action must be labeled as restore");
@@ -54,7 +88,7 @@ assert(app.includes('function runHistory(direction)') && app.includes("runHistor
 assert(!app.includes('id="undoButton" type="button" title="撤销上一次编辑" disabled'), "Preview undo control must remain clickable when history is empty");
 assert(app.includes('function stripGzhPreviewMasthead('), "Legacy preview masthead stripping is missing");
 assert(!app.includes("WAVESIGHT BRIEFING") && !app.includes("const mastheadLabel"), "Generated layout must not include an article masthead");
-assert(html.includes('class="layout-editor-workbench"') && html.includes('class="layout-inspector"') && html.includes('class="layout-delivery-panel"'), "Layout editor must use the three-zone workbench structure");
+assert(html.includes('class="layout-editor-workbench"') && html.includes('class="layout-inspector"') && html.includes('class="layout-editor-pane"') && !html.includes('class="layout-delivery-panel"'), "Layout editor must keep only the scheme and editing work zones");
 assert(html.includes('data-layout-preset="judgment"') && html.includes('data-layout-insert="quote"'), "Layout presets and insertable article components are missing");
 assert(app.includes('const GZH_LAYOUT_PRESETS') && app.includes('function insertLayoutBlock(') && app.includes('function updateLayoutWorkbenchStatus('), "Layout workbench controls are missing their functional handlers");
 assert(app.includes('const TOPIC_TIME_ZONE = "America/Los_Angeles"'), "Topic date filter must use the local editorial timezone");
@@ -188,7 +222,121 @@ assert(app.includes("savePublicationFromForm") && app.includes("savePublicationR
 assert(app.includes('document.querySelector("#reviewDecisionGrid")?.addEventListener("click"'), "Publication decision controls are not interactive");
 assert(html.includes('id="publicationForm"') && html.includes('id="saveRecapButton"'), "Publication review controls are missing");
 assert(app.includes('value="${escapeHtml(profile.id)}"'), "Writing style select must use stable ids");
-assert(app.includes('document.querySelector("#runWritingStyleTestButton")') && app.includes('document.querySelector("#analyzeReferenceButton")'), "Writing style lab handlers are missing");
+assert(app.includes('id: "style-weekly-roundup"') && app.includes('id: "style-case-event-breakdown"') && app.includes('id: "style-personal-analysis"'), "Three writing methods are missing");
+assert(app.includes("function captureWritingStyleLab()") && app.includes("function rebuildPromptFromMethod()"), "Writing method handlers are missing");
+assert(htmlIds.includes("writingStylePerspective") && htmlIds.includes("writingStyleTraits") && htmlIds.includes("writingStyleStructure") && htmlIds.includes("writingStyleTitlePatterns") && htmlIds.includes("writingStyleTechniques"), "Writing method detail fields are incomplete");
+assert(htmlIds.includes("writingStyleVoice") && htmlIds.includes("writingStyleSignatureMoves") && htmlIds.includes("writingStyleAntiAiRules") && htmlIds.includes("writingStyleRevisionPass"), "Authorship and anti-template fields are incomplete");
+assert(html.includes('data-style-tab="voice"') && app.includes('"method", "structure", "voice", "prompt"'), "Author voice tab is not connected");
+assert(app.includes("恢复“作者性”") || html.includes("恢复“作者性”"), "Anti-AI guidance must focus on authorship");
+assert((app.match(/antiAiRules:/g) || []).length >= 3 && (app.match(/revisionPass:/g) || []).length === 3, "Each writing method needs anti-template rules and a revision pass");
+assert(app.includes("methodVersion: 4") && app.includes("profile.methodVersion || 1"), "Writing method content migration is missing");
+assert(app.includes("function titleCandidateMatrix(") && app.includes("function titleStrengthScore("), "Headline matrix or scoring is missing");
+assert(html.includes('class="title-matrix-guide"') && app.includes('angle: item.angle') && app.includes('score: titleStrengthScore'), "Headline angle and score UI is incomplete");
+assert(app.includes('const offset = (Number(draft.titleSeed || 0) * 5)'), "Headline regeneration must rotate through different angles");
+assert(app.includes("const TITLE_ENGINE_VERSION = 2") && app.includes("draft.titleEngineVersion || 1"), "Existing drafts are not migrated to the headline matrix");
+assert(htmlIds.includes("writingStyleSourceList") && app.includes("profile.sources"), "Writing method sources are missing");
+assert(!html.includes("writingStyleHeaderSummary") && !html.includes("style-catalog-note") && !html.includes("先固定文章任务"), "Writing style page should not show auxiliary method explanations");
+assert(!htmlIds.includes("writingStyleReference") && !htmlIds.includes("writingStyleTestOutput") && !htmlIds.includes("newWritingStyleButton") && !htmlIds.includes("exportWritingSkillButton"), "Legacy writing Skill controls must stay removed");
+
+const titleContext = vm.createContext({
+  writingStylesById: {
+    "style-weekly-roundup": { id: "style-weekly-roundup" },
+    "style-case-event-breakdown": { id: "style-case-event-breakdown" },
+    "style-personal-analysis": { id: "style-personal-analysis" },
+  },
+  writingStyleByName: () => null,
+  currentDraft: () => null,
+});
+["titleFragment", "fitTitle", "titleCandidateMatrix", "titleStrengthScore", "buildTitleCandidates"].forEach((name) => {
+  vm.runInContext(functionSource(name), titleContext);
+});
+const titleTestTopic = {
+  title: "AI 代理开始接管企业采购流程",
+  category: "企业采购",
+  valueTag: "交付成本",
+  opinion: "AI 代理真正改变的不是工具，而是采购的责任边界",
+};
+const titleTestDraft = {
+  styleId: "style-weekly-roundup",
+  selectedTitle: "AI 代理与企业采购",
+  coreJudgment: titleTestTopic.opinion,
+  titleSeed: 0,
+};
+const firstTitleBatch = titleContext.buildTitleCandidates(titleTestTopic, titleTestDraft);
+titleTestDraft.titleSeed = 1;
+const secondTitleBatch = titleContext.buildTitleCandidates(titleTestTopic, titleTestDraft);
+assert(firstTitleBatch.length === 6 && secondTitleBatch.length === 6, "Headline matrix should return six comparable candidates");
+assert(firstTitleBatch.filter((title) => secondTitleBatch.includes(title)).length <= 2, "Regenerated headline batches are not different enough");
+assert(Object.values(titleTestDraft.titleCandidateDetails).every((detail) => detail.score >= 45 && detail.score <= 94 && detail.angle), "Headline scoring metadata is invalid");
+
+const outlineContext = vm.createContext({
+  writingStylesById: {
+    "style-weekly-roundup": { id: "style-weekly-roundup" },
+    "style-case-event-breakdown": { id: "style-case-event-breakdown" },
+    "style-personal-analysis": { id: "style-personal-analysis" },
+  },
+  defaultWritingStyleId: "style-weekly-roundup",
+  writingStyleByName: () => null,
+  currentDraft: () => null,
+});
+["outlineFragment", "outlineAnchorTokens", "outlineFragmentsEquivalent", "sourceOutlineFragments", "stableOutlineHash", "uniqueOutlineSections", "numberedOutline", "writingMaterialSignals", "buildWritingPreparation", "buildOutlineDraft"].forEach((name) => {
+  vm.runInContext(functionSource(name), outlineContext);
+});
+const outlineTestTopic = {
+  id: "outline-test",
+  title: "Fable 用 AI 重写 sqlite-utils 4.0rc2",
+  category: "AI 编程",
+  valueTag: "开发方式",
+  worth: "Simon Willison 记录了 Fable 重写 sqlite-utils 的完整过程；他保留了测试、人工审查和未解问题。",
+  opinion: "这个案例最有价值的不是代码量，而是它暴露了 AI 编程仍依赖人类判断。",
+  evidenceBoundary: "原文没有证明这种方法适用于所有项目。",
+  source: "Simon Willison",
+  provenance: { sourceName: "Simon Willison", originalTitle: "sqlite-utils 4.0rc2" },
+};
+const outlineDraft = { styleId: "style-case-event-breakdown", coreJudgment: outlineTestTopic.opinion, outlineSeed: 0 };
+const firstOutline = outlineContext.buildOutlineDraft(outlineTestTopic, outlineDraft);
+outlineDraft.outlineSeed = 1;
+const secondOutline = outlineContext.buildOutlineDraft(outlineTestTopic, outlineDraft);
+const bannedOutlinePattern = /老板|验收边界|行动落点|本周可执行|五段式/;
+assert(firstOutline !== secondOutline, "Outline regeneration must change the material-led organization");
+assert([firstOutline, secondOutline].every((outline) => outline.split("\n").length >= 3 && outline.split("\n").length <= 5), "Material-led outlines must use a variable 3-5 section range");
+assert([firstOutline, secondOutline].every((outline) => outline.includes("Fable") || outline.includes("sqlite-utils")), "Outlines must preserve specific source material");
+assert([firstOutline, secondOutline].every((outline) => !bannedOutlinePattern.test(outline)), "Outlines must not restore generic boss, acceptance, or action sections");
+const casePreparation = outlineContext.buildWritingPreparation({
+  title: "Engram 携 9800 万美元启动",
+  worth: "Engram 携 9800 万美元启动，定位为真正了解组织的 AI。",
+  source: "公司公告",
+}, { styleId: "style-case-event-breakdown" });
+const weeklyPreparation = outlineContext.buildWritingPreparation(outlineTestTopic, { styleId: "style-weekly-roundup" });
+const opinionPreparation = outlineContext.buildWritingPreparation(outlineTestTopic, { styleId: "style-personal-analysis" });
+assert(casePreparation.labels.focus === "拆解焦点" && casePreparation.values.notWrite.includes("不把事件摘要硬写成完整复盘"), "Case preparation must flag missing process evidence instead of inventing a case workflow");
+assert(weeklyPreparation.labels.focus === "本期编辑取舍" && opinionPreparation.labels.focus === "我的主张", "Preparation fields must change with the selected writing method");
+const duplicatedTitleFragments = outlineContext.sourceOutlineFragments({
+  worth: "原始来源记录的事件为“多智能体 AI 销售团队案例：SQL 转化提升 4.2 倍，带来 1420 万美元管线”。",
+  provenance: { originalTitle: "Multi-Agent AI Sales Crew Case Study: 4.2× SQL Conversion Lift, $14.2M Pipeline" },
+});
+assert(duplicatedTitleFragments.filter((fragment) => fragment.includes("4.2")).length === 1, "Translated and original versions of the same source title must collapse into one fact");
+const researchedCaseTopic = {
+  id: "researched-sales-case",
+  title: "多智能体 AI 销售团队案例",
+  category: "销售自动化",
+  worth: "SQL 转化提升 4.2 倍。",
+  opinion: "这个案例的关键是销售分工被重新组织。",
+  evidenceItems: [
+    { role: "result", heading: "6% 到 25%：转化率发生了什么", text: "SQL 转化率从 6% 提升到 25%。" },
+    { role: "problem", heading: "25 名 SDR 为什么消化不了 1.2 万条线索", text: "65% 时间花在研究上。" },
+    { role: "process", heading: "四个智能体如何接力", text: "Researcher、Qualifier、Outreach 和 Coach 分工。" },
+    { role: "timeline", heading: "8 周、14 周和 12 个月", text: "系统分阶段上线。" },
+    { role: "boundary", heading: "人工复核仍然在场", text: "低置信度线索转给人工。" },
+  ],
+};
+const researchedOutline = outlineContext.buildOutlineDraft(researchedCaseTopic, { styleId: "style-case-event-breakdown", outlineSeed: 0 });
+assert(researchedOutline.includes("25 名 SDR") && researchedOutline.includes("四个智能体"), "A researched case outline must use problem and process evidence, not repeat source titles");
+assert(!researchedOutline.includes("Case Study") && new Set(researchedOutline.split("\n")).size === researchedOutline.split("\n").length, "A researched case outline must not repeat translated or original titles");
+assert(app.includes("const WRITING_PREP_VERSION = 3") && app.includes("draft.writingPrepVersion || 1"), "Existing drafts are not migrated to method-specific writing preparation");
+assert(app.includes("const OUTLINE_ENGINE_VERSION = 4") && app.includes("draft.outlineEngineVersion || 1"), "Existing drafts are not migrated to the material-led outline engine");
+assert(!app.includes("老板今天可以先做一件小事") && !app.includes("今天可以开始的一个动作"), "Body generation must not restore the old educational action template");
+assert(htmlIds.includes("qualityMaterial") && !htmlIds.includes("qualityBoss") && html.includes("紧扣原始材料"), "Writing checks must reward source specificity instead of a boss-oriented formula");
 assert(htmlIds.includes("layoutArticleFile") && htmlIds.includes("layoutPasteTitle") && htmlIds.includes("layoutPasteEditor") && htmlIds.includes("layoutPasteToggleButton"), "Manual article import controls or separate pasted title are missing");
 assert(html.includes('<span>文章标题</span>') && htmlIds.includes("layoutDraftSelect") && app.includes("parsed.title !== \"粘贴文章\""), "Layout title selection or pasted-title extraction is missing");
 assert(html.includes("⌘V / Ctrl+V") && app.includes('addEventListener("paste"'), "Copy and paste article import is missing");
@@ -201,9 +349,14 @@ assert(htmlIds.includes("writerSettingsPanel") && htmlIds.includes("writerSettin
 assert(htmlIds.includes("writerFinalCheckSummary") && htmlIds.includes("writerHandoffNote"), "Final-step writing checks are missing");
 assert(htmlIds.includes("saveDraftButton") && htmlIds.includes("handoffLayoutButton") && html.indexOf('class="writer-final-actions"') > html.indexOf('data-writing-panel="images"'), "Writing completion actions must appear only in the final image step");
 assert(!html.includes("editorWordCount") && !html.includes("editorSaveState") && !html.includes("writer-topic-strip") && !html.includes("topicContextToggle"), "Redundant writing-page status and source context fields must be removed");
-assert((html.match(/data-writing-action="save"/g) || []).length === 1, "Only the final image step should keep an explicit confirm action");
-assert(app.includes('brief: [draft.painScene, draft.coreJudgment].every'), "Optional Brief boundary fields still block step completion");
-assert(app.includes("adopt.hidden") && app.includes("open.hidden") && app.includes("exportButton.hidden"), "Unavailable image actions must stay hidden until relevant");
+assert((html.match(/data-writing-action="save"/g) || []).length === 0, "Optional image delivery must not require a separate confirmation action");
+assert(htmlIds.includes("writerTaskPanel") && htmlIds.includes("writerTaskSummary") && htmlIds.includes("editorCoreJudgment") && htmlIds.includes("editorPainScene") && htmlIds.includes("editorNotWrite"), "Method-specific writing preparation is incomplete");
+assert(!htmlIds.includes("editorArticleGoal") && !html.includes("读者处境") && !html.includes("读完收获"), "Generic reader-benefit brief fields must stay removed");
+assert(htmlIds.includes("outlineMethodLabel") && htmlIds.includes("outlineMaterialFit") && htmlIds.includes("outlineBasisList"), "Outline material and method context is incomplete");
+assert(app.includes('const WRITING_STEPS = ["title", "outline", "body", "images"]') && !html.includes('data-writing-step="brief"') && !html.includes('data-writing-panel="brief"'), "Legacy Brief step must stay outside the primary writing flow");
+assert(htmlIds.includes("skipImagesButton") && htmlIds.includes("generateAllImagesButton") && htmlIds.includes("imageDeliverySummary"), "Optional image delivery actions or status are missing");
+assert(app.includes("function skipImagesAndHandoff()") && app.includes("async function generateImageAssets(") && app.includes("function renderVisualPlanToPng("), "Image skip or real PNG delivery capability is incomplete");
+assert(html.includes('data-image-action="generate-asset"') && !html.includes('data-image-action="create-task"') && !html.includes("导出待执行任务"), "Image UI must create assets directly instead of exposing task export");
 assert(html.includes('data-page="library"') && html.includes('data-page-panel="library"'), "Topic library must remain a standalone sidebar page");
 assert(htmlIds.includes("libraryPage") && htmlIds.includes("libraryDateFilter") && htmlIds.includes("libraryStatusFilter"), "Standalone topic library controls are incomplete");
 assert(app.includes("libraryArchivedAt") && app.includes("allLibraryTopics") && app.includes('if (!topic.libraryArchivedAt) topic.libraryArchivedAt = new Date().toISOString()'), "Topic library archive retention is incomplete");
@@ -235,9 +388,9 @@ assert(html.includes('data-layout-surface="html"') && !html.includes("查看稿�
 const layoutPageMarkup = html.slice(html.indexOf('id="layoutPage"'), html.indexOf('id="pendingPage"'));
 assert(!layoutPageMarkup.includes("<h2>公众号排版</h2>"), "Layout page repeats the global page title");
 assert(layoutPageMarkup.indexOf('class="layout-source-actions"') < layoutPageMarkup.indexOf('class="layout-editor-workbench"'), "Article import actions must appear before the editing workspace");
-assert(layoutPageMarkup.includes('class="layout-inspector"') && layoutPageMarkup.includes('class="layout-editor-pane"') && layoutPageMarkup.includes('class="layout-delivery-panel"'), "Layout workbench zones are incomplete");
+assert(layoutPageMarkup.includes('class="layout-inspector"') && layoutPageMarkup.includes('class="layout-editor-pane"') && !layoutPageMarkup.includes('class="layout-delivery-panel"'), "Layout workbench zones are incomplete");
 assert(layoutPageMarkup.indexOf('id="layoutPasteImport"') < layoutPageMarkup.indexOf('class="layout-editor-workbench"'), "Paste import panel must stay near article intake controls");
-assert(layoutPageMarkup.indexOf('class="layout-delivery-actions"') > layoutPageMarkup.indexOf('class="layout-editor-pane"'), "Layout actions must remain in the delivery zone after the article editor");
+assert(layoutPageMarkup.indexOf('class="layout-editor-actions"') > layoutPageMarkup.indexOf('class="layout-editor-surface"'), "Layout actions must appear below the article editor");
 assert(app.includes("pickGzhKeyword") && app.includes("gzhSectionLabel") && app.includes("detectGzhArticleType"), "gzh-design skill structure intelligence is missing");
 assert(app.includes("THE NEXT MOVE") && app.includes("你会看到什么") && app.includes("{{作者名}}"), "gzh-design skill article skeleton is incomplete");
 assert(htmlIds.includes("pendingPage") && htmlIds.includes("pendingPublishList") && htmlIds.includes("savePendingPublishButton"), "Pending publication UI is missing");
