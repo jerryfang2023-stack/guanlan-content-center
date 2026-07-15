@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>观澜内容工厂 Lite v0.1</title>
+  <link rel="stylesheet" href="style.css?v=20260715-layout-revision-15">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="side-nav" aria-label="内容工厂导航">
+      <a class="brand" href="#" aria-label="观澜 AI 内容工厂">
+        <img class="brand-full" src="assets/logo-wavesight-horizontal.svg" alt="观澜 AI Wavesight AI">
+      </a>
+      <div class="workspace-label">Content Factory Lite</div>
+      <nav class="nav-list" aria-label="主要页面">
+        <button class="nav-item is-active" data-page="topics" title="今日选题">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/><path d="M17 14l1.2 2.5 2.8.4-2 1.9.5 2.7-2.5-1.3-2.5 1.3.5-2.7-2-1.9 2.8-.4z"/></svg></span>
+          <span class="nav-text">今日选题</span>
+        </button>
+        <button class="nav-item" data-page="library" title="选题库">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14v16l-7-3-7 3z"/><path d="M8 9h8M8 13h6"/></svg></span>
+          <span class="nav-text">选题库</span>
+        </button>
+        <button class="nav-item" data-page="styles" title="写作风格">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l8.8-8.8 2 2L8 18H6z"/><path d="M13.5 8.5l2 2M5 5h6"/></svg></span>
+          <span class="nav-text">写作风格</span>
+        </button>
+        <button class="nav-item" data-page="editor" title="公众号写作">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h10l4 4v12H5z"/><path d="M15 4v5h5M8 13h8M8 17h6"/></svg></span>
+          <span class="nav-text">公众号写作</span>
+        </button>
+        <button class="nav-item" data-page="layout" title="公众号排版">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+          <span class="nav-text">公众号排版</span>
+        </button>
+        <button class="nav-item" data-page="pending" title="待发布">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h10l4 4v12H5z"/><path d="M15 4v5h5M8 13h8M8 17h5"/><circle cx="17" cy="17" r="4"/><path d="M17 15v2l1.4 1"/></svg></span>
+          <span class="nav-text">待发布</span>
+        </button>
+        <button class="nav-item" data-page="review" title="发布复盘">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h17"/><path d="M8 15l3-3 3 2 5-7"/><path d="M17 7h2v2"/></svg></span>
+          <span class="nav-text">发布复盘</span>
+        </button>
+      </nav>
+      <button class="sidebar-toggle" type="button" aria-label="收起侧边栏" aria-expanded="true">收起侧栏</button>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="page-kicker" id="pageKicker">TODAY TOPICS</p>
+          <div class="title-row">
+            <h1 id="pageTitle">今日选题</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="ghost-button" id="importTopicsButton">导入今日材料</button>
+          <button class="primary-button" id="newTopicButton">新建人工选题</button>
+        </div>
+      </header>
+
+      <section class="page is-active" id="topicsPage" data-page-panel="topics">
+        <div class="toolbar topic-toolbar">
+          <div class="metric-strip" aria-label="今日选题统计">
+            <div><strong id="metricCandidate">0</strong><span>待判断</span></div>
+            <div><strong id="metricQueued">0</strong><span>写作中</span></div>
+            <div><strong id="metricLibrary">0</strong><span>已留档</span></div>
+          </div>
+          <div class="toolbar-controls">
+            <label class="date-filter">
+              <span>日期</span>
+              <select class="date-filter-select" aria-label="筛选选题日期"></select>
+            </label>
+            <label class="search-box">
+              <span>搜索</span>
+              <input id="topicSearch" type="search" placeholder="输入关键词、方向或来源">
+            </label>
+          </div>
+        </div>
+
+        <div class="data-boundary" role="note" aria-label="七月选题数据边界">
+          <div>
+            <strong>7 月内容日历已补齐</strong>
+            <span id="calendarCoverageText">31 天 · 每天至少 10 条</span>
+          </div>
+          <p>排期日期与事实日期分开显示；观澜数据观察台当前信号截至 <strong id="observationActiveDate">2026-06-24</strong>，不将六月信号伪装成七月当日新闻。</p>
+        </div>
+
+        <div class="topics-grid">
+          <div class="topic-list" id="topicList" aria-label="选题列表">
+            <article class="topic-row is-selected">
+              <div class="topic-score">92</div>
+              <div>
+                <h3>Cloudflare 推出全新AI流量管理选项：区分搜索、智能体与训练爬虫，保护广告页面</h3>
+                <p>来源：商业信号 + 社群情报 / 方向：客户入口 / 价值：收入漏损</p>
+              </div>
+              <span class="status-pill queued">写作中</span>
+            </article>
+            <article class="topic-row">
+              <div class="topic-score">88</div>
+              <div>
+                <h3>Smartsheet 使用 Claude Platform API 改造企业工作流</h3>
+                <p>来源：商业信号 + 社群情报 / 方向：岗位 Agent / 价值：落地路径</p>
+              </div>
+              <span class="status-pill">待判断</span>
+            </article>
+            <article class="topic-row">
+              <div class="topic-score">84</div>
+              <div>
+                <h3>Glean 年经常性收入超过 3 亿美元，企业上下文推动 AI 采用</h3>
+                <p>来源：商业信号 / 方向：组织知识 / 价值：资产沉淀</p>
+              </div>
+              <span class="status-pill">待判断</span>
+            </article>
+            <article class="topic-row">
+              <div class="topic-score">79</div>
+              <div>
+                <h3>Houston Methodist 全企业部署 Midstream Health 智能体财务行动平台</h3>
+                <p>来源：商业信号 / 方向：风控财务 / 价值：结果可验收</p>
+              </div>
+              <span class="status-pill library">已入库</span>
+            </article>
+          </div>
+
+          <aside class="topic-detail" aria-label="选题详情">
+            <div class="detail-top">
+              <span class="mono-label" id="detailRank">TOP 01</span>
+              <strong id="detailStatus">写作中</strong>
+            </div>
+            <h2 id="detailTitle">Cloudflare 推出全新AI流量管理选项：区分搜索、智能体与训练爬虫，保护广告页面</h2>
+            <dl class="detail-list">
+              <div>
+                <dt>为什么值得写</dt>
+                <dd id="detailWorth">Cloudflare 在 2026-07-02 的商业信号里同时出现 AI 流量管理和 Monetization Gateway，说明网站、内容和搜索入口正在从“人访问”变成“人和智能体一起访问”。</dd>
+              </div>
+              <div>
+                <dt>核心观点</dt>
+                <dd id="detailOpinion">企业 AI 化的第一张表不是工具清单，而是客户入口表；入口漏掉，AI 就和收入无关。</dd>
+              </div>
+              <div id="detailSourceBlock">
+                <dt>数据依据</dt>
+                <dd class="source-evidence"><span id="detailSourceDate">本地 7 月选题素材</span><a id="detailSourceLink" href="#" target="_blank" rel="noreferrer" hidden>打开原始来源</a></dd>
+              </div>
+              <div>
+                <dt>写作角度</dt>
+                <dd id="detailAngle" class="angle-grid">
+                  <div><strong>经营视角</strong><span>从老板最敏感的收入入口切入：搜索、官网、内容、客服、私信，哪里已经被 AI 流量改变。</span></div>
+                  <div><strong>流程视角</strong><span>把入口拆成曝光、访问、咨询、记录、跟进、成交，找 AI 能补上的断点。</span></div>
+                  <div><strong>组织视角</strong><span>讨论谁负责新入口：市场、销售、客服、运营还是一个新的 AI 增长岗。</span></div>
+                  <div><strong>资产视角</strong><span>把入口数据、问答、客户问题和跟进 SOP 沉淀为企业自己的获客资产。</span></div>
+                </dd>
+              </div>
+            </dl>
+            <div class="action-row">
+              <button class="primary-button" data-topic-action="queue">放入公众号写作</button>
+              <button class="secondary-button" data-topic-action="library">存入选题库</button>
+              <button class="ghost-button" data-topic-action="skip">不采用</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="page" id="libraryPage" data-page-panel="library">
+        <div class="library-workspace">
+          <div class="toolbar topic-toolbar library-toolbar">
+            <div class="metric-strip" aria-label="选题库统计">
+              <div><strong id="libraryCount">0</strong><span>留档选题</span></div>
+              <div><strong id="libraryHighCount">0</strong><span>高潜力</span></div>
+              <div><strong id="libraryQueuedCount">0</strong><span>写作中</span></div>
+            </div>
+            <div class="toolbar-controls">
+              <label class="date-filter" for="libraryStatusFilter">
+                <span>状态</span>
+                <select id="libraryStatusFilter" aria-label="按状态筛选选题库">
+                  <option value="all">全部状态</option>
+                  <option value="library">已入库</option>
+                  <option value="queued">写作中</option>
+                  <option value="skipped">不采用</option>
+                </select>
+              </label>
+              <label class="date-filter" for="libraryDateFilter">
+                <span>排期日期</span>
+                <select id="libraryDateFilter" aria-label="按排期日期筛选选题库"></select>
+              </label>
+              <label class="search-box" for="librarySearch">
+                <span>搜索</span>
+                <input id="librarySearch" type="search" placeholder="搜索标题、方向或来源">
+              </label>
+            </div>
+          </div>
+
+          <div class="library-archive-note" role="note">
+            <strong>长期留档</strong>
+            <span>选题进入写作台后仍保留在库内，可按排期日期检索和继续管理。</span>
+          </div>
+
+          <div class="topics-grid library-grid">
+            <div class="topic-list" id="libraryList" aria-label="选题库列表"></div>
+
+            <aside class="topic-detail" aria-label="入库选题详情">
+              <div class="detail-top">
+                <span class="mono-label" id="libraryDetailRank">库内 01</span>
+                <strong id="libraryDetailStatus">已入库</strong>
+              </div>
+              <h2 id="libraryDetailTitle">请选择一个留档选题</h2>
+              <p class="library-archive-meta" id="libraryDetailArchiveMeta">等待读取留档信息</p>
+              <dl class="detail-list">
+                <div>
+                  <dt>为什么值得存</dt>
+                  <dd id="libraryDetailWorth">有长期写作价值，但不一定适合今天进入写作。</dd>
+                </div>
+                <div>
+                  <dt>核心观点</dt>
+                  <dd id="libraryDetailOpinion">沉淀后可在后续日期重新筛选或直接送入公众号写作。</dd>
+                </div>
+                <div>
+                  <dt>可用切入点</dt>
+                  <dd id="libraryDetailAngle" class="angle-grid"></dd>
+                </div>
+              </dl>
+              <div class="action-row">
+                <button class="primary-button" data-library-action="queue">放入公众号写作</button>
+                <button class="ghost-button" data-library-action="remove">移出选题库</button>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="stylesPage" data-page-panel="styles">
+        <div class="style-lab-workspace">
+          <aside class="style-catalog" aria-label="写作风格列表">
+            <div class="style-catalog-head">
+              <div><span class="mono-label">STYLE PROFILES</span><h2>风格库</h2></div>
+              <button class="icon-command" id="newWritingStyleButton" type="button" title="新建写作风格" aria-label="新建写作风格">+</button>
+            </div>
+            <label class="style-search" for="writingStyleSearch">
+              <span>搜索</span>
+              <input id="writingStyleSearch" type="search" placeholder="风格名或方法">
+            </label>
+            <div class="style-profile-list" id="writingStyleList" role="listbox" aria-label="可调试写作风格"></div>
+          </aside>
+
+          <section class="style-lab-main" aria-label="写作风格调试工作区">
+            <header class="style-commandbar">
+              <label class="style-title-field" for="writingStyleName">
+                <span>风格名称</span>
+                <input id="writingStyleName" type="text" aria-label="风格名称" value="观澜判断感">
+              </label>
+            </header>
+
+            <nav class="style-lab-tabs" aria-label="风格调试模式">
+              <button type="button" data-style-tab="method" aria-current="page">风格详情</button>
+              <button type="button" data-style-tab="reference">参考文案</button>
+              <button type="button" data-style-tab="prompt">Prompt</button>
+              <button type="button" data-style-tab="test">样稿测试</button>
+            </nav>
+
+            <div class="style-lab-stage">
+              <section class="style-tab-panel is-active" data-style-panel="method">
+                <div class="style-panel-head">
+                  <div><span class="mono-label">STYLE DETAIL</span><h2>风格详情</h2><p>定义这套风格如何观察、判断、组织和表达。</p></div>
+                  <button class="text-button" id="resetWritingStyleButton" type="button">还原内置方法</button>
+                </div>
+                <label class="lab-field" for="writingStyleDescription"><span>适用场景</span><input id="writingStyleDescription" type="text"></label>
+                <label class="lab-field" for="writingStyleMethod"><span>可复用写作方法</span><textarea id="writingStyleMethod" class="lab-editor method-editor"></textarea></label>
+                <div class="voice-dimension-grid">
+                  <label for="styleJudgmentScore"><span>方法拆解 <output id="styleJudgmentValue">82</output></span><input id="styleJudgmentScore" type="range" min="0" max="100" value="82"></label>
+                  <label for="styleEvidenceScore"><span>经验分享 <output id="styleEvidenceValue">74</output></span><input id="styleEvidenceScore" type="range" min="0" max="100" value="74"></label>
+                  <label for="styleNarrativeScore"><span>场景叙述 <output id="styleNarrativeValue">46</output></span><input id="styleNarrativeScore" type="range" min="0" max="100" value="46"></label>
+                  <label for="styleActionScore"><span>技巧提炼 <output id="styleActionValue">88</output></span><input id="styleActionScore" type="range" min="0" max="100" value="88"></label>
+                </div>
+                <label class="lab-field" for="writingStyleGuardrails"><span>表达边界</span><textarea id="writingStyleGuardrails" class="lab-editor compact-editor"></textarea></label>
+                <section class="style-publish-card" aria-label="公众号引用">
+                  <div class="style-publish-copy">
+                    <h3>公众号引用</h3>
+                    <p id="writingStylePublishNote">当前版本已发布，可在公众号写作中选择。</p>
+                  </div>
+                  <div class="style-publish-actions">
+                    <button class="secondary-button" id="saveWritingStyleButton" type="button">保存</button>
+                    <button class="secondary-button" id="exportWritingSkillButton" type="button">导出 Skill.md</button>
+                    <button class="text-button" id="openWritingStyleInEditorButton" type="button">在写作中使用</button>
+                    <button class="primary-button" id="publishWritingStyleButton" type="button">发布并设为默认</button>
+                  </div>
+                </section>
+              </section>
+
+              <section class="style-tab-panel" data-style-panel="reference" hidden>
+                <div class="style-panel-head">
+                  <div><span class="mono-label">REFERENCE COPY</span><h2>从参考文案提炼</h2><p>粘贴你认可的文案，提炼可复用方法，不保存为简单仿写模板。</p></div>
+                  <div class="action-row tight"><button class="secondary-button" id="analyzeReferenceButton" type="button">提炼写作方法</button><button class="ghost-button" id="clearReferenceButton" type="button">清空</button></div>
+                </div>
+                <label class="lab-field" for="writingStyleReference"><span>参考文案</span><textarea id="writingStyleReference" class="lab-editor reference-editor" placeholder="粘贴 300-2000 字参考文案……"></textarea></label>
+                <div class="extraction-report" id="styleExtractionReport" aria-live="polite">
+                  <strong>待提炼</strong><p>将识别句长节奏、开头方式、论证结构、词汇倾向和实用技巧。</p>
+                </div>
+              </section>
+
+              <section class="style-tab-panel" data-style-panel="prompt" hidden>
+                <div class="style-panel-head">
+                  <div><span class="mono-label">SYSTEM PROMPT</span><h2>Prompt 调试</h2><p>直接修改风格指令；发布时公众号写作将引用这个版本。</p></div>
+                  <button class="secondary-button" id="buildPromptFromMethodButton" type="button">根据方法重建 Prompt</button>
+                </div>
+                <label class="lab-field" for="writingStylePrompt"><span>核心 Prompt</span><textarea id="writingStylePrompt" class="lab-editor prompt-editor" spellcheck="false"></textarea></label>
+                <label class="lab-field" for="writingStyleOutputRules"><span>输出规则</span><textarea id="writingStyleOutputRules" class="lab-editor compact-editor" spellcheck="false"></textarea></label>
+              </section>
+
+              <section class="style-tab-panel" data-style-panel="test" hidden>
+                <div class="style-panel-head">
+                  <div><span class="mono-label">TEST BENCH</span><h2>样稿测试</h2><p>用同一个题目反复试写，评估风格是否稳定、自然、有判断。</p></div>
+                  <div class="action-row tight"><button class="secondary-button" id="compareWritingStyleButton" type="button">对比上一版</button><button class="primary-button" id="runWritingStyleTestButton" type="button">运行样稿</button></div>
+                </div>
+                <label class="lab-field" for="writingStyleTestTopic"><span>测试选题</span><input id="writingStyleTestTopic" type="text"></label>
+                <label class="lab-field" for="writingStyleTestBrief"><span>测试 Brief</span><textarea id="writingStyleTestBrief" class="lab-editor compact-editor"></textarea></label>
+                <label class="lab-field" for="writingStyleTestOutput"><span>生成样稿（可编辑）</span><textarea id="writingStyleTestOutput" class="lab-editor test-output-editor"></textarea></label>
+                <div class="version-compare" id="writingStyleComparison" hidden></div>
+              </section>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <section class="page" id="editorPage" data-page-panel="editor">
+        <div class="writer-workspace">
+          <section class="writer-main">
+            <header class="writer-commandbar">
+              <div class="draft-switcher">
+                <label for="editorDraftSelect">当前稿件</label>
+                <select id="editorDraftSelect" aria-label="选择待写公众号稿件"></select>
+                <span class="draft-status" id="editorDraftStatus">待写作</span>
+              </div>
+            </header>
+
+            <details class="writer-settings-panel" id="writerSettingsPanel">
+              <summary>
+                <span><strong>写作设置</strong><small id="writerSettingsSummary">默认风格 · 中篇</small></span>
+                <span class="writer-settings-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="writer-settings-fields">
+                <label class="field-block" for="styleSelect"><span>公众号风格</span><select id="styleSelect"></select></label>
+                <label class="field-block" for="lengthSelect"><span>目标篇幅</span><select id="lengthSelect"><option>中篇 / 1800-2400 字</option><option>短篇 / 800-1200 字</option><option>长篇 / 3000 字以上</option></select></label>
+                <button class="text-button" id="editWritingStyleButton" type="button">调试当前风格</button>
+              </div>
+            </details>
+
+            <nav class="writer-stepper" aria-label="公众号写作步骤">
+              <button type="button" data-writing-step="brief" aria-current="step"><span>01</span><strong>Brief</strong><em id="stepStatusBrief">进行中</em></button>
+              <button type="button" data-writing-step="title"><span>02</span><strong>标题</strong><em id="stepStatusTitle">待完成</em></button>
+              <button type="button" data-writing-step="outline"><span>03</span><strong>提纲</strong><em id="stepStatusOutline">待完成</em></button>
+              <button type="button" data-writing-step="body"><span>04</span><strong>正文</strong><em id="stepStatusBody">待完成</em></button>
+              <button type="button" data-writing-step="images"><span>05</span><strong>图片资产</strong><em id="stepStatusImages">待完成</em></button>
+            </nav>
+
+            <div class="writer-stage">
+              <section class="writer-stage-panel is-active" data-writing-panel="brief" aria-labelledby="briefPanelTitle">
+                <div class="writer-panel-head">
+                  <div><span class="mono-label">STEP 01</span><h2 id="briefPanelTitle">写作 Brief</h2><p>先明确老板的具体焦虑和文章核心判断。</p></div>
+                  <div class="action-row tight">
+                    <button class="ghost-button" type="button" data-writing-action="generate" data-writing-target="brief">AI 生成</button>
+                    <button class="primary-button" type="button" data-writing-action="next">下一步</button>
+                  </div>
+                </div>
+                <div class="brief-grid writer-brief-grid">
+                  <label for="editorPainScene"><span>痛点场景</span><textarea id="editorPainScene"></textarea></label>
+                  <label for="editorCoreJudgment"><span>核心判断</span><textarea id="editorCoreJudgment"></textarea></label>
+                </div>
+                <details class="writer-optional-fields">
+                  <summary>补充写作边界（选填）</summary>
+                  <div class="brief-grid writer-brief-grid">
+                    <label for="editorArticleGoal"><span>文章目标</span><textarea id="editorArticleGoal"></textarea></label>
+                    <label for="editorNotWrite"><span>不写什么</span><textarea id="editorNotWrite"></textarea></label>
+                  </div>
+                </details>
+              </section>
+
+              <section class="writer-stage-panel" data-writing-panel="title" aria-labelledby="titlePanelTitle" hidden>
+                <div class="writer-panel-head">
+                  <div><span class="mono-label">STEP 02</span><h2 id="titlePanelTitle">标题</h2><p>原始选题不变，只在这里生成和选定公众号标题。</p></div>
+                  <div class="action-row tight">
+                    <button class="ghost-button" type="button" data-title-action="regenerate">重新生成</button>
+                    <button class="primary-button" type="button" data-writing-action="next">下一步</button>
+                  </div>
+                </div>
+                <div class="title-options" id="titleOptions" role="radiogroup" aria-label="标题候选"></div>
+                <label class="selected-title-field" for="selectedTitleEditor"><span>已选标题（可继续修改）</span><input id="selectedTitleEditor" type="text"></label>
+              </section>
+
+              <section class="writer-stage-panel" data-writing-panel="outline" aria-labelledby="outlinePanelTitle" hidden>
+                <div class="writer-panel-head">
+                  <div><span class="mono-label">STEP 03</span><h2 id="outlinePanelTitle">提纲</h2><p>用“场景切入 → 方法拆解 → 技巧收束”控制文章结构。</p></div>
+                  <div class="action-row tight">
+                    <button class="ghost-button" type="button" data-writing-action="generate" data-writing-target="outline">AI 生成提纲</button>
+                    <button class="primary-button" type="button" data-writing-action="next">下一步</button>
+                  </div>
+                </div>
+                <textarea id="outlineEditor" class="stage-editor outline-stage-editor" aria-label="公众号提纲"></textarea>
+              </section>
+
+              <section class="writer-stage-panel" data-writing-panel="body" aria-labelledby="bodyPanelTitle" hidden>
+                <div class="writer-panel-head">
+                  <div><span class="mono-label">STEP 04</span><h2 id="bodyPanelTitle">公众号正文</h2><p>正文 Markdown 是写作页的唯一真源，完成后再交给独立排版页。</p></div>
+                  <div class="action-row tight">
+                    <button class="ghost-button" type="button" data-writing-action="generate" data-writing-target="body">AI 生成初稿</button>
+                    <button class="ghost-button" type="button" data-writing-action="rewrite-opening">重写开头</button>
+                    <button class="primary-button" type="button" data-writing-action="next">下一步</button>
+                  </div>
+                </div>
+                <textarea class="large-editor stage-editor body-stage-editor" id="bodyEditor" aria-label="公众号正文编辑器"></textarea>
+              </section>
+
+              <section class="writer-stage-panel" data-writing-panel="images" aria-labelledby="imagesPanelTitle" hidden>
+                <div class="writer-panel-head">
+                  <div><span class="mono-label">STEP 05</span><h2 id="imagesPanelTitle">图片资产</h2><p>生成或导入封面与正文配图；已采用资产会随版本交给排版。</p></div>
+                  <div class="action-row tight">
+                    <button class="ghost-button" type="button" data-writing-action="generate" data-writing-target="images">AI 生成 Brief</button>
+                    <button class="ghost-button" id="exportImageTasksButton" type="button" hidden>导出待执行任务</button>
+                    <button class="secondary-button" type="button" data-writing-action="save">确认本步</button>
+                  </div>
+                </div>
+                <div class="image-studio-grid">
+                  <article class="image-generator-card" data-image-slot="cover">
+                    <header>
+                      <div><span class="mono-label">COVER · 2.35:1</span><h3>公众号封面图</h3></div>
+                      <span class="image-task-status" id="coverImageStatus">未创建</span>
+                    </header>
+                    <label for="imageEditor"><span>封面图 Prompt</span><textarea id="imageEditor"></textarea></label>
+                    <div class="image-preview-frame image-preview-cover">
+                      <img id="coverImagePreview" alt="" hidden>
+                      <div class="image-preview-empty" id="coverImagePlaceholder"><strong>尚无封面资产</strong><span>生成后在这里选择并预览</span></div>
+                    </div>
+                    <p class="image-task-meta" id="coverImageTaskMeta">Prompt 准备好后创建 Codex 任务。</p>
+                    <div class="image-card-actions">
+                      <button class="primary-button" type="button" data-image-action="create-task" data-image-role="cover">生成封面图</button>
+                      <button class="secondary-button" type="button" data-image-action="adopt" data-image-role="cover" hidden>采用当前图</button>
+                      <button class="ghost-button" type="button" data-image-action="open" data-image-role="cover" hidden>打开原图</button>
+                      <button class="ghost-button" type="button" data-image-action="import" data-image-role="cover">导入图片</button>
+                      <input class="image-file-input" id="coverImageFile" type="file" accept="image/png,image/jpeg,image/webp">
+                    </div>
+                  </article>
+
+                  <article class="image-generator-card" data-image-slot="inline">
+                    <header>
+                      <div><span class="mono-label">INLINE · 3:2</span><h3>正文配图</h3></div>
+                      <span class="image-task-status" id="inlineImageStatus">未创建</span>
+                    </header>
+                    <label for="inlineImageEditor"><span>正文配图 Prompt</span><textarea id="inlineImageEditor"></textarea></label>
+                    <div class="image-preview-frame image-preview-inline">
+                      <img id="inlineImagePreview" alt="" hidden>
+                      <div class="image-preview-empty" id="inlineImagePlaceholder"><strong>尚无正文配图</strong><span>建议服务流程理解，不做装饰图</span></div>
+                    </div>
+                    <p class="image-task-meta" id="inlineImageTaskMeta">Prompt 准备好后创建 Codex 任务。</p>
+                    <div class="image-card-actions">
+                      <button class="primary-button" type="button" data-image-action="create-task" data-image-role="inline">生成正文配图</button>
+                      <button class="secondary-button" type="button" data-image-action="adopt" data-image-role="inline" hidden>采用当前图</button>
+                      <button class="ghost-button" type="button" data-image-action="open" data-image-role="inline" hidden>打开原图</button>
+                      <button class="ghost-button" type="button" data-image-action="import" data-image-role="inline">导入图片</button>
+                      <input class="image-file-input" id="inlineImageFile" type="file" accept="image/png,image/jpeg,image/webp">
+                    </div>
+                  </article>
+                </div>
+                <details class="codex-task-guide">
+                  <summary>图片生成说明</summary>
+                  <p>当前页面不保存 API Key。点击生成会创建可追踪的 Codex 图片任务；任务完成后回写项目资产，也可用“导入图片”回填。</p>
+                </details>
+                <details class="writer-final-checks">
+                  <summary><span>交付前检查</span><strong id="writerFinalCheckSummary">0 / 5 必需</strong></summary>
+                  <div class="quality-list writer-quality-list" aria-label="公众号写作质检">
+                    <label><input type="checkbox" id="qualityTitle" disabled> 公众号标题已选定</label>
+                    <label><input type="checkbox" id="qualityJudgment" disabled> 前三句有核心判断</label>
+                    <label><input type="checkbox" id="qualityBoss" disabled> 围绕老板业务问题</label>
+                    <label><input type="checkbox" id="qualityBody" disabled> 正文达到目标篇幅 <span id="qualityBodyTarget">（1800 字）</span></label>
+                    <label><input type="checkbox" id="qualityImages" disabled> 图片 Prompt 已完成</label>
+                    <label><input type="checkbox" id="qualityImageAssets" disabled> <span id="imageAssetReadiness">图片资产 0 / 2 已采用（非阻塞）</span></label>
+                  </div>
+                  <div class="inspector-handoff" id="writerHandoffNote" hidden>
+                    <strong>交接内容</strong>
+                    <p>交付标题、Markdown 正文、图片 Prompt 与已采用资产。主题、HTML、校验和预览在“公众号排版”栏目完成。</p>
+                  </div>
+                </details>
+                <div class="writer-final-actions" aria-label="写作完成操作">
+                  <button class="ghost-button" id="saveDraftButton" type="button">保存草稿</button>
+                  <button class="primary-button" id="handoffLayoutButton" type="button">完成写作，进入排版</button>
+                </div>
+              </section>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="page" id="layoutPage" data-page-panel="layout">
+        <div class="layout-workspace">
+          <section class="layout-panel">
+            <div class="gzh-design-module is-expanded" aria-label="gzh-design 公众号排版引擎">
+              <div class="gzh-intake-row">
+                <label class="gzh-theme-select">
+                  <span>文章标题</span>
+                  <select id="layoutDraftSelect" aria-label="选择文章标题"></select>
+                </label>
+                <div class="layout-source-actions" aria-label="导入文章">
+                  <button class="ghost-button" id="layoutPasteToggleButton" type="button" aria-expanded="false" aria-controls="layoutPasteImport">粘贴文章</button>
+                  <button class="ghost-button" id="layoutImportButton" type="button">从文件导入</button>
+                  <input id="layoutArticleFile" class="layout-file-input" type="file" accept=".md,.markdown,.txt,.html,.htm,text/markdown,text/plain,text/html">
+                </div>
+              </div>
+              <details class="layout-paste-import" id="layoutPasteImport">
+                <summary>粘贴文章</summary>
+                <label for="layoutPasteTitle"><span>文章标题</span><input id="layoutPasteTitle" type="text" maxlength="120" required placeholder="输入文章标题"></label>
+                <label for="layoutPasteEditor"><span>文章正文</span><textarea id="layoutPasteEditor" placeholder="在此粘贴正文（⌘V / Ctrl+V）"></textarea></label>
+                <button class="secondary-button" id="layoutPasteButton" type="button">导入文章</button>
+              </details>
+              <div class="gzh-format-row">
+                <label class="gzh-theme-select">
+                  <span>排版主题</span>
+                  <select id="gzhThemeSelect">
+                    <option>观澜判断感 / 观澜蓝内参风</option>
+                    <option>石墨极简风</option>
+                    <option>橄榄手记</option>
+                    <option>红白色系</option>
+                    <option>摸鱼绿</option>
+                    <option>留白禅意风</option>
+                    <option>摸鱼票据风</option>
+                  </select>
+                </label>
+                <fieldset class="gzh-layout-options">
+                  <legend class="visually-hidden">排版要求，可多选</legend>
+                  <div class="gzh-options-toolbar">
+                    <span class="gzh-options-title">排版要求 <small>可多选</small></span>
+                  </div>
+                  <div class="gzh-layout-option-list">
+                    <label><input type="checkbox" data-gzh-feature="sectionNumbers" checked><span>章节编号</span></label>
+                    <label><input type="checkbox" data-gzh-feature="outline" checked><span>文章导读</span></label>
+                    <label><input type="checkbox" data-gzh-feature="quoteCard" checked><span>引言强调</span></label>
+                    <label><input type="checkbox" data-gzh-feature="keywordEmphasis" checked><span>关键词强调</span></label>
+                    <label><input type="checkbox" data-gzh-feature="richLists" checked><span>列表卡片</span></label>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+
+            <div class="layout-editor-stack">
+              <label>
+                <span>正文内容</span>
+                <textarea id="layoutMarkdownEditor" class="large-editor" aria-label="公众号排版 Markdown 正文"></textarea>
+              </label>
+              <details class="layout-html-details">
+                <summary>查看或编辑公众号 HTML</summary>
+                <label>
+                  <span>公众号 HTML 片段</span>
+                  <textarea id="layoutHtmlEditor" class="large-editor" aria-label="公众号 HTML 片段">等待生成 HTML。产物应为纯 section 片段，不包含 html/head/body。</textarea>
+                </label>
+              </details>
+            </div>
+            <div class="layout-final-actions" aria-label="排版操作">
+              <div class="action-row tight">
+                <button class="secondary-button" type="button" data-gzh-action="html">生成排版</button>
+                <button class="secondary-button" type="button" data-gzh-action="preview">预览效果</button>
+                <button class="primary-button" id="savePendingPublishButton" type="button" data-save-pending-publication title="保存到待发布栏目">保存稿件</button>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <section class="page" id="pendingPage" data-page-panel="pending">
+        <div class="section-head">
+          <div>
+            <h2>待发布稿件</h2>
+            <p>保存已完成排版和合规校验的公众号稿件，发布前可继续排版或生成复制预览。</p>
+          </div>
+          <span class="pending-count" id="pendingPublishCount">0 篇待发布</span>
+        </div>
+
+        <div class="pending-publish-layout">
+          <section class="pending-publish-list-panel" aria-label="待发布稿件列表">
+            <div class="pending-publish-list-head"><span>稿件</span><span>状态</span><span>操作</span></div>
+            <div id="pendingPublishList"></div>
+          </section>
+
+          <aside class="pending-publish-detail">
+            <p class="pending-publish-empty" id="pendingPublishEmpty">还没有待发布稿件。请在“公众号排版”完成校验后存入。</p>
+            <div id="pendingPublishDetailContent" hidden>
+              <span class="mono-label">READY TO PUBLISH</span>
+              <h2 id="pendingPublishTitle">待发布稿件</h2>
+              <p class="pending-publish-meta" id="pendingPublishMeta"></p>
+              <div class="pending-publish-facts">
+                <div><span>主题</span><strong id="pendingPublishTheme">-</strong></div>
+                <div><span>合规校验</span><strong id="pendingPublishValidation">-</strong></div>
+                <div><span>图片资产</span><strong id="pendingPublishImages">-</strong></div>
+                <div><span>最后存稿</span><strong id="pendingPublishSavedAt">-</strong></div>
+              </div>
+              <p class="pending-publish-excerpt" id="pendingPublishExcerpt"></p>
+              <div class="pending-publish-actions">
+                <button class="primary-button" id="pendingPreviewButton" type="button">生成复制预览</button>
+                <button class="secondary-button" id="pendingContinueLayoutButton" type="button">继续排版</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="page" id="reviewPage" data-page-panel="review">
+        <div class="section-head">
+          <div>
+            <h2>发布统计与项目复盘</h2>
+            <p>把发布后的表现回填到选题，判断下一轮继续写、改写、系列化还是暂不继续。</p>
+          </div>
+          <button class="primary-button" id="newPublicationButton" type="button">录入发布数据</button>
+        </div>
+
+        <form class="publication-entry-form" id="publicationForm" hidden>
+          <div class="publication-form-heading"><div><span class="mono-label">NEW PUBLICATION</span><h3>录入一次发布</h3></div><button class="ghost-button" id="cancelPublicationButton" type="button">取消</button></div>
+          <label class="publication-title-field">文章标题<input id="publicationTitle" required maxlength="120" placeholder="输入已发布文章标题"></label>
+          <label>平台<select id="publicationPlatform"><option>公众号</option><option>观澜站内</option><option>小红书</option><option>视频号</option><option>其他</option></select></label>
+          <label>发布日期<input id="publicationDate" type="date" required></label>
+          <label>阅读<input id="publicationReads" type="number" min="0" step="1" value="0"></label>
+          <label>收藏<input id="publicationSaves" type="number" min="0" step="1" value="0"></label>
+          <label>评论<input id="publicationComments" type="number" min="0" step="1" value="0"></label>
+          <label>线索<input id="publicationLeads" type="number" min="0" step="1" value="0"></label>
+          <button class="primary-button" type="submit">保存发布记录</button>
+        </form>
+
+        <div class="review-layout">
+          <div class="publication-table" role="table" aria-label="发布表现">
+            <div class="table-row table-head" role="row">
+              <span>文章</span>
+              <span>平台</span>
+              <span>阅读</span>
+              <span>收藏</span>
+              <span>评论</span>
+              <span>线索</span>
+              <span>动作</span>
+            </div>
+            <div id="publicationRows"></div>
+          </div>
+
+          <aside class="recap-panel">
+            <span class="mono-label">PROJECT RECAP</span>
+            <h2>项目复盘</h2>
+            <p class="review-selection-meta" id="reviewSelectionMeta">选择左侧文章开始复盘。</p>
+            <label for="recapConclusion">复盘结论</label>
+            <textarea id="recapConclusion" placeholder="记录什么判断得到验证、读者真正关心什么，以及下一篇怎么改。"></textarea>
+            <label>下一步动作</label>
+            <div class="decision-grid" id="reviewDecisionGrid">
+              <button type="button" data-review-decision="continue">继续写</button>
+              <button type="button" data-review-decision="rewrite">改写再发</button>
+              <button type="button" data-review-decision="series">系列化</button>
+              <button type="button" data-review-decision="pause">暂不继续</button>
+            </div>
+            <button class="primary-button full" id="saveRecapButton" type="button">保存复盘结论</button>
+            <p class="review-save-state" id="reviewSaveState" aria-live="polite"></p>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="data/topics-2026-07.js"></script>
+  <script src="assets/generated/manifest.js"></script>
+  <script src="app.js?v=20260715-topic-schedule-16"></script>
+</body>
+</html>
