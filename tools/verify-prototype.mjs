@@ -35,10 +35,27 @@ assert(!html.includes("nav-sub-item") && !css.includes(".nav-sub-item"), "Sideba
 assert(html.includes('data-page="agent"') && html.includes('data-page-panel="agent"'), "Agent writing workbench navigation or page is missing");
 assert(html.indexOf('data-page="agent"') < html.indexOf('data-page="topics"'), "Agent writing workbench must stay above Today Topics");
 assert(html.includes('data-page="editor"') && html.includes('data-page-panel="editor"'), "Legacy WeChat writer must remain available during the transition");
-assert(["agentComposer", "agentPlan", "agentTopicList", "agentTaskList", "agentHandoffButton"].every((id) => htmlIds.includes(id)), "Agent workbench core regions are incomplete");
-assert(app.includes("function renderAgentWorkbench()") && app.includes("function confirmAgentPlan()") && app.includes("function handoffAgentDraft("), "Agent workbench interactions or legacy handoff are incomplete");
+assert(["agentComposer", "agentPrompt", "agentTopicList", "agentStyleSelect", "agentStyleTrainer", "agentStyleReference", "agentHandoffButton"].every((id) => htmlIds.includes(id)), "AI writing workbench core regions are incomplete");
+assert(app.includes("function renderAgentWorkbench()") && app.includes("function applyAgentDraftResult(") && app.includes("function learnAgentWritingStyle(") && app.includes("function handoffAgentDraft("), "AI writing workbench interactions or legacy handoff are incomplete");
 assert(product.includes("## Core Page Principle") && product.includes("非必要不展示"), "Content Center core page principle is missing");
 assert(!html.includes('class="agent-steps"') && !html.includes("Hermes API 尚未连接") && !html.includes("EXECUTION PLAN"), "Agent workbench still contains redundant helper content");
+assert(!html.includes('id="agentPlan"') && !app.includes("renderAgentPlan") && !css.includes(".agent-plan"), "Removed Agent plan card must not remain in markup, logic, or styles");
+assert(html.includes('class="agent-composer-shell"') && html.includes('id="agentSendButton"'), "Chat-style Agent composer is incomplete");
+assert(css.includes(".agent-composer-shell") && css.includes("min-height: 52px") && css.includes("max-height: 140px") && !html.includes("agent-composer-foot"), "AI writing composer must stay compact and grow only for multiline input");
+assert(!html.includes("agentToolsMenu") && !html.includes("agentTaskList") && !html.includes("检查任务队列") && !html.includes("读取今日选题，安排"), "Preset writing tasks must stay removed");
+assert(!css.includes(".agent-task") && !app.includes("data-agent-task-id") && !server.includes("任务队列和对话"), "Legacy writing task queue must stay removed");
+assert(app.includes("function agentTopicDate()") && app.includes("topicDate: agentTopicDate()") && app.includes("candidates: agentTopicCandidates().map(agentTopicRequestPayload)") && !functionSource("agentTopicCandidates").includes(".slice("), "AI writing workbench must send the full real daily topic set");
+assert(html.includes("让澜学习") && app.includes("/api/agent/style") && server.includes("/api/agent/style") && server.includes("CLAUDE_STYLE_SCHEMA"), "AI writing style learning flow is incomplete");
+assert(app.includes("writingStylesById[id] = { ...profile, id, isBuiltIn: false }"), "Learned writing styles must restore from local storage");
+assert(!html.includes("Hermes") && !app.includes("Hermes"), "Legacy Hermes labels must stay removed");
+assert(html.includes("AI 写作台") && html.includes('<h2 id="agentWorkspaceTitle">澜</h2>') && html.includes("<strong>澜</strong>"), "AI writing workbench identity is incomplete");
+assert(!html.includes("观澜写作台") && !html.includes("观澜写作助手"), "Deprecated writing assistant identity must stay removed");
+assert(!html.includes("Claude 写作 Agent") && !html.includes("<strong>Claude CLI</strong>") && !html.includes("发消息给 Claude"), "Provider branding must not appear in the writing assistant UI");
+assert(!app.includes("Claude CLI：") && !app.includes('"CLI 已连接"') && !app.includes('"CLI 不可用"') && !app.includes("Claude Agent 调用失败") && !app.includes("Claude 草稿已生成"), "Provider-specific status or feedback must not appear in the writing assistant UI");
+assert(app.includes('"/api/agent/health"') || app.includes("/api/agent/health"), "Claude Agent health endpoint is missing from the client");
+assert(app.includes("/api/agent/chat") && app.includes("/api/agent/draft") && app.includes("/api/agent/style"), "Writing assistant client endpoints are incomplete");
+assert(server.includes('"/api/agent/chat"') && server.includes('"/api/agent/draft"') && server.includes('"/api/agent/style"') && server.includes("CLAUDE_CLI_PATH"), "Claude CLI server bridge is incomplete");
+assert(!server.includes('"--tools", ""') && !server.includes('"--safe-mode"') && !server.includes('"--permission-mode"') && !server.includes('"--max-budget-usd"') && !server.includes('"--model"'), "Claude CLI bridge must inherit the user's tools, permissions, model, and budget configuration");
 
 // Optional hooks may be absent while their companion feature is not rendered.
 const optionalSelectorIds = new Set(["styleExtractionReport", "writingStyleComparison"]);
@@ -53,7 +70,7 @@ assert(JSON.stringify(scriptOrder) === JSON.stringify([
   "assets/generated/manifest.js",
   "app.js",
 ]), `Unexpected script order: ${scriptOrder.join(" -> ")}`);
-assert(scriptSources.some((source) => /^app\.js\?v=20260715-agent-distill-39$/.test(source)), "Current app cache-busting version is missing");
+assert(scriptSources.some((source) => /^app\.js\?v=20260716-ai-writer-45$/.test(source)), "Current app cache-busting version is missing");
 assert(["titleGenerationStatus", "outlineGenerationStatus", "bodyGenerationStatus"].every((id) => html.includes(`id="${id}"`)), "DeepSeek writing generation status UI is incomplete");
 assert(html.includes('>生成标题</button>') && html.includes('>生成提纲</button>') && html.includes('>生成正文</button>'), "Writing generation action labels are incomplete");
 assert(!html.includes("DeepSeek"), "Writing steps must not expose the model provider");
@@ -107,6 +124,21 @@ const catalogContext = { window: {} };
 vm.runInNewContext(read("data/topics-2026-07.js"), catalogContext);
 const catalog = catalogContext.window.CONTENT_FACTORY_TOPIC_CATALOGS?.[0];
 assert(catalog?.catalogVersion === "2026-07-r1", "July catalog version is missing or unexpected");
+const agentTopicContext = {
+  topics: catalog.topics,
+  selectedDate: "2026-07-13",
+  dataBatchDate: "2026-07-13",
+  topicLocalDate: () => "2026-07-16",
+  topicDate: (topic) => topic.scheduledDate || topic.date,
+  availableDates: () => ["2026-07-16", "2026-07-15", "2026-07-13"],
+};
+vm.runInNewContext([
+  functionSource("agentTopicDate"),
+  functionSource("agentTopicCandidates"),
+].join("\n"), agentTopicContext);
+const actualDailyTopics = catalog.topics.filter((topic) => (topic.scheduledDate || topic.date) === "2026-07-16");
+assert(agentTopicContext.agentTopicDate() === "2026-07-16", "AI writing workbench must prefer the actual editorial date");
+assert(agentTopicContext.agentTopicCandidates().length === actualDailyTopics.length && actualDailyTopics.length === 10, "AI writing workbench must receive all ten real daily topics");
 assert(catalog?.source?.activeDate === "2026-06-24", "Observation source boundary changed without review");
 assert(catalog?.policy?.calendarMeaning === "editorial_schedule", "Calendar must remain an editorial schedule");
 assert(catalog?.topics?.length === 297, `Expected 297 generated topics, found ${catalog?.topics?.length || 0}`);
@@ -228,7 +260,7 @@ assert(htmlIds.includes("writingStylePerspective") && htmlIds.includes("writingS
 assert(htmlIds.includes("writingStyleVoice") && htmlIds.includes("writingStyleSignatureMoves") && htmlIds.includes("writingStyleAntiAiRules") && htmlIds.includes("writingStyleRevisionPass"), "Authorship and anti-template fields are incomplete");
 assert(html.includes('data-style-tab="voice"') && app.includes('"method", "structure", "voice", "prompt"'), "Author voice tab is not connected");
 assert(app.includes("恢复“作者性”") || html.includes("恢复“作者性”"), "Anti-AI guidance must focus on authorship");
-assert((app.match(/antiAiRules:/g) || []).length >= 3 && (app.match(/revisionPass:/g) || []).length === 3, "Each writing method needs anti-template rules and a revision pass");
+assert((app.match(/antiAiRules:/g) || []).length >= 3 && (app.match(/revisionPass:/g) || []).length >= 3, "Each writing method needs anti-template rules and a revision pass");
 assert(app.includes("methodVersion: 4") && app.includes("profile.methodVersion || 1"), "Writing method content migration is missing");
 assert(app.includes("function titleCandidateMatrix(") && app.includes("function titleStrengthScore("), "Headline matrix or scoring is missing");
 assert(html.includes('class="title-matrix-guide"') && app.includes('angle: item.angle') && app.includes('score: titleStrengthScore'), "Headline angle and score UI is incomplete");

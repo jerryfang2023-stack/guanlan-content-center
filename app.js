@@ -1,5 +1,5 @@
 const pageTitles = {
-  agent: "Agent 写作台",
+  agent: "AI 写作台",
   topics: "今日选题",
   library: "选题库",
   styles: "写作风格",
@@ -617,6 +617,12 @@ const DEEPSEEK_WRITING_ENDPOINTS = {
   body: `${DEEPSEEK_WRITING_API_BASE}/api/generate-body`,
   images: `${DEEPSEEK_WRITING_API_BASE}/api/generate-image-plan`,
 };
+const CLAUDE_AGENT_ENDPOINTS = {
+  health: `${DEEPSEEK_WRITING_API_BASE}/api/agent/health`,
+  chat: `${DEEPSEEK_WRITING_API_BASE}/api/agent/chat`,
+  draft: `${DEEPSEEK_WRITING_API_BASE}/api/agent/draft`,
+  style: `${DEEPSEEK_WRITING_API_BASE}/api/agent/style`,
+};
 const WRITING_STEP_LABELS = {
   title: "定标题",
   outline: "组提纲",
@@ -742,10 +748,16 @@ const writingGenerationInFlight = { title: false, outline: false, body: false };
 let imageGenerationInFlight = false;
 let workspaceSaveError = "";
 let agentWorkspace = {
+  schemaVersion: 2,
+  provider: "claude-cli",
   selectedTopicId: "",
-  planStatus: "ready",
+  selectedStyleId: defaultWritingStyleId,
   messages: [],
 };
+let agentRequestInFlight = false;
+let agentConnectionStatus = "checking";
+let agentConnectionLabel = "检查中";
+let agentHealthChecked = false;
 const REVIEW_DECISION_LABELS = {
   continue: "继续写",
   rewrite: "改写再发",
@@ -864,7 +876,11 @@ if (restoredWorkspace?.version === 3) {
   }
   if (restoredWorkspace.writingStyles && typeof restoredWorkspace.writingStyles === "object") {
     Object.entries(restoredWorkspace.writingStyles).forEach(([id, profile]) => {
-      if (!BUILT_IN_WRITING_STYLE_BY_ID[id] || !profile) return;
+      if (!profile) return;
+      if (!BUILT_IN_WRITING_STYLE_BY_ID[id]) {
+        writingStylesById[id] = { ...profile, id, isBuiltIn: false };
+        return;
+      }
       const currentMethod = writingStylesById[id];
       if (Number(profile.methodVersion || 1) < Number(currentMethod.methodVersion || 1)) {
         writingStylesById[id] = {
@@ -883,10 +899,16 @@ if (restoredWorkspace?.version === 3) {
     publicationEntries = restoredWorkspace.publications.filter((entry) => entry?.id && entry?.title);
   }
   if (restoredWorkspace.agent && typeof restoredWorkspace.agent === "object") {
+    const usesClaudeCli = restoredWorkspace.agent.provider === "claude-cli";
+    const currentAgentSchema = Number(restoredWorkspace.agent.schemaVersion || 1) >= 2;
     agentWorkspace = {
+      schemaVersion: 2,
+      provider: "claude-cli",
       selectedTopicId: String(restoredWorkspace.agent.selectedTopicId || ""),
-      planStatus: ["ready", "confirmed"].includes(restoredWorkspace.agent.planStatus) ? restoredWorkspace.agent.planStatus : "ready",
-      messages: Array.isArray(restoredWorkspace.agent.messages)
+      selectedStyleId: writingStylesById[restoredWorkspace.agent.selectedStyleId]
+        ? String(restoredWorkspace.agent.selectedStyleId)
+        : defaultWritingStyleId,
+      messages: usesClaudeCli && currentAgentSchema && Array.isArray(restoredWorkspace.agent.messages)
         ? restoredWorkspace.agent.messages.filter((message) => ["user", "assistant"].includes(message?.role) && message?.text).slice(-8)
         : [],
     };
@@ -930,6 +952,9 @@ if (restoredWorkspace?.version === 3) {
 }
 
 normalizeWritingStyleSelections();
+if (!writingStylesById[agentWorkspace.selectedStyleId] || writingStylesById[agentWorkspace.selectedStyleId].status !== "published") {
+  agentWorkspace.selectedStyleId = defaultWritingStyleId;
+}
 topics.forEach((topic) => {
   topic.date = normalizeDate(topic.scheduledDate || topic.date || dataBatchDate);
   if (["library", "queued"].includes(topic.status) && !topic.libraryArchivedAt) {
@@ -1006,12 +1031,15 @@ function setWritingStyleTab(tab) {
 function renderWritingStyleList() {
   const container = document.querySelector("#writingStyleList");
   if (!container) return;
-  const profiles = BUILT_IN_WRITING_STYLES.map((item) => writingStylesById[item.id]).filter(Boolean);
+  const profiles = Object.values(writingStylesById).sort((a, b) => {
+    if (a.isBuiltIn !== b.isBuiltIn) return a.isBuiltIn ? -1 : 1;
+    return String(a.name).localeCompare(String(b.name), "zh-CN");
+  });
   container.innerHTML = profiles.map((profile) => `
     <button class="style-profile-item${profile.id === selectedWritingStyleId ? " is-selected" : ""}" type="button" role="option" aria-selected="${profile.id === selectedWritingStyleId}" data-writing-style-id="${escapeHtml(profile.id)}">
-      <span>${escapeHtml(profile.typeLabel)}</span>
+      <span>${escapeHtml(profile.typeLabel || "自定义")}</span>
       <strong>${escapeHtml(profile.name)}</strong>
-      <em>${profile.id === defaultWritingStyleId ? "默认" : "已发布"}</em>
+      <em>${profile.id === defaultWritingStyleId ? "默认" : profile.status === "published" ? "已发布" : "草稿"}</em>
     </button>
   `).join("");
 }
@@ -4848,13 +4876,19 @@ function renderCalendarCoverage() {
   if (activeDate) activeDate.textContent = julyTopicCatalog?.source?.activeDate || "未读取";
 }
 
+function agentTopicDate() {
+  const today = topicLocalDate();
+  if (topics.some((topic) => topicDate(topic) === today)) return today;
+  return availableDates()[0] || selectedDate || dataBatchDate;
+}
+
 function agentTopicCandidates() {
-  const today = dailyTopics();
-  const prioritized = [...today].sort((a, b) => {
+  const activeDate = agentTopicDate();
+  const today = topics.filter((topic) => topicDate(topic) === activeDate);
+  return [...today].sort((a, b) => {
     const priority = { queued: 0, candidate: 1, library: 2, skipped: 3 };
     return (priority[a.status] ?? 4) - (priority[b.status] ?? 4) || b.score - a.score;
   });
-  return prioritized.slice(0, 2);
 }
 
 function agentSelectedTopic() {
@@ -4867,7 +4901,11 @@ function agentSelectedTopic() {
 }
 
 function agentWritingStyle() {
-  return writingStylesById[defaultWritingStyleId] || publishedWritingStyles()[0] || currentWritingStyle();
+  const selected = writingStylesById[agentWorkspace.selectedStyleId];
+  if (selected?.status === "published") return selected;
+  const fallback = writingStylesById[defaultWritingStyleId] || publishedWritingStyles()[0] || currentWritingStyle();
+  agentWorkspace.selectedStyleId = fallback?.id || "";
+  return fallback;
 }
 
 function agentMessageTime() {
@@ -4877,10 +4915,10 @@ function agentMessageTime() {
 function agentDefaultMessageMarkup() {
   return `
     <article class="agent-message is-assistant">
-      <div class="agent-message-avatar" aria-hidden="true">H</div>
+      <div class="agent-message-avatar" aria-hidden="true">澜</div>
       <div class="agent-message-body">
-        <div class="agent-message-meta"><strong>Hermes</strong><time>待接入</time></div>
-        <p>我先生成计划，确认后再创建草稿。</p>
+        <div class="agent-message-meta"><strong>澜</strong></div>
+        <p>告诉我今天要写什么。</p>
       </div>
     </article>`;
 }
@@ -4890,9 +4928,9 @@ function renderAgentThread() {
   if (!thread) return;
   const messages = agentWorkspace.messages.map((message) => `
     <article class="agent-message is-${message.role}">
-      <div class="agent-message-avatar" aria-hidden="true">${message.role === "assistant" ? "H" : "我"}</div>
+      <div class="agent-message-avatar" aria-hidden="true">${message.role === "assistant" ? "澜" : "我"}</div>
       <div class="agent-message-body">
-        <div class="agent-message-meta"><strong>${message.role === "assistant" ? "Hermes · 本地预览" : "我"}</strong><time>${escapeHtml(message.time || "")}</time></div>
+        <div class="agent-message-meta"><strong>${message.role === "assistant" ? "澜" : "我"}</strong><time>${escapeHtml(message.time || "")}</time></div>
         <p>${escapeHtml(message.text)}</p>
       </div>
     </article>`).join("");
@@ -4900,27 +4938,45 @@ function renderAgentThread() {
   thread.scrollTop = thread.scrollHeight;
 }
 
-function renderAgentPlan() {
-  const topic = agentSelectedTopic();
-  const style = agentWritingStyle();
-  const confirmed = agentWorkspace.planStatus === "confirmed" && topic?.status === "queued";
-  const topicNode = document.querySelector("#agentPlanTopic");
-  const styleNode = document.querySelector("#agentPlanStyle");
-  const stateNode = document.querySelector("#agentPlanState");
-  const hintNode = document.querySelector("#agentPlanHint");
-  const confirmButton = document.querySelector("#agentConfirmPlanButton");
-  const plan = document.querySelector("#agentPlan");
-  if (!plan || !topicNode || !styleNode || !stateNode || !confirmButton) return;
+function renderAgentConnection() {
+  const state = document.querySelector("#agentConnectionState");
+  const label = document.querySelector("#agentConnectionLabel");
+  if (!state || !label) return;
+  state.classList.toggle("is-connected", agentConnectionStatus === "connected");
+  state.classList.toggle("is-error", agentConnectionStatus === "error");
+  state.classList.toggle("is-working", agentConnectionStatus === "working");
+  state.setAttribute("aria-label", `写作助手：${agentConnectionLabel}`);
+  label.textContent = agentConnectionLabel;
+  const prompt = document.querySelector("#agentPrompt");
+  const send = document.querySelector("#agentSendButton");
+  const learnStyle = document.querySelector("#agentStyleLearnSubmitButton");
+  if (prompt) prompt.disabled = agentRequestInFlight;
+  if (send) send.disabled = agentRequestInFlight;
+  if (learnStyle) learnStyle.disabled = agentRequestInFlight;
+}
 
-  topicNode.textContent = topic?.title || "今日没有可用选题";
-  styleNode.textContent = style ? `${style.publishedName || style.name}（已发布）` : "暂无已发布风格";
-  stateNode.textContent = confirmed ? "草稿已创建" : "待确认";
-  stateNode.classList.toggle("is-confirmed", confirmed);
-  hintNode.textContent = confirmed
-    ? "已保存到本地"
-    : "只创建草稿";
-  confirmButton.disabled = !topic || confirmed;
-  confirmButton.textContent = confirmed ? "草稿已创建" : "创建草稿";
+async function refreshClaudeAgentStatus({ force = false } = {}) {
+  if (agentHealthChecked && !force) return;
+  agentConnectionStatus = "checking";
+  agentConnectionLabel = "检查中";
+  renderAgentConnection();
+  try {
+    const response = await fetch(`${CLAUDE_AGENT_ENDPOINTS.health}${force ? "?refresh=1" : ""}`, {
+      headers: { "X-Content-Factory-Client": "content-factory-lite" },
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result?.available || !result?.loggedIn) {
+      throw new Error(result?.error || "写作助手未连接");
+    }
+    agentConnectionStatus = "connected";
+    agentConnectionLabel = "已连接";
+    agentHealthChecked = true;
+  } catch (error) {
+    agentConnectionStatus = "error";
+    agentConnectionLabel = "暂不可用";
+    agentHealthChecked = false;
+  }
+  renderAgentConnection();
 }
 
 function renderAgentContext() {
@@ -4928,12 +4984,12 @@ function renderAgentContext() {
   const selected = agentSelectedTopic();
   const topicList = document.querySelector("#agentTopicList");
   const topicCount = document.querySelector("#agentTopicCount");
-  const styleSummary = document.querySelector("#agentStyleSummary");
-  const taskList = document.querySelector("#agentTaskList");
+  const styleSelect = document.querySelector("#agentStyleSelect");
+  const contextFooter = document.querySelector("#agentContextFooter");
   const handoffButton = document.querySelector("#agentHandoffButton");
-  if (!topicList || !topicCount || !styleSummary || !taskList || !handoffButton) return;
+  if (!topicList || !topicCount || !styleSelect || !contextFooter || !handoffButton) return;
 
-  topicCount.textContent = candidates.length ? `${dailyTopics().length} 条 · 优先 ${candidates.length} 条` : "今日暂无可用选题";
+  topicCount.textContent = candidates.length ? `${formatDate(agentTopicDate())} · ${candidates.length} 条已同步` : `${formatDate(agentTopicDate())} · 暂无选题`;
   topicList.innerHTML = candidates.length ? candidates.map((topic) => `
     <button class="agent-topic-item${topic.id === selected?.id ? " is-selected" : ""}" type="button" data-agent-topic-id="${escapeHtml(topic.id)}">
       <span class="agent-topic-score">${topic.score}</span>
@@ -4942,30 +4998,23 @@ function renderAgentContext() {
     </button>`).join("") : '<p class="agent-empty-state">先去“今日选题”导入或新建选题。</p>';
 
   const style = agentWritingStyle();
-  styleSummary.innerHTML = style ? `
-    <div class="agent-style-icon" aria-hidden="true">文</div>
-    <div><strong>${escapeHtml(style.publishedName || style.name)}</strong><span>已发布</span></div>`
-    : '<p class="agent-empty-state">暂无已发布写作风格。</p>';
+  const styles = publishedWritingStyles();
+  styleSelect.innerHTML = styles.map((profile) => `
+    <option value="${escapeHtml(profile.id)}">${escapeHtml(profile.publishedName || profile.name)}</option>
+  `).join("");
+  styleSelect.value = style?.id || "";
+  styleSelect.disabled = !styles.length || agentRequestInFlight;
 
-  const tasks = queuedTopics().slice(0, 3);
-  taskList.innerHTML = tasks.length ? tasks.map((topic) => {
-    const draft = draftsByTopicId[topic.id];
-    const completed = Boolean(String(draft?.bodyMarkdown || "").trim());
-    return `
-      <button class="agent-task-item" type="button" data-agent-task-id="${escapeHtml(topic.id)}">
-        <span class="agent-task-state ${completed ? "is-done" : "is-waiting"}" aria-hidden="true"></span>
-        <span><strong>${escapeHtml(topic.title)}</strong><small>${completed ? "草稿已生成，可继续编辑" : "已创建草稿，等待写作"}</small></span>
-        <em>${completed ? "查看草稿" : "继续"}</em>
-      </button>`;
-  }).join("") : '<p class="agent-empty-state">确认一份写作计划后，任务会出现在这里。</p>';
-  handoffButton.disabled = !selected;
+  const currentDraftHasBody = Boolean(String(draftsByTopicId[selected?.id]?.bodyMarkdown || "").trim());
+  contextFooter.hidden = !currentDraftHasBody;
+  handoffButton.disabled = !currentDraftHasBody;
 }
 
 function renderAgentWorkbench() {
   if (!document.querySelector("#agentPage")) return;
   renderAgentThread();
-  renderAgentPlan();
   renderAgentContext();
+  renderAgentConnection();
 }
 
 function appendAgentMessage(role, text) {
@@ -4973,35 +5022,264 @@ function appendAgentMessage(role, text) {
   agentWorkspace.messages = agentWorkspace.messages.slice(-8);
 }
 
-function submitAgentInstruction(value) {
+function agentTopicRequestPayload(topic) {
+  if (!topic) return null;
+  return {
+    id: topic.id,
+    title: topic.title,
+    score: topic.score,
+    status: topic.status,
+    category: topic.category,
+    valueTag: topic.valueTag,
+    worth: topic.worth,
+    opinion: topic.opinion,
+    evidenceBoundary: topic.evidenceBoundary,
+    source: topic.source,
+    sourceUrl: topic.provenance?.sourceUrl || "",
+    sourceDate: topic.provenance?.sourceObservedDate || topic.sourceDate || "",
+  };
+}
+
+function agentStyleRequestPayload(style = agentWritingStyle()) {
+  if (!style) return {};
+  return {
+    id: style.id,
+    name: style.publishedName || style.name,
+    perspective: style.perspective,
+    traits: style.traits,
+    voice: style.voice,
+    structure: style.structure,
+    titlePatterns: style.titlePatterns,
+    techniques: style.techniques,
+    antiAiRules: style.antiAiRules,
+    guardrails: style.guardrails,
+    prompt: style.prompt,
+  };
+}
+
+function agentRequestPayload(prompt = "") {
+  const selected = agentSelectedTopic();
+  return {
+    prompt,
+    topicDate: agentTopicDate(),
+    selectedTopicId: selected?.id || "",
+    selectedTopic: agentTopicRequestPayload(selected),
+    candidates: agentTopicCandidates().map(agentTopicRequestPayload),
+    style: agentStyleRequestPayload(),
+    messages: agentWorkspace.messages.slice(-6).map(({ role, text }) => ({ role, text })),
+  };
+}
+
+function writingAssistantErrorMessage(value, fallback = "写作助手暂时无法响应") {
+  return String(value || fallback)
+    .replace(/Claude\s*(?:CLI|Agent)?/gi, "写作助手")
+    .replace(/\bCLI\b/gi, "本地服务")
+    .trim() || fallback;
+}
+
+async function requestClaudeAgent(endpoint, payload) {
+  let response;
+  try {
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Content-Factory-Client": "content-factory-lite",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    throw new Error("无法连接写作服务");
+  }
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(writingAssistantErrorMessage(
+    result?.error,
+    `写作服务调用失败（${response.status}）`,
+  ));
+  return result;
+}
+
+function setAgentRequestState(active, label = "") {
+  agentRequestInFlight = active;
+  if (active) {
+    agentConnectionStatus = "working";
+    agentConnectionLabel = label || "处理中";
+  } else if (agentConnectionStatus === "working") {
+    agentConnectionStatus = "connected";
+    agentConnectionLabel = "已连接";
+  }
+  renderAgentWorkbench();
+}
+
+async function submitAgentInstruction(value) {
   const prompt = String(value || "").trim();
   if (!prompt) {
     showToast("请先输入一条写作指令");
     return;
   }
-  const topic = agentSelectedTopic();
+  if (agentRequestInFlight) return;
+  const payload = agentRequestPayload(prompt);
   appendAgentMessage("user", prompt);
-  appendAgentMessage("assistant", topic
-    ? `计划已更新：主选题为“${topic.title}”。`
-    : "今日没有可用选题，请先去“今日选题”导入或新建选题。");
-  agentWorkspace.planStatus = "ready";
   persistWorkspace();
-  renderAgentWorkbench();
+  setAgentRequestState(true, "思考中");
+  try {
+    const result = await requestClaudeAgent(CLAUDE_AGENT_ENDPOINTS.chat, payload);
+    if (agentTopicCandidates().some((topic) => topic.id === result.selectedTopicId)) {
+      agentWorkspace.selectedTopicId = result.selectedTopicId;
+      selectedTopicId = result.selectedTopicId;
+    }
+    appendAgentMessage("assistant", result.reply || "已处理。");
+    if (result.action === "generate_draft") {
+      agentConnectionStatus = "working";
+      agentConnectionLabel = "写作中";
+      renderAgentWorkbench();
+      const draftResult = await requestClaudeAgent(
+        CLAUDE_AGENT_ENDPOINTS.draft,
+        agentRequestPayload(prompt),
+      );
+      applyAgentDraftResult(draftResult);
+      appendAgentMessage("assistant", draftResult.reply || "草稿已生成，可继续编辑。");
+      syncTopicUi();
+      showToast("草稿已生成");
+    }
+    agentConnectionStatus = "connected";
+    agentConnectionLabel = "已连接";
+    agentHealthChecked = true;
+    persistWorkspace();
+  } catch (error) {
+    appendAgentMessage("assistant", `调用失败：${error?.message || "请稍后重试"}`);
+    agentConnectionStatus = "error";
+    agentConnectionLabel = "调用失败";
+    agentHealthChecked = false;
+    persistWorkspace();
+    showToast(error?.message || "写作助手暂时无法响应");
+  } finally {
+    agentRequestInFlight = false;
+    renderAgentWorkbench();
+  }
 }
 
-function confirmAgentPlan() {
+function applyAgentDraftResult(result) {
   const topic = agentSelectedTopic();
-  if (!topic) {
-    showToast("今日没有可用选题");
+  if (!topic) throw new Error("请先选择一条今日选题");
+  const draft = ensureDraft(topic);
+  const style = agentWritingStyle();
+  const outlineNumerals = ["一", "二", "三", "四", "五", "六"];
+  draft.selectedTitle = result.title;
+  draft.titleCandidates = [result.title, ...(draft.titleCandidates || []).filter((title) => title !== result.title)].slice(0, 6);
+  draft.outline = (Array.isArray(result.outline) ? result.outline : [])
+    .map((section, index) => `${outlineNumerals[index] || index + 1}、${section}`)
+    .join("\n");
+  draft.bodyMarkdown = result.bodyMarkdown;
+  draft.styleId = style?.id || draft.styleId;
+  draft.style = style?.publishedName || style?.name || draft.style;
+  draft.confirmedSteps = ["title", "outline", "body"];
+  draft.currentStep = "body";
+  draft.revision = Number(draft.revision || 0) + 1;
+  draft.updatedAt = new Date().toISOString();
+  draft.dirty = false;
+  draft.agentGeneration = {
+    provider: "claude-cli",
+    model: result.model || "本地写作模型",
+    generatedAt: draft.updatedAt,
+    usage: result.usage || null,
+    costUsd: Number(result.costUsd || 0),
+  };
+  agentWorkspace.selectedTopicId = topic.id;
+  selectedTopicId = topic.id;
+  queuedTopicId = topic.id;
+  topic.status = "queued";
+  if (!topic.libraryArchivedAt) topic.libraryArchivedAt = new Date().toISOString();
+}
+
+function toggleAgentStyleTrainer(open) {
+  const trainer = document.querySelector("#agentStyleTrainer");
+  const button = document.querySelector("#agentStyleLearnButton");
+  if (!trainer || !button) return;
+  trainer.hidden = !open;
+  button.setAttribute("aria-expanded", String(open));
+  if (open) document.querySelector("#agentStyleReference")?.focus();
+}
+
+function saveLearnedWritingStyle(style) {
+  const current = agentWritingStyle();
+  const canRefineCurrent = current && !current.isBuiltIn && current.learnedByAgent;
+  const id = canRefineCurrent ? current.id : `style-learned-${Date.now()}`;
+  const now = new Date().toISOString();
+  const profile = {
+    ...(canRefineCurrent ? current : {}),
+    id,
+    name: String(style.name || "自定义写作风格").trim().slice(0, 40),
+    publishedName: String(style.name || "自定义写作风格").trim().slice(0, 40),
+    typeLabel: "自定义",
+    headerSummary: String(style.description || "").trim(),
+    status: "published",
+    isBuiltIn: false,
+    learnedByAgent: true,
+    learningRevision: Number(current?.learningRevision || 0) + 1,
+    description: String(style.description || "").trim(),
+    perspective: String(style.perspective || "").trim(),
+    traits: String(style.traits || "").trim(),
+    voice: String(style.voice || "").trim(),
+    method: String(style.method || "").trim(),
+    structure: String(style.structure || "").trim(),
+    titlePatterns: String(style.titlePatterns || "").trim(),
+    techniques: String(style.techniques || "").trim(),
+    signatureMoves: String(style.signatureMoves || "").trim(),
+    antiAiRules: String(style.antiAiRules || "").trim(),
+    revisionPass: String(style.revisionPass || "").trim(),
+    prompt: String(style.prompt || "").trim(),
+    outputRules: String(style.outputRules || "").trim(),
+    guardrails: String(style.guardrails || "").trim(),
+    sources: [],
+    hasUnpublishedChanges: false,
+    publishedAt: now,
+    updatedAt: now,
+  };
+  writingStylesById[id] = profile;
+  agentWorkspace.selectedStyleId = id;
+  selectedWritingStyleId = id;
+  return profile;
+}
+
+async function learnAgentWritingStyle(reference) {
+  const material = String(reference || "").trim();
+  if (material.length < 20) {
+    showToast("请提供更完整的参考文或写作要求");
     return;
   }
-  agentWorkspace.planStatus = "confirmed";
-  selectedTopicId = topic.id;
-  setTopicStatus("queued", topic);
-  appendAgentMessage("assistant", `已为“${topic.title}”创建草稿。`);
-  persistWorkspace();
-  renderAgentWorkbench();
-  showToast("写作草稿已创建");
+  if (agentRequestInFlight) return;
+  setAgentRequestState(true, "学习中");
+  try {
+    const result = await requestClaudeAgent(CLAUDE_AGENT_ENDPOINTS.style, {
+      reference: material,
+      currentStyle: agentStyleRequestPayload(),
+      topicDate: agentTopicDate(),
+      selectedTopic: agentTopicRequestPayload(agentSelectedTopic()),
+      messages: agentWorkspace.messages.slice(-6).map(({ role, text }) => ({ role, text })),
+    });
+    const profile = saveLearnedWritingStyle(result.style || {});
+    appendAgentMessage("assistant", result.reply || `已学习并保存“${profile.name}”。`);
+    const referenceInput = document.querySelector("#agentStyleReference");
+    if (referenceInput) referenceInput.value = "";
+    toggleAgentStyleTrainer(false);
+    renderWritingStyleLab();
+    renderPublishedWritingStyles(profile.id);
+    persistWorkspace();
+    showToast(`已保存“${profile.name}”`);
+    agentConnectionStatus = "connected";
+    agentConnectionLabel = "已连接";
+    agentHealthChecked = true;
+  } catch (error) {
+    appendAgentMessage("assistant", `风格学习失败：${error?.message || "请稍后重试"}`);
+    agentConnectionStatus = "error";
+    agentConnectionLabel = "调用失败";
+    agentHealthChecked = false;
+    showToast(error?.message || "风格学习失败");
+  } finally {
+    agentRequestInFlight = false;
+    renderAgentWorkbench();
+  }
 }
 
 function handoffAgentDraft(topic = agentSelectedTopic()) {
@@ -5010,7 +5288,6 @@ function handoffAgentDraft(topic = agentSelectedTopic()) {
     return;
   }
   agentWorkspace.selectedTopicId = topic.id;
-  agentWorkspace.planStatus = "confirmed";
   selectedTopicId = topic.id;
   setTopicStatus("queued", topic);
   queuedTopicId = topic.id;
@@ -5171,7 +5448,10 @@ function setPage(page) {
   pageKicker.textContent = pageKickers[page] || "";
   pageKicker.hidden = !pageKickers[page];
   document.querySelector(".topbar-actions").classList.toggle("is-hidden", page !== "topics");
-  if (page === "agent") renderAgentWorkbench();
+  if (page === "agent") {
+    renderAgentWorkbench();
+    refreshClaudeAgentStatus();
+  }
   if (page === "styles") renderWritingStyleLab();
   if (page === "library") renderLibrary();
   if (page === "editor") hydrateWriter();
@@ -5230,37 +5510,49 @@ document.querySelector("#agentComposer")?.addEventListener("submit", (event) => 
   const input = document.querySelector("#agentPrompt");
   submitAgentInstruction(input.value);
   input.value = "";
+  input.style.height = "";
 });
 
-document.querySelectorAll("[data-agent-prompt]").forEach((button) => {
-  button.addEventListener("click", () => submitAgentInstruction(button.dataset.agentPrompt));
+document.querySelector("#agentPrompt")?.addEventListener("input", (event) => {
+  event.currentTarget.style.height = "auto";
+  event.currentTarget.style.height = `${Math.min(event.currentTarget.scrollHeight, 140)}px`;
 });
-
-document.querySelector("#agentConfirmPlanButton")?.addEventListener("click", confirmAgentPlan);
-document.querySelector("#agentAdjustPlanButton")?.addEventListener("click", () => {
-  agentWorkspace.planStatus = "ready";
-  const input = document.querySelector("#agentPrompt");
-  input.value = "调整这份计划：";
-  input.focus();
-  input.setSelectionRange(input.value.length, input.value.length);
-  renderAgentWorkbench();
+document.querySelector("#agentPrompt")?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+  event.preventDefault();
+  event.currentTarget.form?.requestSubmit();
 });
-document.querySelector("#agentOpenTopicsButton")?.addEventListener("click", () => setPage("topics"));
+document.querySelector("#agentOpenTopicsButton")?.addEventListener("click", () => {
+  selectedDate = agentTopicDate();
+  renderDateFilter();
+  syncTopicUi();
+  setPage("topics");
+});
 document.querySelector("#agentOpenStylesButton")?.addEventListener("click", () => setPage("styles"));
 document.querySelector("#agentHandoffButton")?.addEventListener("click", () => handoffAgentDraft());
+document.querySelector("#agentStyleSelect")?.addEventListener("change", (event) => {
+  const profile = writingStylesById[event.target.value];
+  if (!profile || profile.status !== "published") return;
+  agentWorkspace.selectedStyleId = profile.id;
+  persistWorkspace();
+  renderAgentWorkbench();
+});
+document.querySelector("#agentStyleLearnButton")?.addEventListener("click", () => {
+  const trainer = document.querySelector("#agentStyleTrainer");
+  toggleAgentStyleTrainer(Boolean(trainer?.hidden));
+});
+document.querySelector("#agentStyleLearnCancelButton")?.addEventListener("click", () => toggleAgentStyleTrainer(false));
+document.querySelector("#agentStyleTrainer")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  learnAgentWritingStyle(document.querySelector("#agentStyleReference")?.value);
+});
 document.querySelector("#agentTopicList")?.addEventListener("click", (event) => {
   const item = event.target.closest("[data-agent-topic-id]");
   if (!item) return;
   agentWorkspace.selectedTopicId = item.dataset.agentTopicId;
-  agentWorkspace.planStatus = "ready";
   selectedTopicId = item.dataset.agentTopicId;
   persistWorkspace();
   renderAgentWorkbench();
-});
-document.querySelector("#agentTaskList")?.addEventListener("click", (event) => {
-  const item = event.target.closest("[data-agent-task-id]");
-  const topic = topics.find((candidate) => candidate.id === item?.dataset.agentTaskId);
-  if (topic) handoffAgentDraft(topic);
 });
 
 document.querySelector("#writingStyleList")?.addEventListener("click", (event) => {

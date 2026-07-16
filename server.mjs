@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,6 +10,7 @@ const HOST = process.env.HOST || "127.0.0.1";
 const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
 const DEFAULT_MODEL = "deepseek-v4-pro";
 const MAX_REQUEST_BYTES = 2 * 1024 * 1024;
+const MAX_CLI_OUTPUT_BYTES = 2 * 1024 * 1024;
 
 async function loadLocalEnvironment() {
   for (const filename of [".env.local", ".env"]) {
@@ -32,6 +34,9 @@ async function loadLocalEnvironment() {
 }
 
 await loadLocalEnvironment();
+
+const CLAUDE_CLI_PATH = process.env.CLAUDE_CLI_PATH || "claude";
+const CLAUDE_AGENT_TIMEOUT_MS = Number(process.env.CLAUDE_AGENT_TIMEOUT_MS || 180000);
 
 function allowedOrigin(origin) {
   if (!origin || origin === "null") return "null";
@@ -86,6 +91,427 @@ async function readJson(request) {
 
 function cleanText(value, limit = 12000) {
   return String(value || "").trim().slice(0, limit);
+}
+
+function runLocalCommand(command, args, { timeoutMs = CLAUDE_AGENT_TIMEOUT_MS } = {}) {
+  return new Promise((resolveCommand, rejectCommand) => {
+    const child = spawn(command, args, {
+      cwd: ROOT,
+      env: { ...process.env, NO_COLOR: "1" },
+      stdio: ["ignore", "pipe", "pipe"],
+      shell: false,
+    });
+    let stdout = "";
+    let stderr = "";
+    let outputBytes = 0;
+    let settled = false;
+    const finish = (handler, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      handler(value);
+    };
+    const collect = (target) => (chunk) => {
+      outputBytes += chunk.length;
+      if (outputBytes > MAX_CLI_OUTPUT_BYTES) {
+        child.kill("SIGTERM");
+        const error = new Error("Claude CLI 返回内容过大");
+        error.status = 502;
+        finish(rejectCommand, error);
+        return;
+      }
+      if (target === "stdout") stdout += chunk.toString("utf8");
+      else stderr += chunk.toString("utf8");
+    };
+    child.stdout.on("data", collect("stdout"));
+    child.stderr.on("data", collect("stderr"));
+    child.on("error", (error) => {
+      const wrapped = new Error(error?.code === "ENOENT"
+        ? "未找到 Claude CLI，请设置 CLAUDE_CLI_PATH"
+        : `无法启动 Claude CLI：${cleanText(error?.message, 300)}`);
+      wrapped.status = 503;
+      finish(rejectCommand, wrapped);
+    });
+    child.on("close", (code, signal) => {
+      if (settled) return;
+      if (code !== 0) {
+        const message = cleanText(stderr || stdout, 800);
+        const error = new Error(message || `Claude CLI 异常退出（${signal || code}）`);
+        error.status = 502;
+        finish(rejectCommand, error);
+        return;
+      }
+      finish(resolveCommand, { stdout, stderr });
+    });
+    const timeout = setTimeout(() => {
+      child.kill("SIGTERM");
+      setTimeout(() => child.kill("SIGKILL"), 1500).unref();
+      const error = new Error("Claude CLI 响应超时，请重试");
+      error.status = 504;
+      finish(rejectCommand, error);
+    }, timeoutMs);
+  });
+}
+
+let claudeHealthCache = { checkedAt: 0, result: null };
+
+async function claudeCliHealth({ force = false } = {}) {
+  if (!force && claudeHealthCache.result && Date.now() - claudeHealthCache.checkedAt < 30000) {
+    return claudeHealthCache.result;
+  }
+  try {
+    const { stdout } = await runLocalCommand(CLAUDE_CLI_PATH, ["auth", "status"], { timeoutMs: 8000 });
+    const status = JSON.parse(stdout);
+    const result = {
+      available: true,
+      loggedIn: Boolean(status?.loggedIn),
+      authMethod: cleanText(status?.authMethod, 80),
+      provider: "claude-cli",
+    };
+    claudeHealthCache = { checkedAt: Date.now(), result };
+    return result;
+  } catch (error) {
+    const result = {
+      available: false,
+      loggedIn: false,
+      provider: "claude-cli",
+      error: cleanText(error?.message, 300),
+    };
+    claudeHealthCache = { checkedAt: Date.now(), result };
+    return result;
+  }
+}
+
+function normalizeAgentTopic(topic) {
+  if (!topic || typeof topic !== "object") return null;
+  const id = cleanText(topic.id, 160);
+  const title = cleanText(topic.title, 600);
+  if (!id || !title) return null;
+  return {
+    id,
+    title,
+    score: Number(topic.score || 0),
+    status: cleanText(topic.status, 40),
+    category: cleanText(topic.category, 160),
+    valueTag: cleanText(topic.valueTag, 160),
+    worth: cleanText(topic.worth, 4000),
+    opinion: cleanText(topic.opinion, 4000),
+    evidenceBoundary: cleanText(topic.evidenceBoundary, 2500),
+    source: cleanText(topic.source, 300),
+    sourceUrl: cleanText(topic.sourceUrl, 1000),
+    sourceDate: cleanText(topic.sourceDate, 100),
+  };
+}
+
+function normalizeAgentStyle(style) {
+  if (!style || typeof style !== "object") return {};
+  return {
+    id: cleanText(style.id, 160),
+    name: cleanText(style.name, 200),
+    perspective: cleanText(style.perspective, 3000),
+    traits: cleanText(style.traits, 3000),
+    voice: cleanText(style.voice, 3500),
+    structure: cleanText(style.structure, 4500),
+    titlePatterns: cleanText(style.titlePatterns, 3500),
+    techniques: cleanText(style.techniques, 3500),
+    antiAiRules: cleanText(style.antiAiRules, 4500),
+    guardrails: cleanText(style.guardrails, 3500),
+    prompt: cleanText(style.prompt, 6000),
+  };
+}
+
+function normalizeAgentInput(input) {
+  const candidates = (Array.isArray(input?.candidates) ? input.candidates : [])
+    .map(normalizeAgentTopic)
+    .filter(Boolean)
+    .slice(0, 30);
+  const selectedTopic = normalizeAgentTopic(input?.selectedTopic)
+    || candidates.find((topic) => topic.id === cleanText(input?.selectedTopicId, 160))
+    || candidates[0]
+    || null;
+  const messages = (Array.isArray(input?.messages) ? input.messages : [])
+    .filter((message) => ["user", "assistant"].includes(message?.role))
+    .map((message) => ({
+      role: message.role,
+      text: cleanText(message.text, 1500),
+    }))
+    .filter((message) => message.text)
+    .slice(-6);
+  return {
+    prompt: cleanText(input?.prompt, 3000),
+    topicDate: cleanText(input?.topicDate, 40),
+    candidates,
+    selectedTopic,
+    style: normalizeAgentStyle(input?.style),
+    messages,
+  };
+}
+
+const CLAUDE_CHAT_SCHEMA = {
+  type: "object",
+  properties: {
+    reply: { type: "string", minLength: 1, maxLength: 1200 },
+    selectedTopicId: { type: "string", maxLength: 160 },
+    action: { type: "string", enum: ["none", "generate_draft"] },
+  },
+  required: ["reply", "action"],
+  additionalProperties: false,
+};
+
+const CLAUDE_DRAFT_SCHEMA = {
+  type: "object",
+  properties: {
+    title: { type: "string", minLength: 8, maxLength: 100 },
+    outline: {
+      type: "array",
+      minItems: 3,
+      maxItems: 6,
+      items: { type: "string", minLength: 4, maxLength: 180 },
+    },
+    bodyMarkdown: { type: "string", minLength: 600, maxLength: 30000 },
+    reply: { type: "string", minLength: 1, maxLength: 300 },
+  },
+  required: ["title", "outline", "bodyMarkdown", "reply"],
+  additionalProperties: false,
+};
+
+const CLAUDE_STYLE_SCHEMA = {
+  type: "object",
+  properties: {
+    style: {
+      type: "object",
+      properties: {
+        name: { type: "string", minLength: 2, maxLength: 40 },
+        description: { type: "string", minLength: 10, maxLength: 800 },
+        perspective: { type: "string", minLength: 10, maxLength: 1200 },
+        traits: { type: "string", minLength: 10, maxLength: 1200 },
+        voice: { type: "string", minLength: 10, maxLength: 1600 },
+        method: { type: "string", minLength: 40, maxLength: 3000 },
+        structure: { type: "string", minLength: 20, maxLength: 2600 },
+        titlePatterns: { type: "string", minLength: 20, maxLength: 1800 },
+        techniques: { type: "string", minLength: 20, maxLength: 1800 },
+        signatureMoves: { type: "string", minLength: 20, maxLength: 1800 },
+        antiAiRules: { type: "string", minLength: 20, maxLength: 2200 },
+        revisionPass: { type: "string", minLength: 20, maxLength: 2200 },
+        prompt: { type: "string", minLength: 80, maxLength: 5000 },
+        outputRules: { type: "string", minLength: 20, maxLength: 1800 },
+        guardrails: { type: "string", minLength: 20, maxLength: 1800 },
+      },
+      required: [
+        "name", "description", "perspective", "traits", "voice", "method",
+        "structure", "titlePatterns", "techniques", "signatureMoves",
+        "antiAiRules", "revisionPass", "prompt", "outputRules", "guardrails",
+      ],
+      additionalProperties: false,
+    },
+    reply: { type: "string", minLength: 1, maxLength: 300 },
+  },
+  required: ["style", "reply"],
+  additionalProperties: false,
+};
+
+function claudeCliArgs({ schema, systemPrompt, prompt }) {
+  return [
+    "--print",
+    "--output-format", "json",
+    "--json-schema", JSON.stringify(schema),
+    "--system-prompt", systemPrompt,
+    prompt,
+  ];
+}
+
+function parseClaudeResult(stdout) {
+  let result;
+  try {
+    result = JSON.parse(stdout);
+  } catch {
+    const error = new Error("Claude CLI 返回格式无法解析");
+    error.status = 502;
+    throw error;
+  }
+  if (result?.is_error || result?.subtype !== "success") {
+    const error = new Error(cleanText(result?.result, 800) || "Claude CLI 调用失败");
+    error.status = 502;
+    throw error;
+  }
+  if (!result?.structured_output || typeof result.structured_output !== "object") {
+    const error = new Error("Claude CLI 没有返回有效结构");
+    error.status = 502;
+    throw error;
+  }
+  return {
+    output: result.structured_output,
+    model: cleanText(Object.keys(result.modelUsage || {})[0], 120) || "Claude CLI",
+    usage: result.usage || null,
+    costUsd: Number(result.total_cost_usd || 0),
+  };
+}
+
+let claudeAgentBusy = false;
+
+async function withClaudeAgent(task) {
+  if (claudeAgentBusy) {
+    const error = new Error("写作服务正在处理上一项请求");
+    error.status = 429;
+    throw error;
+  }
+  const health = await claudeCliHealth();
+  if (!health.available || !health.loggedIn) {
+    const error = new Error(health.error || "Claude CLI 尚未登录");
+    error.status = 503;
+    throw error;
+  }
+  claudeAgentBusy = true;
+  try {
+    return await task();
+  } finally {
+    claudeAgentBusy = false;
+  }
+}
+
+async function chatWithClaudeAgent(input) {
+  const context = normalizeAgentInput(input);
+  if (!context.prompt) {
+    const error = new Error("请先输入写作指令");
+    error.status = 400;
+    throw error;
+  }
+  if (!context.candidates.length) {
+    const error = new Error("今日没有可用选题");
+    error.status = 400;
+    throw error;
+  }
+  const systemPrompt = [
+    "你是观澜 AI 内容中心的写作搭档“澜”。",
+    "你不承担预设写作任务，只处理用户本次明确提出的要求；不要自动创建写作计划、任务清单或排期。",
+    "candidates 是内容中心在 topicDate 下真实保存的每日选题，回答时必须以这些数据为准。",
+    "只依据输入中的每日选题、当前写作风格和对话，不补充外部事实，不声称已经发布内容。",
+    "回复使用简洁中文，先给判断，再给下一步；控制在 2–4 句。",
+    "只有用户明确要求切换或选择选题时才改变 selectedTopicId；否则返回当前 selectedTopic.id 或空字符串。",
+    "当用户要求选出、推荐或切换选题时，selectedTopicId 必须与回复中推荐的选题完全一致，禁止推荐 A 却返回 B。",
+    "只有用户明确要求写成完整文章或生成草稿时，action 才返回 generate_draft；其余情况返回 none。",
+  ].join("\n");
+  const prompt = `用户本次指令与内容中心上下文如下：\n\n${JSON.stringify(context, null, 2)}`;
+  return withClaudeAgent(async () => {
+    const { stdout } = await runLocalCommand(CLAUDE_CLI_PATH, claudeCliArgs({
+      schema: CLAUDE_CHAT_SCHEMA,
+      systemPrompt,
+      prompt,
+    }));
+    const result = parseClaudeResult(stdout);
+    const allowedIds = new Set(context.candidates.map((topic) => topic.id));
+    const selectedTopicId = allowedIds.has(result.output.selectedTopicId)
+      ? result.output.selectedTopicId
+      : context.selectedTopic?.id || context.candidates[0].id;
+    return {
+      reply: cleanText(result.output.reply, 1200),
+      selectedTopicId,
+      action: result.output.action === "generate_draft" ? "generate_draft" : "none",
+      provider: "claude-cli",
+      model: result.model,
+      usage: result.usage,
+      costUsd: result.costUsd,
+    };
+  });
+}
+
+async function draftWithClaudeAgent(input) {
+  const context = normalizeAgentInput(input);
+  const topic = context.selectedTopic;
+  if (!topic) {
+    const error = new Error("请先选择一条今日选题");
+    error.status = 400;
+    throw error;
+  }
+  const systemPrompt = [
+    "你是观澜 AI 的中文公众号作者。用户已经在对话中明确要求生成完整草稿。",
+    "把当前选中的真实每日选题写成一篇可交给人工编辑的完整 Markdown 草稿。",
+    "只使用输入提供的事实、来源和判断；未提供的数字、引语、客户案例、时间线和结论不得补写。",
+    "不得把方法建议写成已经发生的行业现状或企业实践；输入没有案例时，明确停留在方法判断。",
+    "标题具体克制，提纲由材料决定，正文面向对 AI 有兴趣但焦虑的企业老板、创业者和业务负责人。",
+    "正文只允许一个一级标题，小标题使用二级标题。不要输出写作说明、任务清单或自我评价。",
+    "保留作者判断与句式变化，避免对称分点、空泛总结和通用 AI 套话。",
+  ].join("\n");
+  const prompt = `当前选题、写作风格与最近对话如下：\n\n${JSON.stringify({
+    topic,
+    style: context.style,
+    recentConversation: context.messages,
+  }, null, 2)}`;
+  return withClaudeAgent(async () => {
+    const { stdout } = await runLocalCommand(CLAUDE_CLI_PATH, claudeCliArgs({
+      schema: CLAUDE_DRAFT_SCHEMA,
+      systemPrompt,
+      prompt,
+    }));
+    const result = parseClaudeResult(stdout);
+    const title = cleanText(result.output.title, 100).replace(/[。；;]+$/, "");
+    const outline = (Array.isArray(result.output.outline) ? result.output.outline : [])
+      .map((item) => cleanText(item, 180).replace(/^[一二三四五六七八九十\d]+[、.．\s]*/, ""))
+      .filter(Boolean)
+      .slice(0, 6);
+    let bodyMarkdown = cleanText(result.output.bodyMarkdown, 30000);
+    if (!bodyMarkdown.startsWith("# ")) bodyMarkdown = `# ${title}\n\n${bodyMarkdown}`;
+    if (title.length < 8 || outline.length < 3 || bodyMarkdown.length < 600) {
+      const error = new Error("Claude CLI 返回的草稿不完整，请重试");
+      error.status = 502;
+      throw error;
+    }
+    return {
+      title,
+      outline,
+      bodyMarkdown,
+      reply: cleanText(result.output.reply, 300) || "草稿已创建。",
+      provider: "claude-cli",
+      model: result.model,
+      usage: result.usage,
+      costUsd: result.costUsd,
+    };
+  });
+}
+
+async function learnStyleWithClaudeAgent(input) {
+  const reference = cleanText(input?.reference, 30000);
+  if (reference.length < 20) {
+    const error = new Error("请提供更完整的参考文或写作要求");
+    error.status = 400;
+    throw error;
+  }
+  const currentStyle = normalizeAgentStyle(input?.currentStyle);
+  const selectedTopic = normalizeAgentTopic(input?.selectedTopic);
+  const messages = (Array.isArray(input?.messages) ? input.messages : [])
+    .filter((message) => ["user", "assistant"].includes(message?.role))
+    .map((message) => ({ role: message.role, text: cleanText(message.text, 1500) }))
+    .filter((message) => message.text)
+    .slice(-6);
+  const systemPrompt = [
+    "你是观澜 AI 的写作风格编辑。",
+    "请把用户提供的参考文或写作要求提炼为一套可复用、可编辑的中文写作方法与 Prompt。",
+    "提炼视角、语气、结构、标题方法、节奏、反模板规则和表达边界；不要复制参考文中的标志性句子。",
+    "如果提供 currentStyle，则在保留有效部分的基础上根据新材料修订，而不是机械追加。",
+    "输出必须能直接保存进内容中心的写作风格栏目，避免抽象形容词堆叠。",
+  ].join("\n");
+  const prompt = `请学习并整理以下风格材料：\n\n${JSON.stringify({
+    reference,
+    currentStyle,
+    selectedTopic,
+    recentConversation: messages,
+  }, null, 2)}`;
+  return withClaudeAgent(async () => {
+    const { stdout } = await runLocalCommand(CLAUDE_CLI_PATH, claudeCliArgs({
+      schema: CLAUDE_STYLE_SCHEMA,
+      systemPrompt,
+      prompt,
+    }));
+    const result = parseClaudeResult(stdout);
+    return {
+      style: result.output.style,
+      reply: cleanText(result.output.reply, 300) || "写作风格已学习并保存。",
+      provider: "claude-cli",
+      model: result.model,
+      usage: result.usage,
+      costUsd: result.costUsd,
+    };
+  });
 }
 
 function normalizeEvidence(items) {
@@ -468,11 +894,35 @@ const server = createServer(async (request, response) => {
     return;
   }
   if (url.pathname === "/api/health" && request.method === "GET") {
+    const claude = await claudeCliHealth();
     sendJson(response, 200, {
       ok: true,
       configured: Boolean(process.env.DEEPSEEK_API_KEY),
       model: process.env.DEEPSEEK_MODEL || DEFAULT_MODEL,
+      claude,
     }, cors);
+    return;
+  }
+  if (url.pathname === "/api/agent/health" && request.method === "GET") {
+    const claude = await claudeCliHealth({ force: url.searchParams.get("refresh") === "1" });
+    sendJson(response, claude.available && claude.loggedIn ? 200 : 503, claude, cors);
+    return;
+  }
+  if (["/api/agent/chat", "/api/agent/draft", "/api/agent/style"].includes(url.pathname) && request.method === "POST") {
+    if (!Object.keys(cors).length) return sendJson(response, 403, { error: "不允许的页面来源" });
+    try {
+      const input = await readJson(request);
+      const result = url.pathname === "/api/agent/chat"
+        ? await chatWithClaudeAgent(input)
+        : url.pathname === "/api/agent/draft"
+          ? await draftWithClaudeAgent(input)
+          : await learnStyleWithClaudeAgent(input);
+      sendJson(response, 200, result, cors);
+    } catch (error) {
+      sendJson(response, Number(error?.status || 500), {
+        error: cleanText(error?.message, 800) || "Claude Agent 调用失败",
+      }, cors);
+    }
     return;
   }
   if (["/api/generate-titles", "/api/generate-outline", "/api/generate-body", "/api/generate-image-plan"].includes(url.pathname) && request.method === "POST") {
@@ -502,4 +952,5 @@ const server = createServer(async (request, response) => {
 server.listen(PORT, HOST, () => {
   console.log(`Content Factory: http://${HOST}:${PORT}`);
   console.log(`DeepSeek: ${process.env.DEEPSEEK_API_KEY ? "configured" : "missing DEEPSEEK_API_KEY"} · ${process.env.DEEPSEEK_MODEL || DEFAULT_MODEL}`);
+  console.log(`Claude Agent: ${CLAUDE_CLI_PATH}`);
 });
