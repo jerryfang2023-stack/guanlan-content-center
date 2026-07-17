@@ -1,24 +1,23 @@
 const pageTitles = {
-  agent: "AI 写作台",
-  topics: "今日选题",
-  library: "选题库",
-  styles: "写作风格",
-  editor: "公众号写作",
-  layout: "公众号排版",
-  pending: "待发布",
-  review: "发布复盘",
+  workbench: "今日工作台",
+  assets: "内容资产",
+  production: "编辑发布",
+  publish: "发布中心",
 };
 
-const pageKickers = {
-  agent: "",
-  topics: "TODAY TOPICS",
-  library: "TOPIC LIBRARY",
-  styles: "WRITING STYLE LAB",
-  editor: "WECHAT WRITING",
-  layout: "GZH DESIGN",
-  pending: "READY TO PUBLISH",
-  review: "PUBLISH REVIEW",
+const pageGroups = {
+  agent: "workbench",
+  topics: "workbench",
+  assets: "assets",
+  library: "assets",
+  styles: "assets",
+  layout: "production",
+  editor: "production",
+  pending: "publish",
+  review: "publish",
 };
+
+const pageKickers = {};
 
 const statusLabels = {
   candidate: "待判断",
@@ -61,6 +60,7 @@ let selectedLibraryTopicId = "";
 let queuedTopicId = "topic-001";
 let selectedLibraryDate = "all";
 let selectedLibraryStatus = "all";
+let selectedContentAssetFilter = "all";
 
 const topics = [
   {
@@ -835,6 +835,7 @@ function persistWorkspace() {
         selectedLibraryTopicId,
         selectedLibraryDate,
         selectedLibraryStatus,
+        selectedContentAssetFilter,
         activeDraftId: queuedTopicId,
         activeWritingStep,
         activeLayoutSnapshotId,
@@ -909,7 +910,7 @@ if (restoredWorkspace?.version === 3) {
         ? String(restoredWorkspace.agent.selectedStyleId)
         : defaultWritingStyleId,
       messages: usesClaudeCli && currentAgentSchema && Array.isArray(restoredWorkspace.agent.messages)
-        ? restoredWorkspace.agent.messages.filter((message) => ["user", "assistant"].includes(message?.role) && message?.text).slice(-8)
+        ? restoredWorkspace.agent.messages.filter((message) => ["user", "assistant"].includes(message?.role) && message?.text)
         : [],
     };
   }
@@ -919,6 +920,7 @@ if (restoredWorkspace?.version === 3) {
   if (ui.selectedLibraryTopicId) selectedLibraryTopicId = ui.selectedLibraryTopicId;
   if (ui.selectedLibraryDate) selectedLibraryDate = ui.selectedLibraryDate;
   if (["all", "library", "queued", "skipped"].includes(ui.selectedLibraryStatus)) selectedLibraryStatus = ui.selectedLibraryStatus;
+  if (["all", "topic", "draft", "pending", "published"].includes(ui.selectedContentAssetFilter)) selectedContentAssetFilter = ui.selectedContentAssetFilter;
   if (ui.activeDraftId) queuedTopicId = ui.activeDraftId;
   if (WRITING_STEPS.includes(ui.activeWritingStep)) activeWritingStep = ui.activeWritingStep;
   if (ui.activeLayoutSnapshotId) activeLayoutSnapshotId = ui.activeLayoutSnapshotId;
@@ -1243,6 +1245,121 @@ function ensureLibrarySelection() {
 function currentLibraryTopic() {
   ensureLibrarySelection();
   return topics.find((topic) => topic.id === selectedLibraryTopicId && isTopicArchived(topic)) || null;
+}
+
+function contentAssetRecords() {
+  const topicRecords = allLibraryTopics()
+    .filter((topic) => !draftsByTopicId[topic.id])
+    .map((topic) => ({
+      id: `topic:${topic.id}`,
+      type: "topic",
+      title: topic.title,
+      stage: statusLabels[topic.status] || "选题",
+      meta: `${topic.category || "选题"} · ${topic.source || "本地"}`,
+      updatedAt: topic.libraryArchivedAt || topicDate(topic),
+      sourceId: topic.id,
+      action: "查看选题",
+    }));
+  const draftRecords = Object.values(draftsByTopicId)
+    .filter((draft) => draft?.topicId)
+    .map((draft) => {
+      const topic = topics.find((item) => item.id === draft.topicId);
+      const ready = draft.status === "ready_for_layout";
+      return {
+        id: `draft:${draft.topicId}`,
+        type: "draft",
+        title: draft.selectedTitle || topic?.articleTitleDraft || topic?.title || "未命名草稿",
+        stage: ready ? "待排版" : "草稿",
+        meta: draft.style || topic?.category || "公众号",
+        updatedAt: draft.updatedAt || topicDate(topic),
+        sourceId: draft.topicId,
+        action: ready ? "继续排版" : "继续编辑",
+      };
+    });
+  const pendingRecords = sortedPendingPublications().map((draft) => ({
+    id: `pending:${draft.id}`,
+    type: "pending",
+    title: draft.title,
+    stage: "待发布",
+    meta: draft.theme || DEFAULT_GZH_THEME,
+    updatedAt: draft.updatedAt || draft.savedAt,
+    sourceId: draft.id,
+    action: "查看发布",
+  }));
+  const publishedRecords = publicationEntries.map((entry) => ({
+    id: `published:${entry.id}`,
+    type: "published",
+    title: entry.title,
+    stage: entry.recap ? "已复盘" : "已发布",
+    meta: entry.platform || "已发布",
+    updatedAt: entry.updatedAt || entry.publishedAt,
+    sourceId: entry.id,
+    action: entry.recap ? "查看复盘" : "开始复盘",
+  }));
+  return [...topicRecords, ...draftRecords, ...pendingRecords, ...publishedRecords]
+    .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
+}
+
+function formatContentAssetDate(value) {
+  const normalized = normalizeDate(String(value || "").slice(0, 10));
+  return /^\d{4}-\d{2}-\d{2}$/.test(normalized) ? formatDate(normalized) : "-";
+}
+
+function renderContentAssets() {
+  const list = document.querySelector("#contentAssetList");
+  const summary = document.querySelector("#contentAssetSummary");
+  if (!list || !summary) return;
+  const records = contentAssetRecords();
+  const query = String(document.querySelector("#contentAssetSearch")?.value || "").trim().toLowerCase();
+  const visible = records.filter((record) => (
+    (selectedContentAssetFilter === "all" || record.type === selectedContentAssetFilter)
+    && (!query || `${record.title} ${record.meta} ${record.stage}`.toLowerCase().includes(query))
+  ));
+  document.querySelectorAll("[data-content-asset-filter]").forEach((button) => {
+    const active = button.dataset.contentAssetFilter === selectedContentAssetFilter;
+    button.setAttribute("aria-selected", String(active));
+  });
+  const draftCount = records.filter((record) => record.type === "draft").length;
+  const pendingCount = records.filter((record) => record.type === "pending").length;
+  summary.textContent = `${records.length} 项 · ${draftCount} 篇草稿 · ${pendingCount} 篇待发布`;
+  list.innerHTML = visible.length ? visible.map((record) => `
+    <div class="content-assets-row" role="row">
+      <span class="content-asset-title"><strong>${escapeHtml(record.title)}</strong><small>${escapeHtml(record.meta)}</small></span>
+      <span><em class="content-asset-stage is-${escapeHtml(record.type)}">${escapeHtml(record.stage)}</em></span>
+      <span class="content-asset-date">${escapeHtml(formatContentAssetDate(record.updatedAt))}</span>
+      <span><button class="text-button" type="button" data-open-content-asset="${escapeHtml(record.id)}">${escapeHtml(record.action)}</button></span>
+    </div>
+  `).join("") : '<p class="content-assets-empty">暂无匹配内容</p>';
+}
+
+function openContentAsset(recordId) {
+  const record = contentAssetRecords().find((item) => item.id === recordId);
+  if (!record) return;
+  if (record.type === "topic") {
+    selectedLibraryTopicId = record.sourceId;
+    selectedTopicId = record.sourceId;
+    setPage("library");
+    return;
+  }
+  if (record.type === "draft") {
+    queuedTopicId = record.sourceId;
+    const draft = draftsByTopicId[record.sourceId];
+    const snapshot = sortedHandoffSnapshots().find((item) => item.topicId === record.sourceId && item.revision === draft?.handedOffRevision);
+    if (snapshot) {
+      activeLayoutSnapshotId = snapshot.id;
+      setPage("layout");
+    } else {
+      setPage("editor");
+    }
+    return;
+  }
+  if (record.type === "pending") {
+    selectedPendingPublicationId = record.sourceId;
+    setPage("pending");
+    return;
+  }
+  selectedPublicationId = record.sourceId;
+  setPage("review");
 }
 
 function queuedTopic() {
@@ -1674,8 +1791,8 @@ function renderLibraryDetail(topic) {
     document.querySelector("#libraryDetailStatus").textContent = "暂无选题";
     document.querySelector("#libraryDetailTitle").textContent = "暂无入库选题";
     document.querySelector("#libraryDetailArchiveMeta").textContent = selectedLibraryDate === "all" ? "选题库暂无留档" : "当前排期日期暂无留档";
-    document.querySelector("#libraryDetailWorth").textContent = "从今日选题放入公众号写作或存入选题库后，选题都会在这里留档。";
-    document.querySelector("#libraryDetailOpinion").textContent = "选题库用于查看写作中、暂缓和已放弃的选题，不与写作台混在一起。";
+    document.querySelector("#libraryDetailWorth").textContent = "从今日选题交给澜或存入选题库后，选题都会在这里留档。";
+    document.querySelector("#libraryDetailOpinion").textContent = "选题库用于查看写作中、暂缓和已放弃的选题。";
     document.querySelector("#libraryDetailAngle").innerHTML = "";
     actionButtons.forEach((button) => { button.disabled = true; });
     return;
@@ -1698,7 +1815,7 @@ function renderLibraryDetail(topic) {
   `;
   actionButtons.forEach((button) => { button.disabled = false; });
   const queueButton = document.querySelector('[data-library-action="queue"]');
-  if (queueButton) queueButton.textContent = topic.status === "queued" ? "打开写作稿" : "放入公众号写作";
+  if (queueButton) queueButton.textContent = topic.status === "queued" ? "继续与澜写作" : "交给澜写作";
 }
 
 function uniqueList(items) {
@@ -4543,7 +4660,7 @@ function renderPendingPublications() {
 function deletePendingPublication(id) {
   const draft = pendingPublicationDraftsById[id];
   if (!draft) return false;
-  if (!window.confirm(`确定从待发布中删除《${draft.title}》？\n\n公众号写作原稿和排版稿仍会保留。`)) return false;
+  if (!window.confirm(`确定从待发布中删除《${draft.title}》？\n\n原始草稿和排版稿仍会保留。`)) return false;
 
   const previousDraft = cloneWorkspaceValue(draft);
   const previousSelectedId = selectedPendingPublicationId;
@@ -4753,7 +4870,7 @@ function renderLayoutFromDraft({ force = false } = {}) {
   document.querySelector("#layoutHtmlEditor").disabled = !snapshot;
   if (!snapshot) {
     applyGzhLayoutOptions(DEFAULT_GZH_LAYOUT_OPTIONS);
-    markdownEditor.value = "请先在“公众号写作”完成稿件并提交排版。";
+    markdownEditor.value = "请先让澜生成草稿，或从经典写作台提交。";
     markdownEditor.dataset.snapshotId = "";
     resetLayoutState("暂无待排版稿件");
     return;
@@ -4815,7 +4932,7 @@ function handoffToLayout() {
   updateWriterChrome();
   renderLayoutFromDraft({ force: true });
   setPage("layout");
-  showToast("写作稿已锁定并交给公众号排版");
+  showToast("写作稿已锁定并进入编辑发布");
 }
 
 function skipImagesAndHandoff() {
@@ -5019,7 +5136,6 @@ function renderAgentWorkbench() {
 
 function appendAgentMessage(role, text) {
   agentWorkspace.messages.push({ role, text: String(text || "").trim(), time: agentMessageTime() });
-  agentWorkspace.messages = agentWorkspace.messages.slice(-8);
 }
 
 function agentTopicRequestPayload(topic) {
@@ -5066,7 +5182,7 @@ function agentRequestPayload(prompt = "") {
     selectedTopic: agentTopicRequestPayload(selected),
     candidates: agentTopicCandidates().map(agentTopicRequestPayload),
     style: agentStyleRequestPayload(),
-    messages: agentWorkspace.messages.slice(-6).map(({ role, text }) => ({ role, text })),
+    messages: agentWorkspace.messages.map(({ role, text }) => ({ role, text })),
   };
 }
 
@@ -5209,8 +5325,8 @@ function saveLearnedWritingStyle(style) {
   const profile = {
     ...(canRefineCurrent ? current : {}),
     id,
-    name: String(style.name || "自定义写作风格").trim().slice(0, 40),
-    publishedName: String(style.name || "自定义写作风格").trim().slice(0, 40),
+    name: String(style.name || "自定义写作风格").trim(),
+    publishedName: String(style.name || "自定义写作风格").trim(),
     typeLabel: "自定义",
     headerSummary: String(style.description || "").trim(),
     status: "published",
@@ -5244,8 +5360,8 @@ function saveLearnedWritingStyle(style) {
 
 async function learnAgentWritingStyle(reference) {
   const material = String(reference || "").trim();
-  if (material.length < 20) {
-    showToast("请提供更完整的参考文或写作要求");
+  if (!material) {
+    showToast("请提供参考文或写作要求");
     return;
   }
   if (agentRequestInFlight) return;
@@ -5256,7 +5372,7 @@ async function learnAgentWritingStyle(reference) {
       currentStyle: agentStyleRequestPayload(),
       topicDate: agentTopicDate(),
       selectedTopic: agentTopicRequestPayload(agentSelectedTopic()),
-      messages: agentWorkspace.messages.slice(-6).map(({ role, text }) => ({ role, text })),
+      messages: agentWorkspace.messages.map(({ role, text }) => ({ role, text })),
     });
     const profile = saveLearnedWritingStyle(result.style || {});
     appendAgentMessage("assistant", result.reply || `已学习并保存“${profile.name}”。`);
@@ -5291,9 +5407,39 @@ function handoffAgentDraft(topic = agentSelectedTopic()) {
   selectedTopicId = topic.id;
   setTopicStatus("queued", topic);
   queuedTopicId = topic.id;
-  persistWorkspace();
-  setPage("editor");
-  showToast("已交给原公众号写作台");
+  const draft = ensureDraft(topic);
+  if (!String(draft.bodyMarkdown || "").trim()) {
+    showToast("请先让澜生成草稿");
+    return;
+  }
+  const existingSnapshot = sortedHandoffSnapshots().find((snapshot) => (
+    snapshot.topicId === draft.topicId && snapshot.revision === draft.handedOffRevision
+  ));
+  if (draft.status === "ready_for_layout" && existingSnapshot) {
+    activeLayoutSnapshotId = existingSnapshot.id;
+    setPage("layout");
+    showToast("已打开编辑排版");
+    return;
+  }
+  draft.imagesSkipped = true;
+  if (!draft.confirmedSteps.includes("images")) draft.confirmedSteps.push("images");
+  draft.revision = Math.max(1, Number(draft.revision || 0));
+  draft.status = "ready_for_layout";
+  draft.handedOffRevision = draft.revision;
+  draft.updatedAt = new Date().toISOString();
+  const snapshot = createHandoffSnapshot(draft);
+  activeLayoutSnapshotId = snapshot.id;
+  if (!persistWorkspace()) {
+    delete handoffSnapshotsById[snapshot.id];
+    draft.status = "drafting";
+    draft.handedOffRevision = null;
+    showToast("本地保存失败，请重试");
+    return;
+  }
+  renderLayoutFromDraft({ force: true });
+  renderContentAssets();
+  setPage("layout");
+  showToast("草稿已进入编辑发布");
 }
 
 function syncTopicUi() {
@@ -5306,6 +5452,7 @@ function syncTopicUi() {
   updateMetrics();
   renderCalendarCoverage();
   renderAgentWorkbench();
+  renderContentAssets();
 }
 
 function reviewMetric(value) {
@@ -5431,11 +5578,13 @@ function savePublicationRecap() {
 }
 
 function setPage(page) {
-  const previousPage = document.querySelector("[data-page].is-active")?.dataset.page;
+  if (!pageGroups[page]) page = "agent";
+  const previousPage = document.querySelector("[data-page-panel].is-active")?.dataset.pagePanel;
+  const group = pageGroups[page];
   if (previousPage === "editor" && page !== "editor") saveCurrentDraft();
   if (previousPage === "styles" && page !== "styles" && writingStyleDirty) saveWritingStyle({ notify: false });
   document.querySelectorAll("[data-page]").forEach((button) => {
-    const active = button.dataset.page === page;
+    const active = pageGroups[button.dataset.page] === group;
     button.classList.toggle("is-active", active);
     if (active) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
@@ -5443,16 +5592,25 @@ function setPage(page) {
   document.querySelectorAll("[data-page-panel]").forEach((panel) => {
     panel.classList.toggle("is-active", panel.dataset.pagePanel === page);
   });
-  document.querySelector("#pageTitle").textContent = pageTitles[page] || "内容工厂";
+  document.querySelectorAll("[data-workspace-tabs]").forEach((tabs) => {
+    tabs.hidden = tabs.dataset.workspaceTabs !== group;
+  });
+  document.querySelectorAll("[data-workspace-page]").forEach((button) => {
+    const active = button.dataset.workspacePage === page;
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  document.querySelector("#pageTitle").textContent = pageTitles[group] || "内容工厂";
   const pageKicker = document.querySelector("#pageKicker");
-  pageKicker.textContent = pageKickers[page] || "";
-  pageKicker.hidden = !pageKickers[page];
+  pageKicker.textContent = pageKickers[group] || "";
+  pageKicker.hidden = !pageKickers[group];
   document.querySelector(".topbar-actions").classList.toggle("is-hidden", page !== "topics");
   if (page === "agent") {
     renderAgentWorkbench();
     refreshClaudeAgentStatus();
   }
   if (page === "styles") renderWritingStyleLab();
+  if (page === "assets") renderContentAssets();
   if (page === "library") renderLibrary();
   if (page === "editor") hydrateWriter();
   if (page === "layout") renderLayoutFromDraft();
@@ -5503,6 +5661,24 @@ function showToast(message) {
 
 document.querySelectorAll("[data-page]").forEach((button) => {
   button.addEventListener("click", () => setPage(button.dataset.page));
+});
+
+document.querySelectorAll("[data-workspace-page]").forEach((button) => {
+  button.addEventListener("click", () => setPage(button.dataset.workspacePage));
+});
+
+document.querySelectorAll("[data-content-asset-filter]").forEach((button) => {
+  button.addEventListener("click", () => {
+    selectedContentAssetFilter = button.dataset.contentAssetFilter;
+    renderContentAssets();
+    persistWorkspace();
+  });
+});
+
+document.querySelector("#contentAssetSearch")?.addEventListener("input", renderContentAssets);
+document.querySelector("#contentAssetList")?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-open-content-asset]");
+  if (button) openContentAsset(button.dataset.openContentAsset);
 });
 
 document.querySelector("#agentComposer")?.addEventListener("submit", (event) => {
@@ -5599,14 +5775,10 @@ document.querySelector("#openWritingStyleInEditorButton")?.addEventListener("cli
     showToast("请先发布这套风格");
     return;
   }
-  const draft = currentDraft();
-  if (draft) {
-    draft.styleId = profile.id;
-    draft.style = profile.publishedName || profile.name;
-    draft.dirty = true;
-  }
-  setPage("editor");
-  showToast(`公众号写作已引用“${profile.name}”`);
+  agentWorkspace.selectedStyleId = profile.id;
+  persistWorkspace();
+  setPage("agent");
+  showToast(`澜已使用“${profile.name}”`);
 });
 
 document.querySelector("#editWritingStyleButton")?.addEventListener("click", () => {
@@ -6020,7 +6192,7 @@ document.querySelectorAll("[data-gzh-action]").forEach((button) => {
     const snapshot = activeLayoutSnapshot();
     const topic = topics.find((item) => item.id === snapshot?.topicId) || (snapshot?.manualImport ? importedLayoutTopic(snapshot) : queuedTopic());
     if (!snapshot || !topic) {
-      showToast("请先从公众号写作提交一篇稿件");
+      showToast("请先让澜生成草稿，或从经典写作台提交");
       return;
     }
     const theme = document.querySelector("#gzhThemeSelect").value;
@@ -6067,8 +6239,9 @@ document.querySelectorAll("[data-topic-action]").forEach((button) => {
     const action = button.dataset.topicAction;
     if (action === "queue") {
       setTopicStatus("queued");
-      setPage("editor");
-      showToast("已放入公众号写作");
+      agentWorkspace.selectedTopicId = currentTopic()?.id || "";
+      setPage("agent");
+      showToast("已交给澜，可以开始写作");
       return;
     }
     if (action === "library") {
@@ -6091,8 +6264,9 @@ document.querySelectorAll("[data-library-action]").forEach((button) => {
     selectedTopicId = topic.id;
     if (button.dataset.libraryAction === "queue") {
       setTopicStatus("queued", topic);
-      setPage("editor");
-      showToast("已打开写作稿，选题仍保留在库内");
+      agentWorkspace.selectedTopicId = topic.id;
+      setPage("agent");
+      showToast("已交给澜，选题仍保留在库内");
       return;
     }
     if (button.dataset.libraryAction === "remove") {
@@ -6171,5 +6345,5 @@ window.addEventListener("pagehide", () => {
 renderPublishedWritingStyles();
 renderDateFilter();
 syncTopicUi();
-setPage(document.querySelector("[data-page].is-active")?.dataset.page || "topics");
+setPage(document.querySelector("[data-page].is-active")?.dataset.page || "agent");
 if (restoredWorkspace?.version === 2) persistWorkspace();

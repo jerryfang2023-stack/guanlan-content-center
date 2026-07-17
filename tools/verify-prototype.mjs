@@ -32,9 +32,15 @@ const htmlIds = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
 const duplicateIds = [...new Set(htmlIds.filter((id, index) => htmlIds.indexOf(id) !== index))];
 assert(!duplicateIds.length, `Duplicate HTML ids: ${duplicateIds.join(", ")}`);
 assert(!html.includes("nav-sub-item") && !css.includes(".nav-sub-item"), "Sidebar navigation must remain a flat, single-level column list");
+const primaryNavMarkup = html.match(/<nav class="nav-list"[\s\S]*?<\/nav>/)?.[0] || "";
+const primaryNavPages = [...primaryNavMarkup.matchAll(/data-page="([^"]+)"/g)].map((match) => match[1]);
+assert(primaryNavPages.join(",") === "agent,assets,layout,pending", `Primary navigation must expose only four AI-flow columns, found: ${primaryNavPages.join(",")}`);
 assert(html.includes('data-page="agent"') && html.includes('data-page-panel="agent"'), "Agent writing workbench navigation or page is missing");
-assert(html.indexOf('data-page="agent"') < html.indexOf('data-page="topics"'), "Agent writing workbench must stay above Today Topics");
-assert(html.includes('data-page="editor"') && html.includes('data-page-panel="editor"'), "Legacy WeChat writer must remain available during the transition");
+assert(html.indexOf('data-page-panel="agent"') < html.indexOf('data-page-panel="topics"'), "Agent writing workbench must stay above Today Topics");
+assert(html.includes('data-workspace-page="topics"') && html.includes('data-workspace-page="library"') && html.includes('data-workspace-page="styles"'), "Daily topic or content asset secondary views are missing");
+assert(html.includes('data-workspace-page="editor"') && html.includes('data-page-panel="editor"') && html.includes("经典写作台"), "Legacy WeChat writer must remain available as a secondary transition entry");
+assert(html.includes('data-page="assets"') && html.includes('data-page-panel="assets"') && html.includes('id="contentAssetList"'), "Unified content assets page is missing");
+assert(app.includes("function contentAssetRecords()") && app.includes("function renderContentAssets()") && app.includes("function openContentAsset("), "Content asset lifecycle aggregation is incomplete");
 assert(["agentComposer", "agentPrompt", "agentTopicList", "agentStyleSelect", "agentStyleTrainer", "agentStyleReference", "agentHandoffButton"].every((id) => htmlIds.includes(id)), "AI writing workbench core regions are incomplete");
 assert(app.includes("function renderAgentWorkbench()") && app.includes("function applyAgentDraftResult(") && app.includes("function learnAgentWritingStyle(") && app.includes("function handoffAgentDraft("), "AI writing workbench interactions or legacy handoff are incomplete");
 assert(product.includes("## Core Page Principle") && product.includes("非必要不展示"), "Content Center core page principle is missing");
@@ -48,14 +54,18 @@ assert(app.includes("function agentTopicDate()") && app.includes("topicDate: age
 assert(html.includes("让澜学习") && app.includes("/api/agent/style") && server.includes("/api/agent/style") && server.includes("CLAUDE_STYLE_SCHEMA"), "AI writing style learning flow is incomplete");
 assert(app.includes("writingStylesById[id] = { ...profile, id, isBuiltIn: false }"), "Learned writing styles must restore from local storage");
 assert(!html.includes("Hermes") && !app.includes("Hermes"), "Legacy Hermes labels must stay removed");
-assert(html.includes("AI 写作台") && html.includes('<h2 id="agentWorkspaceTitle">澜</h2>') && html.includes("<strong>澜</strong>"), "AI writing workbench identity is incomplete");
+assert(html.includes("今日工作台") && html.includes('<h2 id="agentWorkspaceTitle">澜</h2>') && html.includes("<strong>澜</strong>"), "AI writing workbench identity is incomplete");
+assert(functionSource("handoffAgentDraft").includes("createHandoffSnapshot") && functionSource("handoffAgentDraft").includes('setPage("layout")'), "Agent drafts must enter the unified editing and publishing flow directly");
 assert(!html.includes("观澜写作台") && !html.includes("观澜写作助手"), "Deprecated writing assistant identity must stay removed");
 assert(!html.includes("Claude 写作 Agent") && !html.includes("<strong>Claude CLI</strong>") && !html.includes("发消息给 Claude"), "Provider branding must not appear in the writing assistant UI");
 assert(!app.includes("Claude CLI：") && !app.includes('"CLI 已连接"') && !app.includes('"CLI 不可用"') && !app.includes("Claude Agent 调用失败") && !app.includes("Claude 草稿已生成"), "Provider-specific status or feedback must not appear in the writing assistant UI");
 assert(app.includes('"/api/agent/health"') || app.includes("/api/agent/health"), "Claude Agent health endpoint is missing from the client");
 assert(app.includes("/api/agent/chat") && app.includes("/api/agent/draft") && app.includes("/api/agent/style"), "Writing assistant client endpoints are incomplete");
 assert(server.includes('"/api/agent/chat"') && server.includes('"/api/agent/draft"') && server.includes('"/api/agent/style"') && server.includes("CLAUDE_CLI_PATH"), "Claude CLI server bridge is incomplete");
-assert(!server.includes('"--tools", ""') && !server.includes('"--safe-mode"') && !server.includes('"--permission-mode"') && !server.includes('"--max-budget-usd"') && !server.includes('"--model"'), "Claude CLI bridge must inherit the user's tools, permissions, model, and budget configuration");
+assert(!server.includes('"--system-prompt"') && !server.includes('"--append-system-prompt"'), "Claude CLI bridge must preserve the default system prompt without modification");
+assert(!server.includes('"--tools", ""') && !server.includes('"--safe-mode"') && !server.includes('"--bare"') && !server.includes('"--permission-mode"') && !server.includes('"--max-budget-usd"') && !server.includes('"--model"') && !server.includes('"--disallowedTools"'), "Claude CLI bridge must inherit the user's tools, permissions, model, budget, and customization configuration");
+assert(!server.includes("CLAUDE_AGENT_TIMEOUT_MS") && !server.includes("MAX_CLI_OUTPUT_BYTES") && !server.includes("claudeAgentBusy"), "Claude CLI tasks must not have app-imposed timeout, output, or concurrency limits");
+assert(server.includes('"--json-schema"') && product.includes("只通过 JSON Schema 约定最终返回字段"), "Claude CLI bridge should limit only the final page transport shape");
 
 // Optional hooks may be absent while their companion feature is not rendered.
 const optionalSelectorIds = new Set(["styleExtractionReport", "writingStyleComparison"]);
@@ -70,7 +80,7 @@ assert(JSON.stringify(scriptOrder) === JSON.stringify([
   "assets/generated/manifest.js",
   "app.js",
 ]), `Unexpected script order: ${scriptOrder.join(" -> ")}`);
-assert(scriptSources.some((source) => /^app\.js\?v=20260716-ai-writer-45$/.test(source)), "Current app cache-busting version is missing");
+assert(scriptSources.some((source) => /^app\.js\?v=20260716-ai-flow-50$/.test(source)), "Current app cache-busting version is missing");
 assert(["titleGenerationStatus", "outlineGenerationStatus", "bodyGenerationStatus"].every((id) => html.includes(`id="${id}"`)), "DeepSeek writing generation status UI is incomplete");
 assert(html.includes('>生成标题</button>') && html.includes('>生成提纲</button>') && html.includes('>生成正文</button>'), "Writing generation action labels are incomplete");
 assert(!html.includes("DeepSeek"), "Writing steps must not expose the model provider");
@@ -389,7 +399,7 @@ assert(app.includes('const WRITING_STEPS = ["title", "outline", "body", "images"
 assert(htmlIds.includes("skipImagesButton") && htmlIds.includes("generateAllImagesButton") && htmlIds.includes("imageDeliverySummary"), "Optional image delivery actions or status are missing");
 assert(app.includes("function skipImagesAndHandoff()") && app.includes("async function generateImageAssets(") && app.includes("function renderVisualPlanToPng("), "Image skip or real PNG delivery capability is incomplete");
 assert(html.includes('data-image-action="generate-asset"') && !html.includes('data-image-action="create-task"') && !html.includes("导出待执行任务"), "Image UI must create assets directly instead of exposing task export");
-assert(html.includes('data-page="library"') && html.includes('data-page-panel="library"'), "Topic library must remain a standalone sidebar page");
+assert(html.includes('data-workspace-page="library"') && html.includes('data-page-panel="library"'), "Topic library must remain available inside Content Assets");
 assert(htmlIds.includes("libraryPage") && htmlIds.includes("libraryDateFilter") && htmlIds.includes("libraryStatusFilter"), "Standalone topic library controls are incomplete");
 assert(app.includes("libraryArchivedAt") && app.includes("allLibraryTopics") && app.includes('if (!topic.libraryArchivedAt) topic.libraryArchivedAt = new Date().toISOString()'), "Topic library archive retention is incomplete");
 assert(html.includes('data-library-action="remove"') && app.includes('button.dataset.libraryAction === "remove"'), "Topic library management action is missing");
@@ -426,7 +436,7 @@ assert(layoutPageMarkup.indexOf('class="layout-editor-actions"') > layoutPageMar
 assert(app.includes("pickGzhKeyword") && app.includes("gzhSectionLabel") && app.includes("detectGzhArticleType"), "gzh-design skill structure intelligence is missing");
 assert(app.includes("THE NEXT MOVE") && app.includes("你会看到什么") && app.includes("{{作者名}}"), "gzh-design skill article skeleton is incomplete");
 assert(htmlIds.includes("pendingPage") && htmlIds.includes("pendingPublishList") && htmlIds.includes("savePendingPublishButton"), "Pending publication UI is missing");
-assert((html.match(/data-save-pending-publication/g) || []).length === 1 && html.includes("保存稿件"), "Persistent layout save entry is missing");
+assert((html.match(/data-save-pending-publication/g) || []).length === 1 && html.includes("保存到发布中心"), "Persistent layout save entry is missing");
 assert(html.includes('data-page="pending"') && html.includes('data-page-panel="pending"'), "Pending publication navigation is missing");
 assert(app.includes("pendingPublicationDraftsById") && app.includes("pendingPublications: pendingPublicationDraftsById"), "Pending publication persistence is missing");
 assert(app.includes("saveLayoutAsPendingPublication") && app.includes("renderPendingPublications") && app.includes("continuePendingPublicationLayout"), "Pending publication workflow is incomplete");
