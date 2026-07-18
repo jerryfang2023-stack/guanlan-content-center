@@ -758,6 +758,7 @@ let agentRequestInFlight = false;
 let agentConnectionStatus = "checking";
 let agentConnectionLabel = "检查中";
 let agentHealthChecked = false;
+const AGENT_TOPIC_PREVIEW_LIMIT = 10;
 const REVIEW_DECISION_LABELS = {
   continue: "继续写",
   rewrite: "改写再发",
@@ -5098,6 +5099,7 @@ async function refreshClaudeAgentStatus({ force = false } = {}) {
 
 function renderAgentContext() {
   const candidates = agentTopicCandidates();
+  const visibleCandidates = candidates.slice(0, AGENT_TOPIC_PREVIEW_LIMIT);
   const selected = agentSelectedTopic();
   const topicList = document.querySelector("#agentTopicList");
   const topicCount = document.querySelector("#agentTopicCount");
@@ -5106,8 +5108,8 @@ function renderAgentContext() {
   const handoffButton = document.querySelector("#agentHandoffButton");
   if (!topicList || !topicCount || !styleSelect || !contextFooter || !handoffButton) return;
 
-  topicCount.textContent = candidates.length ? `${formatDate(agentTopicDate())} · ${candidates.length} 条已同步` : `${formatDate(agentTopicDate())} · 暂无选题`;
-  topicList.innerHTML = candidates.length ? candidates.map((topic) => `
+  topicCount.textContent = visibleCandidates.length ? `${formatDate(agentTopicDate())} · ${visibleCandidates.length} 条` : `${formatDate(agentTopicDate())} · 暂无选题`;
+  topicList.innerHTML = visibleCandidates.length ? visibleCandidates.map((topic) => `
     <button class="agent-topic-item${topic.id === selected?.id ? " is-selected" : ""}" type="button" data-agent-topic-id="${escapeHtml(topic.id)}">
       <span class="agent-topic-score">${topic.score}</span>
       <span><strong>${escapeHtml(topic.title)}</strong><small>${escapeHtml(topic.category)} · ${escapeHtml(topic.valueTag)}</small></span>

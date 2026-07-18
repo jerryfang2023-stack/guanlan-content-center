@@ -3320,6 +3320,7 @@ textarea:focus-visible {
   grid-template-columns: minmax(0, 1.62fr) minmax(340px, .92fr);
   gap: 18px;
   align-items: stretch;
+  min-height: 0;
 }
 
 .agent-conversation,
@@ -3333,12 +3334,13 @@ textarea:focus-visible {
 .agent-conversation {
   display: flex;
   flex-direction: column;
-  min-height: 600px;
-  overflow: visible;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .agent-context {
-  overflow: hidden;
+  min-height: 0;
+  overflow: visible;
 }
 
 .agent-profile {
@@ -3349,6 +3351,7 @@ textarea:focus-visible {
   min-height: 68px;
   padding: 12px 18px;
   border-bottom: 1px solid rgba(7, 24, 39, .08);
+  flex: 0 0 auto;
 }
 
 .agent-profile h2,
@@ -3425,10 +3428,12 @@ textarea:focus-visible {
   flex: 1 1 auto;
   flex-direction: column;
   gap: 22px;
-  min-height: 380px;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 24px 20px 20px;
   scrollbar-color: rgba(13, 53, 92, .24) transparent;
+  scrollbar-gutter: stable;
 }
 
 .agent-message {
@@ -3501,6 +3506,7 @@ textarea:focus-visible {
 }
 
 .agent-composer {
+  flex: 0 0 auto;
   margin-top: auto;
   padding: 8px 20px 16px;
 }
@@ -3610,9 +3616,8 @@ textarea:focus-visible {
 .agent-topic-list {
   display: grid;
   gap: 8px;
-  max-height: 326px;
-  overflow-y: auto;
-  padding-right: 2px;
+  max-height: none;
+  overflow: visible;
 }
 
 .agent-topic-item {
@@ -3766,6 +3771,11 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+.agent-thread:focus-visible {
+  outline: 2px solid #2f7fb8;
+  outline-offset: -2px;
+}
+
 @media (max-width: 1320px) {
   .style-lab-workspace {
     grid-template-columns: 220px minmax(0, 1fr);
@@ -3797,15 +3807,19 @@ textarea:focus-visible {
 
   .agent-workbench {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .agent-conversation {
+    height: clamp(500px, calc(100dvh - 176px), 680px);
     min-height: 0;
   }
 
   .agent-context {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    height: auto;
+    overflow: visible;
   }
 
   .agent-context-section + .agent-context-section {

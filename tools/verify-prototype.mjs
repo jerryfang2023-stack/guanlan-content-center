@@ -48,6 +48,11 @@ assert(!html.includes('class="agent-steps"') && !html.includes("Hermes API 尚�
 assert(!html.includes('id="agentPlan"') && !app.includes("renderAgentPlan") && !css.includes(".agent-plan"), "Removed Agent plan card must not remain in markup, logic, or styles");
 assert(html.includes('class="agent-composer-shell"') && html.includes('id="agentSendButton"'), "Chat-style Agent composer is incomplete");
 assert(css.includes(".agent-composer-shell") && css.includes("min-height: 52px") && css.includes("max-height: 140px") && !html.includes("agent-composer-foot"), "AI writing composer must stay compact and grow only for multiline input");
+assert(html.includes('id="agentThread" role="log"') && html.includes('aria-relevant="additions text"') && html.includes('tabindex="0"'), "Agent conversation log must be keyboard-scrollable and expose new messages accessibly");
+assert(app.includes("const AGENT_TOPIC_PREVIEW_LIMIT = 10") && functionSource("renderAgentContext").includes("candidates.slice(0, AGENT_TOPIC_PREVIEW_LIMIT)"), "Agent context must show at most ten daily topics");
+assert(css.includes(".agent-topic-list") && css.includes("max-height: none") && css.includes("overflow: visible") && css.includes("overscroll-behavior: contain") && css.includes("scrollbar-gutter: stable"), "Only the Agent conversation may use contained internal scrolling");
+assert(functionSource("renderAgentThread").includes("thread.scrollTop = thread.scrollHeight"), "Agent conversation must open at the newest message");
+assert(product.includes("长对话只在消息区内部滚动") && product.includes("输入区始终可达"), "Stable long-conversation behavior is missing from the product principles");
 assert(!html.includes("agentToolsMenu") && !html.includes("agentTaskList") && !html.includes("检查任务队列") && !html.includes("读取今日选题，安排"), "Preset writing tasks must stay removed");
 assert(!css.includes(".agent-task") && !app.includes("data-agent-task-id") && !server.includes("任务队列和对话"), "Legacy writing task queue must stay removed");
 assert(app.includes("function agentTopicDate()") && app.includes("topicDate: agentTopicDate()") && app.includes("candidates: agentTopicCandidates().map(agentTopicRequestPayload)") && !functionSource("agentTopicCandidates").includes(".slice("), "AI writing workbench must send the full real daily topic set");
@@ -80,7 +85,7 @@ assert(JSON.stringify(scriptOrder) === JSON.stringify([
   "assets/generated/manifest.js",
   "app.js",
 ]), `Unexpected script order: ${scriptOrder.join(" -> ")}`);
-assert(scriptSources.some((source) => /^app\.js\?v=20260716-ai-flow-50$/.test(source)), "Current app cache-busting version is missing");
+assert(scriptSources.some((source) => /^app\.js\?v=20260718-chat-panel-52$/.test(source)), "Current app cache-busting version is missing");
 assert(["titleGenerationStatus", "outlineGenerationStatus", "bodyGenerationStatus"].every((id) => html.includes(`id="${id}"`)), "DeepSeek writing generation status UI is incomplete");
 assert(html.includes('>生成标题</button>') && html.includes('>生成提纲</button>') && html.includes('>生成正文</button>'), "Writing generation action labels are incomplete");
 assert(!html.includes("DeepSeek"), "Writing steps must not expose the model provider");
