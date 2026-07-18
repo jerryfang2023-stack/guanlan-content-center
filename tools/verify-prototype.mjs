@@ -13,6 +13,7 @@ const html = read("index.html");
 const app = read("app.js");
 const css = read("style.css");
 const server = read("server.mjs");
+const radar = read("radar-v4-index.mjs");
 const product = read("PRODUCT.md");
 
 function functionSource(name) {
@@ -41,7 +42,7 @@ assert(html.includes('data-workspace-page="topics"') && html.includes('data-work
 assert(html.includes('data-workspace-page="editor"') && html.includes('data-page-panel="editor"') && html.includes("经典写作台"), "Legacy WeChat writer must remain available as a secondary transition entry");
 assert(html.includes('data-page="assets"') && html.includes('data-page-panel="assets"') && html.includes('id="contentAssetList"'), "Unified content assets page is missing");
 assert(app.includes("function contentAssetRecords()") && app.includes("function renderContentAssets()") && app.includes("function openContentAsset("), "Content asset lifecycle aggregation is incomplete");
-assert(["agentComposer", "agentPrompt", "agentTopicList", "agentStyleSelect", "agentStyleTrainer", "agentStyleReference", "agentHandoffButton"].every((id) => htmlIds.includes(id)), "AI writing workbench core regions are incomplete");
+assert(["agentComposer", "agentPrompt", "agentMaterialList", "agentRadarStatus", "agentStyleSelect", "agentStyleTrainer", "agentStyleReference", "agentHandoffButton"].every((id) => htmlIds.includes(id)), "AI writing workbench core regions are incomplete");
 assert(app.includes("function renderAgentWorkbench()") && app.includes("function applyAgentDraftResult(") && app.includes("function learnAgentWritingStyle(") && app.includes("function handoffAgentDraft("), "AI writing workbench interactions or legacy handoff are incomplete");
 assert(product.includes("## Core Page Principle") && product.includes("非必要不展示"), "Content Center core page principle is missing");
 assert(!html.includes('class="agent-steps"') && !html.includes("Hermes API 尚未连接") && !html.includes("EXECUTION PLAN"), "Agent workbench still contains redundant helper content");
@@ -49,13 +50,14 @@ assert(!html.includes('id="agentPlan"') && !app.includes("renderAgentPlan") && !
 assert(html.includes('class="agent-composer-shell"') && html.includes('id="agentSendButton"'), "Chat-style Agent composer is incomplete");
 assert(css.includes(".agent-composer-shell") && css.includes("min-height: 52px") && css.includes("max-height: 140px") && !html.includes("agent-composer-foot"), "AI writing composer must stay compact and grow only for multiline input");
 assert(html.includes('id="agentThread" role="log"') && html.includes('aria-relevant="additions text"') && html.includes('tabindex="0"'), "Agent conversation log must be keyboard-scrollable and expose new messages accessibly");
-assert(app.includes("const AGENT_TOPIC_PREVIEW_LIMIT = 10") && functionSource("renderAgentContext").includes("candidates.slice(0, AGENT_TOPIC_PREVIEW_LIMIT)"), "Agent context must show at most ten daily topics");
-assert(css.includes(".agent-topic-list") && css.includes("max-height: none") && css.includes("overflow: visible") && css.includes("overscroll-behavior: contain") && css.includes("scrollbar-gutter: stable"), "Only the Agent conversation may use contained internal scrolling");
+assert(app.includes("const AGENT_MATERIAL_PREVIEW_LIMIT = 5") && functionSource("renderAgentContext").includes("agentWorkspace.materials"), "Agent context must show a compact V4 material preview");
+assert(css.includes(".agent-material-list") && css.includes(".agent-material-item") && css.includes("overscroll-behavior: contain") && css.includes("scrollbar-gutter: stable"), "V4 material context or contained conversation scrolling is incomplete");
 assert(functionSource("renderAgentThread").includes("thread.scrollTop = thread.scrollHeight"), "Agent conversation must open at the newest message");
 assert(product.includes("长对话只在消息区内部滚动") && product.includes("输入区始终可达"), "Stable long-conversation behavior is missing from the product principles");
 assert(!html.includes("agentToolsMenu") && !html.includes("agentTaskList") && !html.includes("检查任务队列") && !html.includes("读取今日选题，安排"), "Preset writing tasks must stay removed");
 assert(!css.includes(".agent-task") && !app.includes("data-agent-task-id") && !server.includes("任务队列和对话"), "Legacy writing task queue must stay removed");
 assert(app.includes("function agentTopicDate()") && app.includes("topicDate: agentTopicDate()") && app.includes("candidates: agentTopicCandidates().map(agentTopicRequestPayload)") && !functionSource("agentTopicCandidates").includes(".slice("), "AI writing workbench must send the full real daily topic set");
+assert(app.includes("function ensureAgentMaterialTopic(") && app.includes("materials: (agentWorkspace.materials") && app.includes("selectedMaterialIds"), "V4 materials must be able to create a writing asset without entering Topic Center");
 assert(html.includes("让澜学习") && app.includes("/api/agent/style") && server.includes("/api/agent/style") && server.includes("CLAUDE_STYLE_SCHEMA"), "AI writing style learning flow is incomplete");
 assert(app.includes("writingStylesById[id] = { ...profile, id, isBuiltIn: false }"), "Learned writing styles must restore from local storage");
 assert(!html.includes("Hermes") && !app.includes("Hermes"), "Legacy Hermes labels must stay removed");
@@ -67,6 +69,8 @@ assert(!app.includes("Claude CLI：") && !app.includes('"CLI 已连接"') && !ap
 assert(app.includes('"/api/agent/health"') || app.includes("/api/agent/health"), "Claude Agent health endpoint is missing from the client");
 assert(app.includes("/api/agent/chat") && app.includes("/api/agent/draft") && app.includes("/api/agent/style"), "Writing assistant client endpoints are incomplete");
 assert(server.includes('"/api/agent/chat"') && server.includes('"/api/agent/draft"') && server.includes('"/api/agent/style"') && server.includes("CLAUDE_CLI_PATH"), "Claude CLI server bridge is incomplete");
+assert(server.includes('"/api/radar/status"') && server.includes('"/api/radar/search"') && server.includes('"/api/radar/sync"') && server.includes("createRadarV4Index"), "AI-Radar V4 server integration is incomplete");
+assert(radar.includes("node:sqlite") && radar.includes("CREATE VIRTUAL TABLE materials_fts USING fts5") && radar.includes("AI_RADAR_ROOT") && radar.includes("github-cache"), "AI-Radar V4 local-first, GitHub-cache, or SQLite FTS layer is incomplete");
 assert(!server.includes('"--system-prompt"') && !server.includes('"--append-system-prompt"'), "Claude CLI bridge must preserve the default system prompt without modification");
 assert(!server.includes('"--tools", ""') && !server.includes('"--safe-mode"') && !server.includes('"--bare"') && !server.includes('"--permission-mode"') && !server.includes('"--max-budget-usd"') && !server.includes('"--model"') && !server.includes('"--disallowedTools"'), "Claude CLI bridge must inherit the user's tools, permissions, model, budget, and customization configuration");
 assert(!server.includes("CLAUDE_AGENT_TIMEOUT_MS") && !server.includes("MAX_CLI_OUTPUT_BYTES") && !server.includes("claudeAgentBusy"), "Claude CLI tasks must not have app-imposed timeout, output, or concurrency limits");
@@ -85,7 +89,7 @@ assert(JSON.stringify(scriptOrder) === JSON.stringify([
   "assets/generated/manifest.js",
   "app.js",
 ]), `Unexpected script order: ${scriptOrder.join(" -> ")}`);
-assert(scriptSources.some((source) => /^app\.js\?v=20260718-chat-panel-52$/.test(source)), "Current app cache-busting version is missing");
+assert(scriptSources.some((source) => /^app\.js\?v=20260718-radar-v4-53$/.test(source)), "Current app cache-busting version is missing");
 assert(["titleGenerationStatus", "outlineGenerationStatus", "bodyGenerationStatus"].every((id) => html.includes(`id="${id}"`)), "DeepSeek writing generation status UI is incomplete");
 assert(html.includes('>生成标题</button>') && html.includes('>生成提纲</button>') && html.includes('>生成正文</button>'), "Writing generation action labels are incomplete");
 assert(!html.includes("DeepSeek"), "Writing steps must not expose the model provider");

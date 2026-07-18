@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "productVersion": "SITE-V4-test",
+    "generatedAt": "2026-07-18T00:00:00.000Z"
+  },
+  "events": [
+    {
+      "id": "EV-test-funding",
+      "date": "2026-07-18",
+      "eventType": "funding",
+      "eventTypeLabel": "融资",
+      "eventGroup": "融资与并购",
+      "publicationStatus": "verified",
+      "title": "测试企业完成融资，用于部署 AI 智能体",
+      "subject": "测试企业",
+      "action": "完成融资",
+      "object": "部署 AI 智能体",
+      "metrics": ["2400 万美元"],
+      "entityNames": ["测试企业"],
+      "sourceUrl": "https://example.com/funding",
+      "publisher": "测试来源"
+    },
+    {
+      "id": "EV-test-hardware",
+      "date": "2026-07-17",
+      "eventType": "hardware_release",
+      "eventTypeLabel": "硬件发布",
+      "eventGroup": "硬件与基础设施",
+      "publicationStatus": "verified",
+      "title": "测试公司发布推理芯片",
+      "subject": "测试公司",
+      "action": "发布",
+      "object": "推理芯片",
+      "entityNames": ["测试公司"],
+      "sourceUrl": "https://example.com/hardware",
+      "publisher": "测试来源"
+    }
+  ]
+}

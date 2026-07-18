@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createRadarV4Index } from "./radar-v4-index.mjs";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
 const PORT = Number(process.env.PORT || 8787);
@@ -35,6 +36,8 @@ async function loadLocalEnvironment() {
 await loadLocalEnvironment();
 
 const CLAUDE_CLI_PATH = process.env.CLAUDE_CLI_PATH || "claude";
+const radarV4 = createRadarV4Index({ root: ROOT });
+radarV4.warm();
 
 function allowedOrigin(origin) {
   if (!origin || origin === "null") return "null";
@@ -216,6 +219,30 @@ function normalizeAgentStyle(style) {
   };
 }
 
+function normalizeRadarMaterial(material) {
+  if (!material || typeof material !== "object") return null;
+  const id = agentText(material.id);
+  const title = agentText(material.title);
+  if (!id || !title) return null;
+  return {
+    id,
+    title,
+    originalTitle: agentText(material.originalTitle),
+    date: agentText(material.date),
+    updatedDate: agentText(material.updatedDate),
+    type: agentText(material.type),
+    typeKey: agentText(material.typeKey),
+    group: agentText(material.group),
+    status: agentText(material.status),
+    publisher: agentText(material.publisher),
+    sourceUrl: agentText(material.sourceUrl),
+    entities: (Array.isArray(material.entities) ? material.entities : []).map(agentText).filter(Boolean).slice(0, 20),
+    metrics: (Array.isArray(material.metrics) ? material.metrics : []).map(agentText).filter(Boolean).slice(0, 20),
+    tags: (Array.isArray(material.tags) ? material.tags : []).map(agentText).filter(Boolean).slice(0, 20),
+    summary: agentText(material.summary),
+  };
+}
+
 function normalizeAgentInput(input) {
   const candidates = (Array.isArray(input?.candidates) ? input.candidates : [])
     .map(normalizeAgentTopic)
@@ -231,6 +258,14 @@ function normalizeAgentInput(input) {
       text: agentText(message.text),
     }))
     .filter((message) => message.text);
+  const materials = (Array.isArray(input?.materials) ? input.materials : [])
+    .map(normalizeRadarMaterial)
+    .filter(Boolean)
+    .slice(0, 20);
+  const materialIds = new Set(materials.map((material) => material.id));
+  const selectedMaterialIds = (Array.isArray(input?.selectedMaterialIds) ? input.selectedMaterialIds : [])
+    .map(agentText)
+    .filter((id) => materialIds.has(id));
   return {
     prompt: agentText(input?.prompt),
     topicDate: agentText(input?.topicDate),
@@ -238,6 +273,8 @@ function normalizeAgentInput(input) {
     selectedTopic,
     style: normalizeAgentStyle(input?.style),
     messages,
+    materials,
+    selectedMaterialIds,
   };
 }
 
@@ -246,6 +283,10 @@ const CLAUDE_CHAT_SCHEMA = {
   properties: {
     reply: { type: "string" },
     selectedTopicId: { type: "string" },
+    selectedMaterialIds: {
+      type: "array",
+      items: { type: "string" },
+    },
     action: { type: "string", enum: ["none", "generate_draft"] },
   },
   required: ["reply", "action"],
@@ -355,21 +396,32 @@ async function chatWithClaudeAgent(input) {
     error.status = 400;
     throw error;
   }
-  if (!context.candidates.length) {
-    const error = new Error("今日没有可用选题");
-    error.status = 400;
-    throw error;
+  let radarSearch = { items: [], status: radarV4.getStatus() };
+  try {
+    radarSearch = await radarV4.search(context.prompt, { limit: 12 });
+  } catch {
+    radarSearch = { items: [], status: radarV4.getStatus() };
   }
+  const materialById = new Map();
+  [...context.materials, ...radarSearch.items].forEach((material) => {
+    const normalized = normalizeRadarMaterial(material);
+    if (normalized && !materialById.has(normalized.id)) materialById.set(normalized.id, normalized);
+  });
+  const materials = [...materialById.values()].slice(0, 12);
   const taskContext = [
     "你是观澜 AI 内容中心的写作搭档“澜”。",
     "这是内容中心提供的任务上下文，不替换 Claude Code 默认系统、CLAUDE.md、Skills、插件、Hooks、MCP、工具、权限模式、模型或用户设置。",
     "你可以按照用户现有 Claude CLI 配置，自主使用可用工具、文件、网络、插件、Skills、MCP 和子 Agent 完成请求。",
-    "candidates 是内容中心在 topicDate 下保存的每日选题；需要选题时可结合这些内容与其他可用能力进行判断。",
-    "页面需要结构化接收最终结果：reply 为给用户的回复；selectedTopicId 为页面应选中的选题；action 表示是否需要进入草稿生成。",
+    "radarMaterials 是根据用户本次指令从观澜数据观察台 V4 检索到的原始素材；优先基于这些素材判断，并保留日期、来源与链接。",
+    "candidates 是内容中心已有的每日选题，只作为补充，不是开始写作的前置条件。",
+    "页面需要结构化接收最终结果：reply 为给用户的回复；selectedMaterialIds 为建议采用的观察台素材；selectedTopicId 为需要沿用的已有选题；action 表示是否需要进入草稿生成。",
     "当回复明确推荐或切换某条候选选题时，让 selectedTopicId 与该选题保持一致。",
     "用户明确要求生成完整文章或草稿时，将 action 设为 generate_draft；其他请求设为 none。",
   ].join("\n");
-  const prompt = `${taskContext}\n\n用户本次指令与内容中心上下文如下：\n\n${JSON.stringify(context, null, 2)}`;
+  const prompt = `${taskContext}\n\n用户本次指令与内容中心上下文如下：\n\n${JSON.stringify({
+    ...context,
+    radarMaterials: materials,
+  }, null, 2)}`;
   return withClaudeAgent(async () => {
     const { stdout } = await runLocalCommand(CLAUDE_CLI_PATH, claudeCliArgs({
       schema: CLAUDE_CHAT_SCHEMA,
@@ -379,11 +431,18 @@ async function chatWithClaudeAgent(input) {
     const allowedIds = new Set(context.candidates.map((topic) => topic.id));
     const selectedTopicId = allowedIds.has(result.output.selectedTopicId)
       ? result.output.selectedTopicId
-      : context.selectedTopic?.id || context.candidates[0].id;
+      : context.selectedTopic?.id || context.candidates[0]?.id || "";
+    const allowedMaterialIds = new Set(materials.map((material) => material.id));
+    const selectedMaterialIds = (Array.isArray(result.output.selectedMaterialIds) ? result.output.selectedMaterialIds : [])
+      .map(agentText)
+      .filter((id) => allowedMaterialIds.has(id));
     return {
       reply: agentText(result.output.reply),
       selectedTopicId,
       action: result.output.action === "generate_draft" ? "generate_draft" : "none",
+      materials,
+      selectedMaterialIds: selectedMaterialIds.length ? selectedMaterialIds : materials.slice(0, 1).map((material) => material.id),
+      radar: radarSearch.status,
       provider: "claude-cli",
       model: result.model,
       usage: result.usage,
@@ -395,8 +454,10 @@ async function chatWithClaudeAgent(input) {
 async function draftWithClaudeAgent(input) {
   const context = normalizeAgentInput(input);
   const topic = context.selectedTopic;
-  if (!topic) {
-    const error = new Error("请先选择一条今日选题");
+  const selectedMaterialIdSet = new Set(context.selectedMaterialIds);
+  const materials = context.materials.filter((material) => !selectedMaterialIdSet.size || selectedMaterialIdSet.has(material.id));
+  if (!topic && !materials.length) {
+    const error = new Error("请先选择一条观察台素材或已有选题");
     error.status = 400;
     throw error;
   }
@@ -404,10 +465,11 @@ async function draftWithClaudeAgent(input) {
     "你是观澜 AI 的中文公众号作者。用户已经在对话中明确要求生成完整草稿。",
     "这是内容中心提供的写作任务上下文，不替换或削弱 Claude Code 默认能力与用户配置。",
     "你可以自主使用当前 Claude CLI 中可用的工具、文件、网络、插件、Skills、MCP 和子 Agent 调研、核对并完成文章。",
-    "结合当前选题、所选写作风格、最近对话以及你获得的有效信息，生成可交给人工编辑的完整 Markdown 草稿。",
+    "结合观察台 V4 素材、可选的已有选题、所选写作风格、最近对话以及你获得的有效信息，生成可交给人工编辑的完整 Markdown 草稿。",
     "页面需要结构化接收最终稿：title 为标题，outline 为章节标题数组，bodyMarkdown 为正文，reply 为交付说明。",
   ].join("\n");
-  const prompt = `${taskContext}\n\n当前选题、写作风格与最近对话如下：\n\n${JSON.stringify({
+  const prompt = `${taskContext}\n\n当前素材、选题、写作风格与最近对话如下：\n\n${JSON.stringify({
+    radarMaterials: materials,
     topic,
     style: context.style,
     recentConversation: context.messages,
@@ -872,6 +934,40 @@ const server = createServer(async (request, response) => {
   if (url.pathname === "/api/agent/health" && request.method === "GET") {
     const claude = await claudeCliHealth({ force: url.searchParams.get("refresh") === "1" });
     sendJson(response, claude.available && claude.loggedIn ? 200 : 503, claude, cors);
+    return;
+  }
+  if (url.pathname === "/api/radar/status" && request.method === "GET") {
+    const current = radarV4.getStatus();
+    sendJson(response, current.state === "error" ? 503 : 200, current, cors);
+    return;
+  }
+  if (url.pathname === "/api/radar/search" && request.method === "GET") {
+    try {
+      const result = await radarV4.search(url.searchParams.get("q") || "", {
+        limit: Number(url.searchParams.get("limit") || 12),
+      });
+      sendJson(response, 200, result, cors);
+    } catch (error) {
+      sendJson(response, 503, { error: cleanText(error?.message, 800), status: radarV4.getStatus(), items: [] }, cors);
+    }
+    return;
+  }
+  if (url.pathname.startsWith("/api/radar/material/") && request.method === "GET") {
+    try {
+      const material = await radarV4.getMaterial(decodeURIComponent(url.pathname.slice("/api/radar/material/".length)));
+      sendJson(response, material ? 200 : 404, material || { error: "未找到素材" }, cors);
+    } catch (error) {
+      sendJson(response, 503, { error: cleanText(error?.message, 800) }, cors);
+    }
+    return;
+  }
+  if (url.pathname === "/api/radar/sync" && request.method === "POST") {
+    if (!Object.keys(cors).length) return sendJson(response, 403, { error: "不允许的页面来源" });
+    try {
+      sendJson(response, 200, await radarV4.sync(), cors);
+    } catch (error) {
+      sendJson(response, 503, { error: cleanText(error?.message, 800), ...radarV4.getStatus() }, cors);
+    }
     return;
   }
   if (["/api/agent/chat", "/api/agent/draft", "/api/agent/style"].includes(url.pathname) && request.method === "POST") {

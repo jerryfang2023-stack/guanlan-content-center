@@ -622,6 +622,7 @@ const CLAUDE_AGENT_ENDPOINTS = {
   chat: `${DEEPSEEK_WRITING_API_BASE}/api/agent/chat`,
   draft: `${DEEPSEEK_WRITING_API_BASE}/api/agent/draft`,
   style: `${DEEPSEEK_WRITING_API_BASE}/api/agent/style`,
+  radarStatus: `${DEEPSEEK_WRITING_API_BASE}/api/radar/status`,
 };
 const WRITING_STEP_LABELS = {
   title: "定标题",
@@ -748,17 +749,21 @@ const writingGenerationInFlight = { title: false, outline: false, body: false };
 let imageGenerationInFlight = false;
 let workspaceSaveError = "";
 let agentWorkspace = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   provider: "claude-cli",
   selectedTopicId: "",
   selectedStyleId: defaultWritingStyleId,
   messages: [],
+  materials: [],
+  selectedMaterialIds: [],
 };
 let agentRequestInFlight = false;
 let agentConnectionStatus = "checking";
 let agentConnectionLabel = "检查中";
 let agentHealthChecked = false;
-const AGENT_TOPIC_PREVIEW_LIMIT = 10;
+let radarV4Status = { state: "loading", source: "", version: "", indexed: 0, total: 0, error: "" };
+let radarStatusRetryCount = 0;
+const AGENT_MATERIAL_PREVIEW_LIMIT = 5;
 const REVIEW_DECISION_LABELS = {
   continue: "继续写",
   rewrite: "改写再发",
@@ -904,7 +909,7 @@ if (restoredWorkspace?.version === 3) {
     const usesClaudeCli = restoredWorkspace.agent.provider === "claude-cli";
     const currentAgentSchema = Number(restoredWorkspace.agent.schemaVersion || 1) >= 2;
     agentWorkspace = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       provider: "claude-cli",
       selectedTopicId: String(restoredWorkspace.agent.selectedTopicId || ""),
       selectedStyleId: writingStylesById[restoredWorkspace.agent.selectedStyleId]
@@ -912,6 +917,12 @@ if (restoredWorkspace?.version === 3) {
         : defaultWritingStyleId,
       messages: usesClaudeCli && currentAgentSchema && Array.isArray(restoredWorkspace.agent.messages)
         ? restoredWorkspace.agent.messages.filter((message) => ["user", "assistant"].includes(message?.role) && message?.text)
+        : [],
+      materials: usesClaudeCli && Array.isArray(restoredWorkspace.agent.materials)
+        ? restoredWorkspace.agent.materials.filter((material) => material?.id && material?.title).slice(0, 12)
+        : [],
+      selectedMaterialIds: usesClaudeCli && Array.isArray(restoredWorkspace.agent.selectedMaterialIds)
+        ? restoredWorkspace.agent.selectedMaterialIds.map(String).slice(0, 6)
         : [],
     };
   }
@@ -5009,6 +5020,107 @@ function agentTopicCandidates() {
   });
 }
 
+function normalizeAgentMaterial(material) {
+  if (!material?.id || !material?.title) return null;
+  return {
+    id: String(material.id),
+    title: String(material.title),
+    originalTitle: String(material.originalTitle || ""),
+    date: normalizeDate(material.date || ""),
+    updatedDate: normalizeDate(material.updatedDate || ""),
+    type: String(material.type || "观察素材"),
+    typeKey: String(material.typeKey || ""),
+    group: String(material.group || ""),
+    status: String(material.status || ""),
+    publisher: String(material.publisher || "观澜数据观察台"),
+    sourceUrl: String(material.sourceUrl || ""),
+    entities: Array.isArray(material.entities) ? material.entities.map(String).slice(0, 20) : [],
+    metrics: Array.isArray(material.metrics) ? material.metrics.map(String).slice(0, 20) : [],
+    tags: Array.isArray(material.tags) ? material.tags.map(String).slice(0, 20) : [],
+    summary: String(material.summary || ""),
+  };
+}
+
+function selectedAgentMaterials() {
+  const selectedIds = new Set(agentWorkspace.selectedMaterialIds || []);
+  const materials = (agentWorkspace.materials || []).map(normalizeAgentMaterial).filter(Boolean);
+  const selected = materials.filter((material) => selectedIds.has(material.id));
+  return selected.length ? selected : materials.slice(0, 1);
+}
+
+function applyAgentMaterialResult(result) {
+  const materials = (Array.isArray(result?.materials) ? result.materials : [])
+    .map(normalizeAgentMaterial)
+    .filter(Boolean)
+    .slice(0, 12);
+  if (materials.length) agentWorkspace.materials = materials;
+  const availableIds = new Set((agentWorkspace.materials || []).map((material) => material.id));
+  const selectedIds = (Array.isArray(result?.selectedMaterialIds) ? result.selectedMaterialIds : [])
+    .map(String)
+    .filter((id) => availableIds.has(id))
+    .slice(0, 6);
+  agentWorkspace.selectedMaterialIds = selectedIds.length
+    ? selectedIds
+    : (agentWorkspace.materials || []).slice(0, 1).map((material) => material.id);
+  if (result?.radar && typeof result.radar === "object") radarV4Status = { ...radarV4Status, ...result.radar };
+}
+
+function ensureAgentMaterialTopic(material = selectedAgentMaterials()[0]) {
+  if (!material) return agentSelectedTopic();
+  const id = `radar-${material.id}`;
+  let topic = topics.find((item) => item.id === id);
+  if (!topic) {
+    const summary = material.summary || `${material.type} · ${material.publisher}`;
+    topic = {
+      id,
+      score: 90,
+      title: material.title,
+      articleTitleDraft: material.title,
+      source: `观澜数据观察台 V4 · ${material.publisher}`,
+      sourceDate: material.date,
+      scheduledDate: topicLocalDate(),
+      date: topicLocalDate(),
+      category: material.type || "观察素材",
+      valueTag: material.metrics[0] || material.group || "原始证据",
+      platform: "公众号主稿",
+      style: agentWritingStyle()?.publishedName || agentWritingStyle()?.name || "每周热点总结",
+      length: "中篇 / 1800-2400 字",
+      status: "queued",
+      worth: summary,
+      opinion: "由澜结合观察台原始证据形成判断。",
+      writingAngles: {
+        business: "这条变化会影响企业的预算、收入、成本或风险中的哪一项。",
+        process: "事件进入了哪个具体业务流程，输入、动作、输出和验收点分别是什么。",
+        organization: "谁会使用、负责或承担结果，组织协作需要怎样调整。",
+        asset: "哪些数据、知识、流程和案例可以沉淀为可复用资产。",
+      },
+      outline: "",
+      imagePrompt: "",
+      layout: "公众号主稿",
+      evidenceItems: [{
+        role: "观察台素材",
+        heading: material.title,
+        text: summary,
+        sourceName: material.publisher,
+        sourceUrl: material.sourceUrl,
+      }],
+      provenance: {
+        signalId: material.id,
+        sourceName: material.publisher,
+        sourceUrl: material.sourceUrl,
+        sourceObservedDate: material.date,
+        originalTitle: material.originalTitle,
+      },
+      radarMaterialId: material.id,
+    };
+    topics.push(topic);
+  }
+  agentWorkspace.selectedTopicId = topic.id;
+  selectedTopicId = topic.id;
+  queuedTopicId = topic.id;
+  return topic;
+}
+
 function agentSelectedTopic() {
   const candidates = agentTopicCandidates();
   const selected = topics.find((topic) => topic.id === agentWorkspace.selectedTopicId);
@@ -5097,24 +5209,43 @@ async function refreshClaudeAgentStatus({ force = false } = {}) {
   renderAgentConnection();
 }
 
+async function refreshRadarV4Status() {
+  try {
+    const response = await fetch(CLAUDE_AGENT_ENDPOINTS.radarStatus, {
+      headers: { "X-Content-Factory-Client": "content-factory-lite" },
+    });
+    const result = await response.json().catch(() => ({}));
+    radarV4Status = response.ok ? { ...radarV4Status, ...result } : { ...radarV4Status, state: "error", error: result?.error || "连接失败" };
+  } catch {
+    radarV4Status = { ...radarV4Status, state: "error", error: "连接失败" };
+  }
+  renderAgentContext();
+  if (["idle", "loading"].includes(radarV4Status.state) && radarStatusRetryCount < 10) {
+    radarStatusRetryCount += 1;
+    window.setTimeout(refreshRadarV4Status, 2500);
+  }
+}
+
 function renderAgentContext() {
-  const candidates = agentTopicCandidates();
-  const visibleCandidates = candidates.slice(0, AGENT_TOPIC_PREVIEW_LIMIT);
   const selected = agentSelectedTopic();
-  const topicList = document.querySelector("#agentTopicList");
-  const topicCount = document.querySelector("#agentTopicCount");
+  const materialList = document.querySelector("#agentMaterialList");
+  const radarStatus = document.querySelector("#agentRadarStatus");
   const styleSelect = document.querySelector("#agentStyleSelect");
   const contextFooter = document.querySelector("#agentContextFooter");
   const handoffButton = document.querySelector("#agentHandoffButton");
-  if (!topicList || !topicCount || !styleSelect || !contextFooter || !handoffButton) return;
+  if (!materialList || !radarStatus || !styleSelect || !contextFooter || !handoffButton) return;
 
-  topicCount.textContent = visibleCandidates.length ? `${formatDate(agentTopicDate())} · ${visibleCandidates.length} 条` : `${formatDate(agentTopicDate())} · 暂无选题`;
-  topicList.innerHTML = visibleCandidates.length ? visibleCandidates.map((topic) => `
-    <button class="agent-topic-item${topic.id === selected?.id ? " is-selected" : ""}" type="button" data-agent-topic-id="${escapeHtml(topic.id)}">
-      <span class="agent-topic-score">${topic.score}</span>
-      <span><strong>${escapeHtml(topic.title)}</strong><small>${escapeHtml(topic.category)} · ${escapeHtml(topic.valueTag)}</small></span>
-      <em>${escapeHtml(statusLabels[topic.status] || "待判断")}</em>
-    </button>`).join("") : '<p class="agent-empty-state">先去“今日选题”导入或新建选题。</p>';
+  const statusLabel = radarV4Status.state === "ready"
+    ? `V4 · ${Number(radarV4Status.indexed || radarV4Status.total || 0).toLocaleString("zh-CN")} 条`
+    : radarV4Status.state === "error" ? "V4 暂不可用" : "正在连接 V4…";
+  radarStatus.textContent = statusLabel;
+  const selectedMaterialIds = new Set(agentWorkspace.selectedMaterialIds || []);
+  const materials = (agentWorkspace.materials || []).slice(0, AGENT_MATERIAL_PREVIEW_LIMIT);
+  materialList.innerHTML = materials.length ? materials.map((material) => `
+    <button class="agent-material-item${selectedMaterialIds.has(material.id) ? " is-selected" : ""}" type="button" data-agent-material-id="${escapeHtml(material.id)}" aria-pressed="${selectedMaterialIds.has(material.id)}">
+      <span class="agent-material-title"><strong>${escapeHtml(material.title)}</strong><em>${selectedMaterialIds.has(material.id) ? "已采用" : "采用"}</em></span>
+      <small><span>${escapeHtml(formatDate(material.date))} · ${escapeHtml(material.type)}</span><span>${escapeHtml(material.publisher)}</span></small>
+    </button>`).join("") : '<p class="agent-empty-state">告诉澜想写什么，相关素材会出现在这里。</p>';
 
   const style = agentWritingStyle();
   const styles = publishedWritingStyles();
@@ -5183,6 +5314,8 @@ function agentRequestPayload(prompt = "") {
     selectedTopicId: selected?.id || "",
     selectedTopic: agentTopicRequestPayload(selected),
     candidates: agentTopicCandidates().map(agentTopicRequestPayload),
+    materials: (agentWorkspace.materials || []).map(normalizeAgentMaterial).filter(Boolean),
+    selectedMaterialIds: (agentWorkspace.selectedMaterialIds || []).slice(0, 6),
     style: agentStyleRequestPayload(),
     messages: agentWorkspace.messages.map(({ role, text }) => ({ role, text })),
   };
@@ -5242,12 +5375,14 @@ async function submitAgentInstruction(value) {
   setAgentRequestState(true, "思考中");
   try {
     const result = await requestClaudeAgent(CLAUDE_AGENT_ENDPOINTS.chat, payload);
+    applyAgentMaterialResult(result);
     if (agentTopicCandidates().some((topic) => topic.id === result.selectedTopicId)) {
       agentWorkspace.selectedTopicId = result.selectedTopicId;
       selectedTopicId = result.selectedTopicId;
     }
     appendAgentMessage("assistant", result.reply || "已处理。");
     if (result.action === "generate_draft") {
+      ensureAgentMaterialTopic();
       agentConnectionStatus = "working";
       agentConnectionLabel = "写作中";
       renderAgentWorkbench();
@@ -5610,6 +5745,7 @@ function setPage(page) {
   if (page === "agent") {
     renderAgentWorkbench();
     refreshClaudeAgentStatus();
+    refreshRadarV4Status();
   }
   if (page === "styles") renderWritingStyleLab();
   if (page === "assets") renderContentAssets();
@@ -5724,11 +5860,14 @@ document.querySelector("#agentStyleTrainer")?.addEventListener("submit", (event)
   event.preventDefault();
   learnAgentWritingStyle(document.querySelector("#agentStyleReference")?.value);
 });
-document.querySelector("#agentTopicList")?.addEventListener("click", (event) => {
-  const item = event.target.closest("[data-agent-topic-id]");
+document.querySelector("#agentMaterialList")?.addEventListener("click", (event) => {
+  const item = event.target.closest("[data-agent-material-id]");
   if (!item) return;
-  agentWorkspace.selectedTopicId = item.dataset.agentTopicId;
-  selectedTopicId = item.dataset.agentTopicId;
+  const id = item.dataset.agentMaterialId;
+  const selectedIds = new Set(agentWorkspace.selectedMaterialIds || []);
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  agentWorkspace.selectedMaterialIds = [...selectedIds].slice(0, 6);
   persistWorkspace();
   renderAgentWorkbench();
 });

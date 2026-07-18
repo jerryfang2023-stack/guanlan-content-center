@@ -3320,6 +3320,7 @@ textarea:focus-visible {
   grid-template-columns: minmax(0, 1.62fr) minmax(340px, .92fr);
   gap: 18px;
   align-items: stretch;
+  height: clamp(560px, calc(100dvh - 178px), 760px);
   min-height: 0;
 }
 
@@ -3339,8 +3340,9 @@ textarea:focus-visible {
 }
 
 .agent-context {
+  height: 100%;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .agent-profile {
@@ -3613,19 +3615,17 @@ textarea:focus-visible {
   line-height: 18px;
 }
 
-.agent-topic-list {
+.agent-material-list {
   display: grid;
   gap: 8px;
-  max-height: none;
-  overflow: visible;
 }
 
-.agent-topic-item {
+.agent-material-item {
   display: grid;
-  align-items: center;
-  gap: 9px;
+  gap: 4px;
   width: 100%;
-  padding: 10px;
+  min-height: 54px;
+  padding: 8px 10px;
   border: 1px solid rgba(7, 24, 39, .09);
   border-radius: 7px;
   color: var(--gl-ink);
@@ -3633,32 +3633,24 @@ textarea:focus-visible {
   text-align: left;
 }
 
-.agent-topic-item {
-  grid-template-columns: 34px minmax(0, 1fr) auto;
-}
-
-.agent-topic-item:hover,
-.agent-topic-item.is-selected {
+.agent-material-item:hover,
+.agent-material-item.is-selected {
   border-color: rgba(13, 53, 92, .22);
   background: #f7faff;
 }
 
-.agent-topic-item.is-selected {
+.agent-material-item.is-selected {
   box-shadow: inset 0 0 0 1px rgba(13, 53, 92, .07);
 }
 
-.agent-topic-score {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 7px;
-  color: var(--gl-blue);
-  background: rgba(13, 53, 92, .07);
-  font: 600 13px / 1 var(--gl-font-mono);
+.agent-material-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.agent-topic-item strong {
+.agent-material-item strong {
   display: block;
   overflow: hidden;
   color: var(--gl-ink);
@@ -3668,19 +3660,25 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
-.agent-topic-item small {
-  display: block;
-  margin-top: 2px;
+.agent-material-item small {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
   overflow: hidden;
   color: var(--gl-gray);
   font-size: 10px;
   line-height: 16px;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.agent-topic-item em {
-  color: var(--gl-gray);
+.agent-material-item small span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agent-material-item em {
+  flex: 0 0 auto;
+  color: var(--gl-blue);
   font: normal 600 10px / 16px var(--gl-font-sans-cn);
   white-space: nowrap;
 }
@@ -3763,7 +3761,7 @@ textarea:focus-visible {
   width: 100%;
 }
 
-.agent-topic-item:focus-visible,
+.agent-material-item:focus-visible,
 .agent-style-picker select:focus-visible,
 .agent-style-trainer textarea:focus-visible,
 .agent-send-button:focus-visible {

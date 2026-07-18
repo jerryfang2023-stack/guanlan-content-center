@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>观澜内容工厂 Lite v0.1</title>
-  <link rel="stylesheet" href="style.css?v=20260718-chat-panel-52">
+  <link rel="stylesheet" href="style.css?v=20260718-radar-v4-53">
 </head>
 <body>
   <div class="app-shell">
@@ -106,11 +106,13 @@
           <aside class="agent-context" aria-label="写作上下文">
             <section class="agent-context-section">
               <div class="agent-context-head">
-                <h2>今日选题</h2>
-                <button class="text-button" id="agentOpenTopicsButton" type="button">查看全部</button>
+                <h2>观察台素材</h2>
+                <button class="text-button" id="agentOpenTopicsButton" type="button">选题中心</button>
               </div>
-              <p class="agent-context-count" id="agentTopicCount">正在读取今日选题…</p>
-              <div class="agent-topic-list" id="agentTopicList"></div>
+              <p class="agent-context-count" id="agentRadarStatus" aria-live="polite">正在连接 V4…</p>
+              <div class="agent-material-list" id="agentMaterialList">
+                <p class="agent-empty-state">告诉澜想写什么，相关素材会出现在这里。</p>
+              </div>
             </section>
 
             <section class="agent-context-section">
@@ -788,6 +790,6 @@
   </div>
   <script src="data/topics-2026-07.js"></script>
   <script src="assets/generated/manifest.js"></script>
-  <script src="app.js?v=20260718-chat-panel-52"></script>
+  <script src="app.js?v=20260718-radar-v4-53"></script>
 </body>
 </html>
